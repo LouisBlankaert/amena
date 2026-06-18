@@ -1,0 +1,29 @@
+# Secrets — JAMAIS commiter
+Amena/Secrets.swift
+
+# Xcode
+*.xcworkspace
+!default.xcworkspace
+xcuserdata/
+*.xcuserstate
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+.DS_Store
+
+# Build
+build/
+DerivedData/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods (pas utilisé mais par précaution)
+Pods/
+Podfile.lock
+screenshots/
