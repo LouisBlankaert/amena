@@ -13,21 +13,37 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
     DEVELOPMENT_TEAM: ""
 
+packages:
+  FirebaseAnalytics:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "11.0.0"
+
 targets:
   Amena:
     type: application
     platform: iOS
     bundleId: com.louis.Amena
     sources:
-      - path: Amena
+      - path: .
+        excludes:
+          - "*.md"
+          - "*.yml"
+          - ".gitignore"
+          - "Amena.xcodeproj/**"
+          - "screenshots/**"
+          - ".git/**"
+          - ".DS_Store"
+    dependencies:
+      - package: FirebaseAnalytics
+        product: FirebaseAnalytics
     settings:
       base:
-        INFOPLIST_FILE: Amena/Info.plist
+        INFOPLIST_FILE: Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
         SWIFT_STRICT_CONCURRENCY: targeted
     info:
-      path: Amena/Info.plist
+      path: Info.plist
       properties:
         CFBundleName: Amena
         CFBundleDisplayName: Amena
