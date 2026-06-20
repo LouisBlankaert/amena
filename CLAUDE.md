@@ -18,42 +18,37 @@ Bundle identifier : com.louis.Amena
 - Target : iOS 16+
 - Xcode, Swift 6
 
-## Couleurs et design (copie fidèle de PrayerLock)
-- Couleur principale : orange (#F97316 ou similaire)
+## Couleurs et design (inspiré de PrayerLock, adapté avec palette bleue)
+- Couleur principale : bleu doux (#4B8BF5)
 - Fond : blanc (#FFFFFF) et gris très clair (#F9F9F9)
 - Texte : noir (#111111)
-- Bouton principal : rectangle orange arrondi, texte blanc, pleine largeur en bas
-- Bouton flottant : cercle orange avec flèche → (utilisé dans les slides d'intro)
+- Bouton principal : rectangle bleu arrondi, texte blanc, pleine largeur en bas
+- Bouton flottant : cercle bleu avec flèche → (utilisé dans les slides d'intro)
 - Style typographie : bold, lowercase pour les titres, sans-serif
-- Gradient fond : blanc → orange très pâle (#FFF5EE) pour certains écrans
+- Gradient fond : blanc → bleu très pâle (#EEF4FF) pour certains écrans
 
 ## Flow complet de l'onboarding (reproduire EXACTEMENT dans cet ordre)
 
 ### PARTIE 1 — Intro slides (swipeable, 3 slides, pas de bouton continue classique)
-- Bouton flottant circulaire orange avec → en bas à droite pour avancer
-- "signed in via web? sign in" en bas à gauche (lien texte orange)
-- Indicateur de slide en haut (3 points, le actif = pill orange)
+- Bouton flottant circulaire bleu avec → en bas à droite pour avancer
+- "already have an account? sign in" en bas à gauche (lien texte bleu)
+- Indicateur de slide en haut (3 points, le actif = pill bleue)
 
 **Slide 1 :**
-- Titre : "social media addiction is taking you away from **God.**" (God en orange)
-- Illustration : Jésus/figure spirituelle + mouton qui s'éloigne (adapter pour Islam : silhouette en prière ou mosquée)
+- Titre : "your screen is stealing the time you owe to **God**." (God en bleu)
 
 **Slide 2 :**
-- Titre : "**amena** can help you choose God first daily." (amena en orange)
-- Illustration : figure spirituelle tenant quelque chose (adapter)
+- Titre : "**amena** helps you put God before the scroll." (amena en bleu)
 
 **Slide 3 :**
-- Titre : "it's **simple.** once a day, we block your apps" (simple en orange)
-- 4 icônes apps verrouillées : Instagram, TikTok, Snapchat, X
-- Slide suivante automatique : "once you **pray**, your apps unlock" (pray en orange)
-- Mêmes 4 icônes mais déverrouillées (couleurs normales)
+- Titre : "the idea is **simple.** pray first, then unlock your apps." (simple en bleu)
 
-### PARTIE 2 — Questions personnalisation (chaque question = écran séparé, bouton "continue" orange en bas)
-- Barre de progression en haut (orange, s'incrémente à chaque écran)
+### PARTIE 2 — Questions personnalisation (chaque question = écran séparé, bouton "continue" bleu en bas)
+- Barre de progression en haut (bleue, s'incrémente à chaque écran)
 
 **Écran 1 — Prénom**
-- "ready to step out of the old and into the **new?**" (new en orange)
-- Aperçu visuel : grille 90 cases "90 day prayer journey - 0% Complete" avec date et "Your name"
+- "ready to build a habit that actually **changes you?**" (changes you en bleu)
+- Aperçu visuel : grille 30 cases "30 day prayer journey - 0% Complete" avec date et "Your name"
 - "what should we call you?" + TextField "enter your name"
 - Stocker dans UserDefaults clé "userName"
 
@@ -73,32 +68,32 @@ Bundle identifier : com.louis.Amena
 - Stocker dans UserDefaults clé "prayerFrequency"
 
 **Écran 5 — Résultat choc (calculé)**
-- Fond : blanc → orange pâle gradient
+- Fond : blanc → bleu pâle gradient
 - Emoji 🤯 en haut
-- "[userName], at this rate you're going to spend **X years** of your life on your phone."
+- "[userName], you're on track to spend **X years** staring at a screen."
 - Calcul : (dailyScreenTime heures × 365 jours × 50 ans de vie restante) / (24 × 365) = années
-- "X years" en orange, bold, grand
+- "X years" en bleu, bold, grand
 - Pas de question, juste "continue"
 
 **Écran 6 — Espoir (suite du résultat)**
-- Fond : blanc → orange pâle gradient
+- Fond : blanc → bleu pâle gradient
 - Illustration colombe blanche
-- "...but the good news is, we'll help you give"
-- "**X years back to God.**" (X = même chiffre, en orange, très grand)
+- "with amena, you could reclaim"
+- "**X years for God.**" (X = même chiffre, en bleu, très grand)
 
 **Écran 7 — Statistique inspirante**
-- Fond : blanc → orange pâle gradient
+- Fond : blanc → bleu pâle gradient
 - Illustration livre (Bible)
-- "you could read the entire **Bible** in X days." (Bible en orange)
-- Sous-titre gris : "if you traded your screen time for prayer time."
+- "you could read the entire **Bible** in X days." (Bible en bleu)
+- Sous-titre gris : "if you swapped half your screen time for prayer."
 - Calcul : Bible = ~77 000 mots, lecture ~200 mots/min → adapter selon screen time
 
 **Écran 8 — Relation avec God**
-- Fond : orange vif (plein écran)
+- Fond : bleu doux vif (plein écran)
 - Texte blanc : "how's your relationship with God today?"
 - Slider avec emoji qui change selon valeur (😔 → 😊 → 😇)
 - Label sous slider : "poor" / "okay" / "good" / "amazing"
-- Bouton "continue" blanc avec texte orange
+- Bouton "continue" blanc avec texte bleu
 
 **Écran 9 — Humeur du jour**
 - Fond : bleu ciel vif (#00BFFF)
@@ -121,11 +116,11 @@ Bundle identifier : com.louis.Amena
 - Sous-titre gris : "tap 'i've prayed today 🙏' once the prayer is complete"
 - Texte de la dua générée par Gemini API (appel API ici)
 - Bouton grisé au départ : "i've prayed today 🙏"
-- Le bouton devient orange après X secondes (temps de lecture estimé)
-- Lien : "share this prayer" (orange, avec icône partage)
+- Le bouton devient bleu après X secondes (temps de lecture estimé)
+- Lien : "share this prayer" (bleu, avec icône partage)
 
 **Écran 12 — Félicitations**
-- Titre orange : "congratulations!"
+- Titre bleu : "congratulations!"
 - Sous-titre : "you've completed your first prayer"
 - Carte récap de la prière (thème, date, début du texte, référence biblique)
 - Texte bas : "your prayers will be saved in your journal to help you build a stronger relationship with God."
@@ -134,14 +129,14 @@ Bundle identifier : com.louis.Amena
 **Écran 13 — Verset du jour**
 - Fond : dégradé bleu (#1a1a6e → #00BFFF)
 - "VERSE OF THE DAY" en petit caps
-- Carte blanche avec verset biblique centré + référence en orange
+- Carte blanche avec verset biblique centré + référence en bleu
 - Bouton partage (icône) en haut à droite
-- Bouton "continue" blanc avec texte orange
+- Bouton "continue" blanc avec texte bleu
 
 **Écran 14 — Heures de prière**
 - Titre : "set your prayer times"
 - Sous-titre gris : "your apps will lock at these times until you pray."
-- Lien orange : "👆 tap any time to edit it"
+- Lien bleu : "👆 tap any time to edit it"
 - Liste de 3 horaires par défaut (horaires de prière chrétiennes : matin, midi, soir ou personnalisé)
   chacun avec heure + "every day" + toggle ON
 - Bouton : "+ add prayer time"
@@ -158,17 +153,17 @@ Bundle identifier : com.louis.Amena
 ### PARTIE 4 — Paywall (après les notifications)
 
 **Écran Paywall**
-- En-tête : logo laurier "the #1 prayer habit app" + ⭐⭐⭐⭐⭐
-- Titre : "start your 3-day FREE trial to continue"
+- En-tête : logo laurier "your daily prayer companion" + ⭐⭐⭐⭐⭐
+- Titre : "try amena free for 3 days"
 - Timeline verticale avec 3 étapes :
   1. 🔓 **today** — "unlock all the app's features..."
   2. 🔔 **in 2 Days** — "we'll send you a reminder that your trial is ending soon."
   3. 👑 **in 3 Days** — "you'll be charged on [date J+3] unless you cancel anytime before."
 - 2 options d'abonnement :
   - weekly : 9,99€/week (pas mis en avant, fond gris)
-  - yearly : 1,73€/week (mis en avant, badge "3-day free trial", fond blanc avec bordure orange + checkmark orange)
+  - yearly : 1,73€/week (mis en avant, badge "3-day free trial", fond blanc avec bordure bleue + checkmark bleu)
 - ✓ "No Payment Due Now" avec emoji main pointant 👇
-- Bouton principal orange : "start my free trial"
+- Bouton principal bleu : "start my free trial"
 - Texte bas petit : "3 days free, then 89,99 €/year (1,73 €/week)"
 - Liens : Privacy • Terms
 
@@ -185,7 +180,7 @@ Bundle identifier : com.louis.Amena
 | com.louis.Amena.yearly        | Auto-renewable | 89,99€/an | 3 jours       |
 | com.louis.Amena.weekly        | Auto-renewable | 9,99€/sem | Aucun         |
 
-- **Yearly mis en avant visuellement** (badge "3-day free trial", checkmark, bordure orange)
+- **Yearly mis en avant visuellement** (badge "3-day free trial", checkmark, bordure bleue)
 - Weekly existe pour l'ancrage psychologique de prix uniquement
 
 ## Écran principal (après onboarding)
@@ -198,7 +193,7 @@ Bundle identifier : com.louis.Amena
 
 ### Vue Journal
 - Historique des prières (SwiftData)
-- Grille 90 jours avec cases remplies
+- Grille 30 jours avec cases remplies
 - Carte de chaque prière avec date, thème, référence
 
 ## Services et APIs
@@ -217,10 +212,6 @@ Bundle identifier : com.louis.Amena
 - `trial_started`
 - `subscription_purchased`
 
-### Superwall
-- SDK via Swift Package Manager : https://github.com/superwall/Superwall-iOS
-- Init dans AmenaApp.swift
-- Utiliser pour afficher le paywall au bon moment
 
 ## Architecture des fichiers
 ```
@@ -263,7 +254,6 @@ Amena/
 ```
 
 ## SDKs à installer via Swift Package Manager
-- Superwall : https://github.com/superwall/Superwall-iOS
 - Firebase : https://github.com/firebase/firebase-ios-sdk (FirebaseAnalytics + FirebaseCore)
 
 ## Ordre de développement
@@ -275,7 +265,7 @@ Amena/
 6. Paywall + StoreKit 2
 7. Notifications (UNUserNotificationCenter)
 8. Écran principal (Home + timer prière)
-9. Journal (SwiftData + grille 90 jours)
+9. Journal (SwiftData + grille 30 jours)
 10. Firebase Analytics (events)
 
 ## Style de travail

@@ -11,6 +11,9 @@ struct PaywallView: View {
     @State private var selectedPlan: SubscriptionPlan = .yearly
     @State private var showPostPaywall = false
     @State private var isPurchasing = false
+    @State private var isRestoring = false
+    @State private var restoreMessage = ""
+    @State private var purchasedPlan: SubscriptionPlan = .yearly
 
     // Date de fin d'essai = aujourd'hui + 3 jours
     private var trialEndDate: String {
@@ -22,7 +25,7 @@ struct PaywallView: View {
 
     var body: some View {
         if showPostPaywall {
-            PostPaywallView(onNext: onNext)
+            PostPaywallView(plan: purchasedPlan, onNext: onNext)
         } else {
             mainPaywall
         }
@@ -43,7 +46,7 @@ struct PaywallView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "laurel.leading")
                                 .foregroundColor(Color.amenaPrimary)
-                            Text("the #1 prayer habit app")
+                            Text("your daily prayer companion")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(Color.amenaText)
                             Image(systemName: "laurel.trailing")
@@ -59,16 +62,20 @@ struct PaywallView: View {
                     }
                     .padding(.top, 60)
 
-                    // Titre principal
-                    Text("start your 3-day FREE trial to continue")
+                    // Titre : adapté selon le plan
+                    Text(selectedPlan == .yearly ? "try amena free for 3 days" : "start praying today")
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 24)
+                        .animation(.easeInOut(duration: 0.2), value: selectedPlan)
 
-                    // Timeline verticale des 3 étapes
-                    TrialTimeline(trialEndDate: trialEndDate)
-                        .padding(.horizontal, 24)
+                    // Timeline : uniquement pour yearly (free trial)
+                    if selectedPlan == .yearly {
+                        TrialTimeline(trialEndDate: trialEndDate)
+                            .padding(.horizontal, 24)
+                            .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
 
                     // Options d'abonnement
                     VStack(spacing: 12) {
@@ -87,17 +94,18 @@ struct PaywallView: View {
                     }
                     .padding(.horizontal, 24)
 
-                    // Badge "No Payment Due Now"
-                    HStack(spacing: 6) {
-                        Text("✓")
-                            .foregroundColor(Color.amenaPrimary)
-                            .fontWeight(.bold)
-                        Text("No Payment Due Now")
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(Color.amenaText)
-                        Text("👇")
+                    // "No Payment Due Now" uniquement pour yearly
+                    if selectedPlan == .yearly {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(Color.amenaPrimary)
+                            Text("No Payment Due Now")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(Color.amenaText)
+                        }
+                        .transition(.opacity)
                     }
-                    .font(.system(size: 14))
 
                     // Bouton principal orange
                     Button {
@@ -112,13 +120,15 @@ struct PaywallView: View {
                                 .cornerRadius(16)
                                 .padding(.horizontal, 24)
                         } else {
-                            Text("start my free trial")
+                            Text(selectedPlan == .yearly ? "start my free trial" : "subscribe now")
                                 .amenaPrimaryButton()
                         }
                     }
 
-                    // Texte légal petit
-                    Text("3 days free, then 89,99 €/year (1,73 €/week)")
+                    // Texte légal adapté au plan
+                    Text(selectedPlan == .yearly
+                         ? "3 days free, then 89,99 €/year (1,73 €/week)"
+                         : "9,99 €/week — billed weekly, cancel anytime")
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -135,11 +145,46 @@ struct PaywallView: View {
                             .foregroundColor(Color.amenaTextSecondary)
                         Text("•")
                             .foregroundColor(Color.amenaTextSecondary)
-                        Button("Restore") {}
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.amenaTextSecondary)
+                        Button(isRestoring ? "Restoring..." : "Restore") {
+                            restorePurchases()
+                        }
+                        .font(.system(size: 12))
+                        .foregroundColor(Color.amenaTextSecondary)
+                        .disabled(isRestoring)
                     }
-                    .padding(.bottom, 40)
+                    if !restoreMessage.isEmpty {
+                        Text(restoreMessage)
+                            .font(.system(size: 12))
+                            .foregroundColor(StoreKitService.shared.isPremium ? .green : Color.amenaTextSecondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    Spacer().frame(height: 40)
+                }
+            }
+        }
+    }
+
+    private func restorePurchases() {
+        isRestoring = true
+        Task {
+            do {
+                try await StoreKitService.shared.restorePurchases()
+                await MainActor.run {
+                    isRestoring = false
+                    if StoreKitService.shared.isPremium {
+                        restoreMessage = "Purchase restored successfully!"
+                        // Redirige vers l'app après un court délai
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                            showPostPaywall = true
+                        }
+                    } else {
+                        restoreMessage = "No active subscription found."
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    isRestoring = false
+                    restoreMessage = "Restore failed. Please try again."
                 }
             }
         }
@@ -153,15 +198,24 @@ struct PaywallView: View {
                 try await StoreKitService.shared.purchase(plan: selectedPlan)
                 await MainActor.run {
                     isPurchasing = false
-                    // Essai démarré avec succès
+                    purchasedPlan = selectedPlan
                     AnalyticsService.shared.log(.trialStarted)
                     AnalyticsService.shared.log(.subscriptionPurchased(plan: selectedPlan.productId))
+                    // Rappel fin d'essai uniquement pour le plan yearly (weekly = paiement immédiat)
+                    if selectedPlan == .yearly {
+                        NotificationService.shared.scheduleTrialEndingReminder()
+                    }
                     showPostPaywall = true
+                }
+            } catch StoreKitError.userCancelled {
+                await MainActor.run {
+                    isPurchasing = false
+                    // L'utilisateur a annulé → on reste sur le paywall
                 }
             } catch {
                 await MainActor.run {
                     isPurchasing = false
-                    showPostPaywall = true
+                    // Erreur → on reste sur le paywall
                 }
             }
         }
@@ -312,6 +366,7 @@ struct PlanOptionCard: View {
 
 // Écran post-paywall : confirmation de démarrage de l'essai
 struct PostPaywallView: View {
+    let plan: SubscriptionPlan
     let onNext: () -> Void
 
     var body: some View {
@@ -321,41 +376,45 @@ struct PostPaywallView: View {
             VStack(spacing: 32) {
                 Spacer()
 
-                // Illustration cloche avec badge "1"
                 ZStack(alignment: .topTrailing) {
                     ZStack {
                         Circle()
                             .fill(Color.amenaOrangePale)
                             .frame(width: 120, height: 120)
-                        Image(systemName: "bell.fill")
+                        Image(systemName: plan == .yearly ? "bell.fill" : "checkmark.circle.fill")
                             .font(.system(size: 50))
                             .foregroundColor(Color.amenaPrimary)
                     }
-                    // Badge rouge "1"
-                    ZStack {
-                        Circle()
-                            .fill(.red)
-                            .frame(width: 24, height: 24)
-                        Text("1")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.white)
+                    if plan == .yearly {
+                        ZStack {
+                            Circle()
+                                .fill(.red)
+                                .frame(width: 24, height: 24)
+                            Text("1")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.white)
+                        }
                     }
                 }
 
                 VStack(spacing: 12) {
-                    Text("we'll send you a reminder before your free trial ends")
+                    Text(plan == .yearly
+                         ? "we'll send you a reminder before your free trial ends"
+                         : "you're all set! welcome to amena.")
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    HStack(spacing: 6) {
-                        Text("✓")
-                            .foregroundColor(Color.amenaPrimary)
-                            .fontWeight(.bold)
-                        Text("No Payment Due Now")
-                            .font(.system(size: 15, weight: .medium))
-                            .foregroundColor(Color.amenaText)
+                    if plan == .yearly {
+                        HStack(spacing: 6) {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(Color.amenaPrimary)
+                                .fontWeight(.bold)
+                            Text("No Payment Due Now")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(Color.amenaText)
+                        }
                     }
                 }
 
@@ -365,11 +424,13 @@ struct PostPaywallView: View {
                     Button {
                         onNext()
                     } label: {
-                        Text("continue for FREE")
+                        Text(plan == .yearly ? "continue for FREE" : "start praying")
                             .amenaPrimaryButton()
                     }
 
-                    Text("just 89,99 € per year (1,73 €/week)")
+                    Text(plan == .yearly
+                         ? "just 89,99 € per year (1,73 €/week)"
+                         : "9,99 €/week — cancel anytime")
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                 }

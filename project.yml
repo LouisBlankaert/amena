@@ -18,21 +18,34 @@ packages:
     url: https://github.com/firebase/firebase-ios-sdk
     from: "11.0.0"
 
+schemes:
+  Amena:
+    build:
+      targets:
+        Amena: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+    archive:
+      config: Release
+
 targets:
   Amena:
     type: application
     platform: iOS
     bundleId: com.louis.Amena
     sources:
-      - path: .
-        excludes:
-          - "*.md"
-          - "*.yml"
-          - ".gitignore"
-          - "Amena.xcodeproj/**"
-          - "screenshots/**"
-          - ".git/**"
-          - ".DS_Store"
+      - path: AmenaApp.swift
+      - path: ContentView.swift
+      - path: Secrets.swift
+      - path: GoogleService-Info.plist
+      - path: Extensions
+      - path: Main
+      - path: Models
+      - path: Onboarding
+      - path: Services
+      - path: Assets.xcassets
     dependencies:
       - package: FirebaseAnalytics
         product: FirebaseAnalytics

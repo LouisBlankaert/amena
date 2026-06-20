@@ -130,6 +130,9 @@ struct OnboardingCoordinator: View {
         UserDefaults.standard.set(dailyScreenTime, forKey: "dailyScreenTime")
         UserDefaults.standard.set(prayerFrequency, forKey: "prayerFrequency")
         UserDefaults.standard.set(sheepName, forKey: "sheepName")
+        // L'utilisateur a prié pendant l'onboarding → on marque aujourd'hui comme prié
+        var sm = StreakManager()
+        sm.markPrayedToday()
         // Onboarding terminé → event "onboarding_completed"
         AnalyticsService.shared.log(.onboardingCompleted)
         withAnimation {

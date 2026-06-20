@@ -2,17 +2,23 @@
 // @main = Swift sait que c'est ici que l'app démarre
 
 import SwiftUI
-import FirebaseCore  // Firebase doit être initialisé au démarrage de l'app
+import FirebaseCore
 
 @main
 struct AmenaApp: App {
-    // @UIApplicationDelegateAdaptor permet d'utiliser un AppDelegate en SwiftUI
-    // Nécessaire pour FirebaseApp.configure() qui doit être appelé dans didFinishLaunching
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+
+    // Stocke le listener pour éviter qu'il soit désalloué
+    // Il tourne en background pendant toute la vie de l'app
+    private let transactionListener = StoreKitService.shared.startTransactionListener()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .task {
+                    // Vérifie l'état de l'abonnement à chaque lancement
+                    await StoreKitService.shared.checkCurrentSubscription()
+                }
         }
     }
 }

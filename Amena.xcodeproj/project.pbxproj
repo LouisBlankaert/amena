@@ -7,90 +7,120 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		070CE1A38EA4EDAB3E788B52 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F5B5081DA64C45173410E2F /* Assets.xcassets */; };
-		09A1AB2DD262D9AB31525040 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1330005EC7632BC394BB67CB /* ContentView.swift */; };
-		109E161494780B7305FF8669 /* PrayerFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C65CA807A2C502333A4FC4A0 /* PrayerFrequencyView.swift */; };
-		14781CAE74636773E0439687 /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD6713154E1B48B5197C508 /* GeminiService.swift */; };
-		17BBCA6BAAB7DE92FBA05B11 /* PrayerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E04C025EE51406CEA422CA4 /* PrayerSession.swift */; };
-		1D3BF42170CF55589525206C /* FirstPrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933C4E42477A08C39C34C635 /* FirstPrayerView.swift */; };
-		360059571B55EBD1E9B1B3A5 /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E9DE964681D3D6435366DED /* NotificationsView.swift */; };
-		40012976197C81CD624285DD /* UserNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34787F0D3D4AC682BF533B33 /* UserNameView.swift */; };
-		46F2B48E94B9428FAE774F39 /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A55E53DBFB5FD5854666BB0D /* StoreKitService.swift */; };
-		4B405D38F2C5374199F8C6A4 /* CongratulationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D49359D8416784CCBF51729C /* CongratulationsView.swift */; };
-		608EE899DD037C13F7CAAA75 /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDEC162A1A838279D9FCC208 /* MascotView.swift */; };
-		664CB0F4CFFA6315F33CA4C1 /* IntroSlidesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AAAEFFF9FEBC6D644837A4C /* IntroSlidesView.swift */; };
-		739AE2C18D03BCC7BABB5D00 /* HopeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A74BBAE120090E62DEE75E56 /* HopeResultView.swift */; };
-		7F13CB731EA455757EAA2714 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C25B49B9B80D99C36524D6 /* HomeView.swift */; };
-		82D9E910BEE5F8A92E583455 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3AD45A353B0EEB662C41102 /* NotificationService.swift */; };
-		83A296C36759A6A2CDC15E62 /* BibleStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7BCF3205DAF8522DB7C2D54 /* BibleStatView.swift */; };
-		96938E425564C8546DD06FD7 /* RelationshipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D7AEB88398CD1A41337A34 /* RelationshipView.swift */; };
-		AF2B91F8B14728E7881A7F57 /* AmenaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAC899D02B0C00DB5950963E /* AmenaApp.swift */; };
-		B2E99E1E2D03F31A581EBC0A /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33A183CDA433F0C97AF7E4BF /* Color+Theme.swift */; };
-		B5304D5CCD2E18054110F03B /* ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054FDCFD61334B8B266F1AC6 /* ScreenTimeView.swift */; };
-		B865457C9F97B8DE1F5D11ED /* ShockResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B39531C3859268D9A8CCFDC5 /* ShockResultView.swift */; };
-		B90536F453EAF5BBC64C85B0 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FEF5490C062043C3C908294 /* OnboardingCoordinator.swift */; };
-		BDF7F076535AA18C780AEB8D /* PrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15CB343A0B1D37F69A368DE6 /* PrayerView.swift */; };
-		C0781A8ADD0C1168C492FBEA /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF8A1CBD385AD889046246C5 /* PaywallView.swift */; };
-		C1FE2EB490EE6FFA2E20D7C6 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E903DED5D714FCC3AE08C8B /* Secrets.swift */; };
-		C771FF74C188E70FC0C5E973 /* VerseOfDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5EBA4246F7D600D57A443F /* VerseOfDayView.swift */; };
-		E2E5B9EBFDEA200BAF3D896E /* StreakManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68B1368A8C47F13FC53BC57 /* StreakManager.swift */; };
-		E8AA22F2A6DB4E7EBF069FBA /* AgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EC817C99579D770FAA6D20 /* AgeView.swift */; };
-		F8298358B189312FAC2FCB5D /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A0366AFAA1F8B543B1AB01 /* JournalView.swift */; };
-		FBF68787911E357AA52EF270 /* MoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9959A7E0772B792D6B5C4813 /* MoodView.swift */; };
-		FC73333E7EE2491FF97DD5D1 /* PrayerTimesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28FD440E3DCC5538FEA9ED18 /* PrayerTimesView.swift */; };
+		009590A0E3DD15AC7C818D92 /* MoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */; };
+		06583FBB2FE60BDD00B56998 /* amena.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 06583FBA2FE60BDD00B56998 /* amena.storekit */; };
+		066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E90549F213EF3455992887 /* ShockResultView.swift */; };
+		0CFF48F9DE495304260420FC /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E5EB00CA35A5229336CF2D /* JournalView.swift */; };
+		0D592DC305E294614C2EA0C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */; };
+		0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43AB2DE206917B253CE21439 /* StoreKitService.swift */; };
+		21E0E112C634283154685EE7 /* PrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFB620370983A9F272D04E5 /* PrayerView.swift */; };
+		21F5FADEC07780F4DFDDB0A6 /* IntroSlidesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */; };
+		22F955099F1B44811C93CCED /* VerseOfDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7504D6CD9DEB6359D4D48F2 /* VerseOfDayView.swift */; };
+		263DAEB5F60C681C497E1621 /* RelationshipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF69552A2806DFB237933F3 /* RelationshipView.swift */; };
+		279C291AC1030A9E74662DAF /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C26F1394867841F292861CA0 /* NotificationsView.swift */; };
+		3B345C411CE33F61F16B21F0 /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F840521E63FE0634524C489C /* GeminiService.swift */; };
+		3DEEC4ED38D9715A5DD77AD2 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */; };
+		486E9466049ED8B7BEE0424E /* HopeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */; };
+		49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24E28D1032D7CE89103E118 /* NotificationService.swift */; };
+		58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */; };
+		62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */; };
+		725C67044AB00B0FC5A77D89 /* PrayerFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */; };
+		7D1CDFDBC765C865171572EB /* AgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EBDE961DF1E850A03458FD /* AgeView.swift */; };
+		9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933268950522EF66A869E983 /* PrayerSession.swift */; };
+		A6842FC9F689ECDB4CC8B1F6 /* PrayerTimesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50CBAF20C797189C2FB56C3 /* PrayerTimesView.swift */; };
+		A79C351F7EED54E5E6FBFCD6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */; };
+		AD2ABEC4837A165F2506DA25 /* BibleStatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6279CFF40C65B2C697121927 /* BibleStatView.swift */; };
+		B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E720D3060A661D2CD31D930 /* SettingsView.swift */; };
+		B6AA12DD112C5A00E96A4339 /* AmenaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55C7C36E537DD35761B285D /* AmenaApp.swift */; };
+		BA89CB232670315AB0759451 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301CE241AA504BA1D9D3F067 /* Secrets.swift */; };
+		BECEC2CF60F15EBC20AD9E53 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2C05680816AEEB8F0292D5 /* ContentView.swift */; };
+		C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843DB842DDC7065A16E943BA /* UserNameView.swift */; };
+		CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4645061C3785261078D504CD /* MascotView.swift */; };
+		DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */; };
+		DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */; };
+		DE881F67ABC0A7C34C537D77 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214D62A7895CB277DDDC601 /* HomeView.swift */; };
+		E5D81750BF5223CDA56500BB /* CongratulationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CFA121547A2DE367D91FE14 /* CongratulationsView.swift */; };
+		F3531A8BB456A27D88F2A056 /* StreakManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CC7DF638852D8A1970174 /* StreakManager.swift */; };
+		FB5D112998A2E093E0ED8C89 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */; };
+		FC139439C95194BE919787AB /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54090A82E29D64451FB45E71 /* PaywallView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		054FDCFD61334B8B266F1AC6 /* ScreenTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeView.swift; sourceTree = "<group>"; };
-		1330005EC7632BC394BB67CB /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		15CB343A0B1D37F69A368DE6 /* PrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerView.swift; sourceTree = "<group>"; };
-		1E9DE964681D3D6435366DED /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
-		20D7AEB88398CD1A41337A34 /* RelationshipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipView.swift; sourceTree = "<group>"; };
-		28FD440E3DCC5538FEA9ED18 /* PrayerTimesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerTimesView.swift; sourceTree = "<group>"; };
-		33A183CDA433F0C97AF7E4BF /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
-		34787F0D3D4AC682BF533B33 /* UserNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNameView.swift; sourceTree = "<group>"; };
-		3AAAEFFF9FEBC6D644837A4C /* IntroSlidesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSlidesView.swift; sourceTree = "<group>"; };
-		3E903DED5D714FCC3AE08C8B /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
-		40EC817C99579D770FAA6D20 /* AgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeView.swift; sourceTree = "<group>"; };
-		5750B9799AAB446B57156C91 /* Amena.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Amena.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6F5B5081DA64C45173410E2F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		7E04C025EE51406CEA422CA4 /* PrayerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerSession.swift; sourceTree = "<group>"; };
-		933C4E42477A08C39C34C635 /* FirstPrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPrayerView.swift; sourceTree = "<group>"; };
-		9959A7E0772B792D6B5C4813 /* MoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodView.swift; sourceTree = "<group>"; };
-		9DD6713154E1B48B5197C508 /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
-		9FEF5490C062043C3C908294 /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
-		A3AD45A353B0EEB662C41102 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		A55E53DBFB5FD5854666BB0D /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
-		A74BBAE120090E62DEE75E56 /* HopeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HopeResultView.swift; sourceTree = "<group>"; };
-		A7BCF3205DAF8522DB7C2D54 /* BibleStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleStatView.swift; sourceTree = "<group>"; };
-		AF2552D546E4E05C074FF9D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		B0C25B49B9B80D99C36524D6 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		B39531C3859268D9A8CCFDC5 /* ShockResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShockResultView.swift; sourceTree = "<group>"; };
-		BDEC162A1A838279D9FCC208 /* MascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotView.swift; sourceTree = "<group>"; };
-		C65CA807A2C502333A4FC4A0 /* PrayerFrequencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerFrequencyView.swift; sourceTree = "<group>"; };
-		CF8A1CBD385AD889046246C5 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
-		D49359D8416784CCBF51729C /* CongratulationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CongratulationsView.swift; sourceTree = "<group>"; };
-		D68B1368A8C47F13FC53BC57 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
-		D6A0366AFAA1F8B543B1AB01 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
-		EA5EBA4246F7D600D57A443F /* VerseOfDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerseOfDayView.swift; sourceTree = "<group>"; };
-		FAC899D02B0C00DB5950963E /* AmenaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmenaApp.swift; sourceTree = "<group>"; };
+		06583FBA2FE60BDD00B56998 /* amena.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = amena.storekit; sourceTree = "<group>"; };
+		0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodView.swift; sourceTree = "<group>"; };
+		137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPrayerView.swift; sourceTree = "<group>"; };
+		2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSlidesView.swift; sourceTree = "<group>"; };
+		2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
+		2EFB620370983A9F272D04E5 /* PrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerView.swift; sourceTree = "<group>"; };
+		301CE241AA504BA1D9D3F067 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		38EBDE961DF1E850A03458FD /* AgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeView.swift; sourceTree = "<group>"; };
+		3CFA121547A2DE367D91FE14 /* CongratulationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CongratulationsView.swift; sourceTree = "<group>"; };
+		43AB2DE206917B253CE21439 /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
+		45E5EB00CA35A5229336CF2D /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
+		4645061C3785261078D504CD /* MascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotView.swift; sourceTree = "<group>"; };
+		4D4CC7DF638852D8A1970174 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
+		54090A82E29D64451FB45E71 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		5750B9799AAB446B57156C91 /* Amena.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Amena.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6279CFF40C65B2C697121927 /* BibleStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleStatView.swift; sourceTree = "<group>"; };
+		6E720D3060A661D2CD31D930 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		7214D62A7895CB277DDDC601 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		843DB842DDC7065A16E943BA /* UserNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNameView.swift; sourceTree = "<group>"; };
+		90E90549F213EF3455992887 /* ShockResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShockResultView.swift; sourceTree = "<group>"; };
+		933268950522EF66A869E983 /* PrayerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerSession.swift; sourceTree = "<group>"; };
+		AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeView.swift; sourceTree = "<group>"; };
+		AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
+		B7504D6CD9DEB6359D4D48F2 /* VerseOfDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerseOfDayView.swift; sourceTree = "<group>"; };
+		BAF69552A2806DFB237933F3 /* RelationshipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipView.swift; sourceTree = "<group>"; };
+		BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
+		C26F1394867841F292861CA0 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
+		C55C7C36E537DD35761B285D /* AmenaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmenaApp.swift; sourceTree = "<group>"; };
+		CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerFrequencyView.swift; sourceTree = "<group>"; };
+		D24E28D1032D7CE89103E118 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		D50CBAF20C797189C2FB56C3 /* PrayerTimesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerTimesView.swift; sourceTree = "<group>"; };
+		DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HopeResultView.swift; sourceTree = "<group>"; };
+		EC2C05680816AEEB8F0292D5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F840521E63FE0634524C489C /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FE989D69209885785CAD7694 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0A54442141A1ECC95931EA43 = {
 			isa = PBXGroup;
 			children = (
-				9E1F26E55AFE6CA79A9B2EFA /* Amena */,
+				06583FBA2FE60BDD00B56998 /* amena.storekit */,
+				C55C7C36E537DD35761B285D /* AmenaApp.swift */,
+				36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */,
+				EC2C05680816AEEB8F0292D5 /* ContentView.swift */,
+				EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */,
+				301CE241AA504BA1D9D3F067 /* Secrets.swift */,
+				D4059CA7D5E533195809605C /* Extensions */,
+				BA0E3D0A01A29F76F649B5A6 /* Main */,
+				3F89B1F076A0594A63F04663 /* Models */,
+				A137B679C681289B348B8432 /* Onboarding */,
+				853D84B09C112C083669744B /* Services */,
 				4274A31F9F34384792F94272 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		1794C10279DC1306B8BF9049 /* Extensions */ = {
+		3F89B1F076A0594A63F04663 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				33A183CDA433F0C97AF7E4BF /* Color+Theme.swift */,
+				933268950522EF66A869E983 /* PrayerSession.swift */,
+				4D4CC7DF638852D8A1970174 /* StreakManager.swift */,
 			);
-			path = Extensions;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		4274A31F9F34384792F94272 /* Products */ = {
@@ -101,75 +131,59 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9E1F26E55AFE6CA79A9B2EFA /* Amena */ = {
+		853D84B09C112C083669744B /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				FAC899D02B0C00DB5950963E /* AmenaApp.swift */,
-				6F5B5081DA64C45173410E2F /* Assets.xcassets */,
-				1330005EC7632BC394BB67CB /* ContentView.swift */,
-				AF2552D546E4E05C074FF9D1 /* Info.plist */,
-				3E903DED5D714FCC3AE08C8B /* Secrets.swift */,
-				1794C10279DC1306B8BF9049 /* Extensions */,
-				F439E3381264850DAB2F49A0 /* Main */,
-				FAA586C778DE18EBBC618B07 /* Models */,
-				DF05A79D5CE51C7498D17D9F /* Onboarding */,
-				DF9FA39734E8085B6A21ED4D /* Services */,
-			);
-			path = Amena;
-			sourceTree = "<group>";
-		};
-		DF05A79D5CE51C7498D17D9F /* Onboarding */ = {
-			isa = PBXGroup;
-			children = (
-				40EC817C99579D770FAA6D20 /* AgeView.swift */,
-				A7BCF3205DAF8522DB7C2D54 /* BibleStatView.swift */,
-				D49359D8416784CCBF51729C /* CongratulationsView.swift */,
-				933C4E42477A08C39C34C635 /* FirstPrayerView.swift */,
-				A74BBAE120090E62DEE75E56 /* HopeResultView.swift */,
-				3AAAEFFF9FEBC6D644837A4C /* IntroSlidesView.swift */,
-				BDEC162A1A838279D9FCC208 /* MascotView.swift */,
-				9959A7E0772B792D6B5C4813 /* MoodView.swift */,
-				1E9DE964681D3D6435366DED /* NotificationsView.swift */,
-				9FEF5490C062043C3C908294 /* OnboardingCoordinator.swift */,
-				CF8A1CBD385AD889046246C5 /* PaywallView.swift */,
-				C65CA807A2C502333A4FC4A0 /* PrayerFrequencyView.swift */,
-				28FD440E3DCC5538FEA9ED18 /* PrayerTimesView.swift */,
-				20D7AEB88398CD1A41337A34 /* RelationshipView.swift */,
-				054FDCFD61334B8B266F1AC6 /* ScreenTimeView.swift */,
-				B39531C3859268D9A8CCFDC5 /* ShockResultView.swift */,
-				34787F0D3D4AC682BF533B33 /* UserNameView.swift */,
-				EA5EBA4246F7D600D57A443F /* VerseOfDayView.swift */,
-			);
-			path = Onboarding;
-			sourceTree = "<group>";
-		};
-		DF9FA39734E8085B6A21ED4D /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				9DD6713154E1B48B5197C508 /* GeminiService.swift */,
-				A3AD45A353B0EEB662C41102 /* NotificationService.swift */,
-				A55E53DBFB5FD5854666BB0D /* StoreKitService.swift */,
+				BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */,
+				F840521E63FE0634524C489C /* GeminiService.swift */,
+				D24E28D1032D7CE89103E118 /* NotificationService.swift */,
+				43AB2DE206917B253CE21439 /* StoreKitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		F439E3381264850DAB2F49A0 /* Main */ = {
+		A137B679C681289B348B8432 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
-				B0C25B49B9B80D99C36524D6 /* HomeView.swift */,
-				D6A0366AFAA1F8B543B1AB01 /* JournalView.swift */,
-				15CB343A0B1D37F69A368DE6 /* PrayerView.swift */,
+				38EBDE961DF1E850A03458FD /* AgeView.swift */,
+				6279CFF40C65B2C697121927 /* BibleStatView.swift */,
+				3CFA121547A2DE367D91FE14 /* CongratulationsView.swift */,
+				137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */,
+				DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */,
+				2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */,
+				4645061C3785261078D504CD /* MascotView.swift */,
+				0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */,
+				C26F1394867841F292861CA0 /* NotificationsView.swift */,
+				AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */,
+				54090A82E29D64451FB45E71 /* PaywallView.swift */,
+				CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */,
+				D50CBAF20C797189C2FB56C3 /* PrayerTimesView.swift */,
+				BAF69552A2806DFB237933F3 /* RelationshipView.swift */,
+				AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */,
+				90E90549F213EF3455992887 /* ShockResultView.swift */,
+				843DB842DDC7065A16E943BA /* UserNameView.swift */,
+				B7504D6CD9DEB6359D4D48F2 /* VerseOfDayView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		BA0E3D0A01A29F76F649B5A6 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				7214D62A7895CB277DDDC601 /* HomeView.swift */,
+				45E5EB00CA35A5229336CF2D /* JournalView.swift */,
+				2EFB620370983A9F272D04E5 /* PrayerView.swift */,
+				6E720D3060A661D2CD31D930 /* SettingsView.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
 		};
-		FAA586C778DE18EBBC618B07 /* Models */ = {
+		D4059CA7D5E533195809605C /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				7E04C025EE51406CEA422CA4 /* PrayerSession.swift */,
-				D68B1368A8C47F13FC53BC57 /* StreakManager.swift */,
+				2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */,
 			);
-			path = Models;
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -181,6 +195,7 @@
 			buildPhases = (
 				0AC3B65D1049E974C3165517 /* Sources */,
 				DD7CCE4A14C18F5DB94B3A83 /* Resources */,
+				FE989D69209885785CAD7694 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -188,6 +203,7 @@
 			);
 			name = Amena;
 			packageProductDependencies = (
+				0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */,
 			);
 			productName = Amena;
 			productReference = 5750B9799AAB446B57156C91 /* Amena.app */;
@@ -203,7 +219,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					5D2A857DDC4D45F0495FBC3D = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -217,6 +232,9 @@
 			);
 			mainGroup = 0A54442141A1ECC95931EA43;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4274A31F9F34384792F94272 /* Products */;
 			projectDirPath = "";
@@ -232,7 +250,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				070CE1A38EA4EDAB3E788B52 /* Assets.xcassets in Resources */,
+				0D592DC305E294614C2EA0C0 /* Assets.xcassets in Resources */,
+				06583FBB2FE60BDD00B56998 /* amena.storekit in Resources */,
+				A79C351F7EED54E5E6FBFCD6 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,36 +263,38 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8AA22F2A6DB4E7EBF069FBA /* AgeView.swift in Sources */,
-				AF2B91F8B14728E7881A7F57 /* AmenaApp.swift in Sources */,
-				83A296C36759A6A2CDC15E62 /* BibleStatView.swift in Sources */,
-				B2E99E1E2D03F31A581EBC0A /* Color+Theme.swift in Sources */,
-				4B405D38F2C5374199F8C6A4 /* CongratulationsView.swift in Sources */,
-				09A1AB2DD262D9AB31525040 /* ContentView.swift in Sources */,
-				1D3BF42170CF55589525206C /* FirstPrayerView.swift in Sources */,
-				14781CAE74636773E0439687 /* GeminiService.swift in Sources */,
-				7F13CB731EA455757EAA2714 /* HomeView.swift in Sources */,
-				739AE2C18D03BCC7BABB5D00 /* HopeResultView.swift in Sources */,
-				664CB0F4CFFA6315F33CA4C1 /* IntroSlidesView.swift in Sources */,
-				F8298358B189312FAC2FCB5D /* JournalView.swift in Sources */,
-				608EE899DD037C13F7CAAA75 /* MascotView.swift in Sources */,
-				FBF68787911E357AA52EF270 /* MoodView.swift in Sources */,
-				82D9E910BEE5F8A92E583455 /* NotificationService.swift in Sources */,
-				360059571B55EBD1E9B1B3A5 /* NotificationsView.swift in Sources */,
-				B90536F453EAF5BBC64C85B0 /* OnboardingCoordinator.swift in Sources */,
-				C0781A8ADD0C1168C492FBEA /* PaywallView.swift in Sources */,
-				109E161494780B7305FF8669 /* PrayerFrequencyView.swift in Sources */,
-				17BBCA6BAAB7DE92FBA05B11 /* PrayerSession.swift in Sources */,
-				FC73333E7EE2491FF97DD5D1 /* PrayerTimesView.swift in Sources */,
-				BDF7F076535AA18C780AEB8D /* PrayerView.swift in Sources */,
-				96938E425564C8546DD06FD7 /* RelationshipView.swift in Sources */,
-				B5304D5CCD2E18054110F03B /* ScreenTimeView.swift in Sources */,
-				C1FE2EB490EE6FFA2E20D7C6 /* Secrets.swift in Sources */,
-				B865457C9F97B8DE1F5D11ED /* ShockResultView.swift in Sources */,
-				46F2B48E94B9428FAE774F39 /* StoreKitService.swift in Sources */,
-				E2E5B9EBFDEA200BAF3D896E /* StreakManager.swift in Sources */,
-				40012976197C81CD624285DD /* UserNameView.swift in Sources */,
-				C771FF74C188E70FC0C5E973 /* VerseOfDayView.swift in Sources */,
+				7D1CDFDBC765C865171572EB /* AgeView.swift in Sources */,
+				B6AA12DD112C5A00E96A4339 /* AmenaApp.swift in Sources */,
+				3DEEC4ED38D9715A5DD77AD2 /* AnalyticsService.swift in Sources */,
+				AD2ABEC4837A165F2506DA25 /* BibleStatView.swift in Sources */,
+				FB5D112998A2E093E0ED8C89 /* Color+Theme.swift in Sources */,
+				E5D81750BF5223CDA56500BB /* CongratulationsView.swift in Sources */,
+				BECEC2CF60F15EBC20AD9E53 /* ContentView.swift in Sources */,
+				58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */,
+				3B345C411CE33F61F16B21F0 /* GeminiService.swift in Sources */,
+				DE881F67ABC0A7C34C537D77 /* HomeView.swift in Sources */,
+				486E9466049ED8B7BEE0424E /* HopeResultView.swift in Sources */,
+				21F5FADEC07780F4DFDDB0A6 /* IntroSlidesView.swift in Sources */,
+				0CFF48F9DE495304260420FC /* JournalView.swift in Sources */,
+				CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */,
+				009590A0E3DD15AC7C818D92 /* MoodView.swift in Sources */,
+				49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */,
+				279C291AC1030A9E74662DAF /* NotificationsView.swift in Sources */,
+				DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */,
+				FC139439C95194BE919787AB /* PaywallView.swift in Sources */,
+				725C67044AB00B0FC5A77D89 /* PrayerFrequencyView.swift in Sources */,
+				9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */,
+				A6842FC9F689ECDB4CC8B1F6 /* PrayerTimesView.swift in Sources */,
+				21E0E112C634283154685EE7 /* PrayerView.swift in Sources */,
+				263DAEB5F60C681C497E1621 /* RelationshipView.swift in Sources */,
+				DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */,
+				BA89CB232670315AB0759451 /* Secrets.swift in Sources */,
+				B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */,
+				066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */,
+				0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */,
+				F3531A8BB456A27D88F2A056 /* StreakManager.swift in Sources */,
+				C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */,
+				22F955099F1B44811C93CCED /* VerseOfDayView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +307,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = Amena/Info.plist;
+				DEVELOPMENT_TEAM = J55DB3RJLY;
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -362,7 +385,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				INFOPLIST_FILE = Amena/Info.plist;
+				DEVELOPMENT_TEAM = J55DB3RJLY;
+				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -462,6 +486,25 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 303340D9292B0FBFAD721B8E /* Project object */;
 }

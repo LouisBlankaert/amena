@@ -1,6 +1,6 @@
 // Écran 11 : première prière dans l'onboarding
-// Le texte de prière est généré par Gemini API
-// Le bouton de confirmation devient orange après un délai (temps de lecture)
+// Le texte apparaît lettre par lettre (effet machine à écrire)
+// Le bouton s'active automatiquement quand la dernière lettre s'affiche
 
 import SwiftUI
 import FirebaseAnalytics
@@ -9,32 +9,30 @@ struct FirstPrayerView: View {
     @Binding var prayer: String
     let onNext: () -> Void
 
-    // @State pour l'état local de cet écran
-    @State private var isLoading = true           // Chargement en cours
-    @State private var isPrayButtonEnabled = false // Bouton actif après délai
-    @State private var timeRemaining = 30         // Secondes avant activation
-    @State private var timerTask: Task<Void, Never>?
+    @State private var isLoading = true
+    @State private var isPrayButtonEnabled = false
+    @State private var displayedText = ""
+    @State private var animationTask: Task<Void, Never>?
 
     var body: some View {
         ZStack {
             Color.amenaBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // En-tête
                 VStack(spacing: 8) {
                     Text("let's pray")
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .padding(.top, 60)
 
-                    Text("tap 'i've prayed today 🙏' once the prayer is complete")
+                    Text("read the prayer, then tap the button below")
                         .font(.system(size: 14))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
+
                 }
 
-                // Texte de la prière ou indicateur de chargement
                 ScrollView {
                     VStack(spacing: 24) {
                         if isLoading {
@@ -49,39 +47,30 @@ struct FirstPrayerView: View {
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 60)
                         } else {
-                            // Texte de la prière dans une carte
-                            VStack(alignment: .leading, spacing: 16) {
-                                Text(prayer)
-                                    .font(.system(size: 17))
+                            VStack(alignment: .leading, spacing: 0) {
+                                (Text(displayedText)
                                     .foregroundColor(Color.amenaText)
-                                    .lineSpacing(6)
-                                    .multilineTextAlignment(.leading)
+                                 + Text(isPrayButtonEnabled ? "" : "▌")
+                                    .foregroundColor(Color.amenaPrimary))
+                                .font(.system(size: 18, design: .serif))
+                                .lineSpacing(10)
+                                .multilineTextAlignment(.leading)
+                                .animation(nil, value: displayedText)
                             }
-                            .padding(20)
-                            .background(Color.amenaSecondaryBackground)
-                            .cornerRadius(16)
-                            .padding(.horizontal, 24)
-
-                            // Compteur si le bouton n'est pas encore actif
-                            if !isPrayButtonEnabled {
-                                Text("Button activates in \(timeRemaining)s...")
-                                    .font(.system(size: 13))
-                                    .foregroundColor(Color.amenaTextSecondary)
-                            }
+                            .padding(.horizontal, 28)
                         }
                     }
                     .padding(.top, 24)
                     .padding(.bottom, 120)
                 }
 
-                // Boutons en bas
                 VStack(spacing: 12) {
-                    // Bouton principal (grisé puis orange)
                     Button {
                         AnalyticsService.shared.log(.prayerCompleted)
+                        savePrayerToJournal()
                         onNext()
                     } label: {
-                        Text("i've prayed today 🙏")
+                        Text("i've prayed today")
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -91,20 +80,18 @@ struct FirstPrayerView: View {
                             .padding(.horizontal, 24)
                     }
                     .disabled(!isPrayButtonEnabled)
-                    .animation(.easeInOut(duration: 0.3), value: isPrayButtonEnabled)
+                    .animation(.easeInOut(duration: 0.4), value: isPrayButtonEnabled)
 
-                    // Lien partage
-                    Button {
-                        sharePrayer()
-                    } label: {
-                        HStack(spacing: 6) {
-                            Image(systemName: "square.and.arrow.up")
-                            Text("share this prayer")
+                    if isPrayButtonEnabled {
+                        ShareLink(item: prayer) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "square.and.arrow.up")
+                                Text("share this prayer")
+                            }
+                            .font(.system(size: 15))
+                            .foregroundColor(Color.amenaPrimary)
                         }
-                        .font(.system(size: 15))
-                        .foregroundColor(Color.amenaPrimary)
                     }
-                    .opacity(isLoading ? 0 : 1)
                 }
                 .padding(.bottom, 48)
             }
@@ -114,63 +101,62 @@ struct FirstPrayerView: View {
             loadPrayer()
         }
         .onDisappear {
-            timerTask?.cancel()
+            animationTask?.cancel()
         }
     }
 
-    // Charge la prière depuis Gemini API
+    private func savePrayerToJournal() {
+        guard !prayer.isEmpty else { return }
+        var entries: [PrayerEntry] = []
+        if let data = UserDefaults.standard.data(forKey: "prayerJournal"),
+           let decoded = try? JSONDecoder().decode([PrayerEntry].self, from: data) {
+            entries = decoded
+        }
+        let entry = PrayerEntry(id: UUID(), text: prayer, date: Date())
+        entries.insert(entry, at: 0)
+        if let encoded = try? JSONEncoder().encode(entries) {
+            UserDefaults.standard.set(encoded, forKey: "prayerJournal")
+        }
+    }
+
     private func loadPrayer() {
         Task {
-            // MainActor.run = met à jour l'UI sur le thread principal (obligatoire en SwiftUI)
             do {
-                let generatedPrayer = try await GeminiService.shared.generatePrayer()
+                let generated = try await GeminiService.shared.generatePrayer()
                 await MainActor.run {
-                    prayer = generatedPrayer
+                    prayer = generated
                     isLoading = false
-                    startReadingTimer()
+                    startTypewriter()
                 }
             } catch {
+                print("⚠️ Gemini fallback: \(error)")
                 await MainActor.run {
                     prayer = GeminiService.fallbackPrayer
                     isLoading = false
-                    startReadingTimer()
+                    startTypewriter()
                 }
             }
         }
     }
 
-    // Démarre un countdown async qui active le bouton après X secondes
-    private func startReadingTimer() {
-        let wordCount = prayer.split(separator: " ").count
-        timeRemaining = max(15, wordCount / 3)
-
-        // Task @MainActor : la boucle s'exécute sur le thread principal (UI-safe)
-        timerTask = Task { @MainActor in
-            while timeRemaining > 0 {
-                // try? pour ignorer l'annulation silencieusement
-                try? await Task.sleep(nanoseconds: 1_000_000_000)  // 1 seconde
+    // Effet machine à écrire : ajoute une lettre toutes les 30ms
+    // Quand toutes les lettres sont affichées → active le bouton
+    private func startTypewriter() {
+        displayedText = ""
+        animationTask = Task { @MainActor in
+            for character in prayer {
                 if Task.isCancelled { return }
-                timeRemaining -= 1
+                displayedText.append(character)
+                // 30ms par caractère — ajuster ici pour accélérer/ralentir
+                try? await Task.sleep(nanoseconds: 30_000_000)
             }
-            withAnimation {
+            // Animation terminée → bouton actif
+            withAnimation(.easeInOut(duration: 0.4)) {
                 isPrayButtonEnabled = true
             }
         }
     }
 
-    // Ouvre le partage natif iOS (UIActivityViewController)
-    private func sharePrayer() {
-        guard !prayer.isEmpty else { return }
-        let activityVC = UIActivityViewController(
-            activityItems: [prayer],
-            applicationActivities: nil
-        )
-        // Récupère la scène active pour présenter le partage
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
-    }
 }
 
 #Preview {
