@@ -6,6 +6,9 @@ GoogleService-Info.plist
 CLAUDE.md
 CAHIER_DES_CHARGES.md
 
+# Fichiers sources originaux (MP4, images brutes)
+_source/
+
 # Xcode
 *.xcworkspace
 !default.xcworkspace
