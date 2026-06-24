@@ -2,6 +2,7 @@
 // Affiche le statut de prière du jour, le streak, et la mascotte mouton
 
 import SwiftUI
+import AVKit
 
 struct HomeView: View {
     // Lecture des données stockées dans UserDefaults
@@ -17,6 +18,9 @@ struct HomeView: View {
 
     @State private var streakManager = StreakManager()
     @State private var showSettings  = false
+    @AppStorage("completedCycles") private var completedCycles: Int = 0
+    @State private var showCycleBanner = false
+    @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
 
     // Niveau et % FAITH calculés dynamiquement depuis totalPrayers
     private var levelData: (level: Int, faithPercent: Double) {
@@ -60,6 +64,15 @@ struct HomeView: View {
                         )
                         .padding(.horizontal, 24)
 
+                        // Bannière cycle complet (30 jours)
+                        if showCycleBanner {
+                            CycleCompletedBanner(
+                                cycleNumber: completedCycles,
+                                onDismiss: { showCycleBanner = false }
+                            )
+                            .padding(.horizontal, 24)
+                        }
+
                         // Carte mascotte mouton
                         SheepStatusCard(
                             sheepName: sheepName,
@@ -68,7 +81,7 @@ struct HomeView: View {
                         )
                         .padding(.horizontal, 24)
 
-                        // Grille 90 jours (aperçu compact)
+                        // Grille 30 jours (aperçu compact)
                         MiniNinetyDayGrid()
                             .padding(.horizontal, 24)
 
@@ -79,11 +92,16 @@ struct HomeView: View {
             .navigationTitle("")
             .navigationBarHidden(true)
             .sheet(isPresented: $showPrayerView) {
-                PrayerView {
-                    // markPrayedToday() incrémente totalPrayers → @AppStorage se met à jour auto
+                PrayerView(prefetchedPrayer: prefetchedPrayer) {
                     currentStreak  = streakManager.markPrayedToday()
                     hasPrayedToday = true
                     totalPrayers   = UserDefaults.standard.integer(forKey: StreakManager.totalPrayersKey)
+                    if UserDefaults.standard.bool(forKey: StreakManager.cycleCompletedTodayKey) {
+                        showCycleBanner = true
+                    }
+                    // Pré-génère la prochaine prière immédiatement après
+                    prefetchedPrayer = ""
+                    prefetchNextPrayer()
                 }
             }
             .sheet(isPresented: $showSettings) {
@@ -114,8 +132,33 @@ struct HomeView: View {
             UserDefaults.standard.set(currentStreak, forKey: StreakManager.totalPrayersKey)
         }
 
-        // Replanifie les notifications à chaque lancement (résiste aux réinstallations)
         NotificationService.shared.schedulePrayerNotifications()
+        prefetchNextPrayer()
+    }
+
+    private func prefetchNextPrayer() {
+        guard prefetchedPrayer.isEmpty else { return }
+        Task {
+            let theme = dailyPrayerTheme()
+            if let generated = try? await GeminiService.shared.generatePrayer(theme: theme) {
+                await MainActor.run { prefetchedPrayer = generated }
+            } else {
+                await MainActor.run { prefetchedPrayer = GeminiService.fallbackPrayer }
+            }
+        }
+    }
+
+    private func dailyPrayerTheme() -> String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let themes: [String]
+        if hour < 12 {
+            themes = ["gratitude for a new day", "morning surrender and trust in God", "seeking God's guidance at the start of the day"]
+        } else if hour < 18 {
+            themes = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"]
+        } else {
+            themes = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness"]
+        }
+        return themes.randomElement()!
     }
 }
 
@@ -179,68 +222,120 @@ struct PrayerStatusCard: View {
     }
 }
 
-// Carte statut de la mascotte mouton
+// Carte statut de la mascotte — vidéo en boucle plein fond + gradient bas
 struct SheepStatusCard: View {
     let sheepName: String
     let level: Int
     let faithPercent: Double
 
+    private var sheepVideoName: String {
+        switch level {
+        case 1, 2:  return "sheep_lv1"
+        case 3, 4:  return "sheep_lv3"
+        case 5, 6:  return "sheep_lv5"
+        case 7, 8:  return "sheep_lv7"
+        default:    return "sheep_lv9"
+        }
+    }
+
     var body: some View {
-        HStack(spacing: 16) {
-            // Mouton qui évolue selon le niveau
-            ZStack {
-                Circle()
-                    .fill(Color.amenaPrimary.opacity(0.10))
-                    .frame(width: 56, height: 56)
-                CuteSheepView(level: level)
-                    .scaleEffect(0.45)
-                    .frame(width: 56, height: 56)
+        ZStack(alignment: .bottom) {
+            // Vidéo mouton en boucle silencieuse
+            if let url = Bundle.main.url(forResource: sheepVideoName, withExtension: "mp4") {
+                LoopingVideoView(url: url)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 220)
+                    .clipped()
+            } else {
+                // Fallback image si vidéo non trouvée
+                Image(sheepVideoName)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 220)
+                    .clipped()
             }
 
-            VStack(alignment: .leading, spacing: 8) {
+            // Gradient sombre en bas
+            LinearGradient(
+                colors: [.clear, .black.opacity(0.65)],
+                startPoint: .center,
+                endPoint: .bottom
+            )
+            .frame(height: 220)
+
+            // Infos en bas
+            VStack(spacing: 8) {
                 HStack {
                     Text(sheepName)
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(Color.amenaText)
+                        .foregroundColor(.white)
                     Spacer()
                     Text("lv \(level)")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(Color.amenaPrimary)
                         .cornerRadius(6)
                 }
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white.opacity(0.25))
+                            .frame(height: 6)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Color.white)
+                            .frame(width: geo.size.width * faithPercent, height: 6)
+                    }
+                }
+                .frame(height: 6)
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 16)
+        }
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
 
+// Bannière de félicitations après 30 jours complétés
+struct CycleCompletedBanner: View {
+    let cycleNumber: Int
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(spacing: 10) {
+            HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text("FAITH")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(Color.amenaTextSecondary)
-                        Spacer()
-                        Text("\(Int(faithPercent * 100))%")
-                            .font(.system(size: 10))
-                            .foregroundColor(Color.amenaTextSecondary)
-                    }
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.amenaUnselectedBackground)
-                                .frame(height: 6)
-                            RoundedRectangle(cornerRadius: 3)
-                                .fill(Color.amenaPrimary)
-                                .frame(width: geo.size.width * faithPercent, height: 6)
-                        }
-                    }
-                    .frame(height: 6)
+                    Text("30-day journey complete!")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(.white)
+                    Text("Cycle #\(cycleNumber) done. A new journey begins.")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.85))
+                }
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.8))
                 }
             }
         }
         .padding(16)
-        .background(Color.amenaSecondaryBackground)
+        .background(
+            LinearGradient(
+                colors: [Color(hex: "#4B8BF5"), Color(hex: "#7B5EF5")],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        )
         .cornerRadius(16)
     }
 }
+
+// LoopingVideoView et PlayerContainerView définis dans Services/LoopingVideoView.swift
 
 // Aperçu compact de la grille 90 jours sur l'écran d'accueil
 struct MiniNinetyDayGrid: View {

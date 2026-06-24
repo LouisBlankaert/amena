@@ -21,15 +21,11 @@ struct HopeResultView: View {
             VStack(spacing: 32) {
                 Spacer()
 
-                // Illustration colombe (SF Symbol comme placeholder)
-                ZStack {
-                    Circle()
-                        .fill(Color.amenaOrangePale)
-                        .frame(width: 160, height: 160)
-                    Image(systemName: "bird.fill")
-                        .font(.system(size: 70))
-                        .foregroundColor(.white)
-                }
+                // Illustration colombe
+                Image("hope_dove")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 220)
 
                 // Texte principal
                 VStack(spacing: 16) {

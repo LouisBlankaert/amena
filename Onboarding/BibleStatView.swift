@@ -28,15 +28,11 @@ struct BibleStatView: View {
             VStack(spacing: 32) {
                 Spacer()
 
-                // Illustration livre/Bible (SF Symbol)
-                ZStack {
-                    Circle()
-                        .fill(Color.amenaOrangePale)
-                        .frame(width: 160, height: 160)
-                    Image(systemName: "book.closed.fill")
-                        .font(.system(size: 65))
-                        .foregroundColor(Color.amenaPrimary)
-                }
+                // Illustration Bible
+                Image("bible_book")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 220)
 
                 // Texte principal avec "Bible" et nombre de jours en orange
                 VStack(spacing: 16) {

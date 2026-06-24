@@ -100,35 +100,28 @@ struct SlideContentView: View {
     let slide: IntroSlide
 
     var body: some View {
-        VStack(spacing: 32) {
-            // Illustration : image depuis Assets si elle existe, sinon placeholder
-            ZStack {
-                RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.amenaOrangePale)
-                    .frame(height: 340)
-                if UIImage(named: slide.imageName) != nil {
-                    // Image Midjourney ajoutée dans Assets.xcassets
-                    Image(slide.imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                } else {
-                    // Placeholder en attendant les illustrations
-                    VStack(spacing: 12) {
-                        Image(systemName: "figure.stand")
-                            .font(.system(size: 80))
-                            .foregroundColor(Color.amenaPrimary.opacity(0.5))
-                        Text("illustration coming soon")
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.amenaPrimary.opacity(0.4))
-                    }
+        VStack(spacing: 0) {
+            // Illustration pleine largeur, sans carte
+            if UIImage(named: slide.imageName) != nil {
+                Image(slide.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxWidth: .infinity)
+            } else {
+                VStack(spacing: 12) {
+                    Image(systemName: "figure.stand")
+                        .font(.system(size: 80))
+                        .foregroundColor(Color.amenaPrimary.opacity(0.5))
+                    Text("illustration coming soon")
+                        .font(.system(size: 12))
+                        .foregroundColor(Color.amenaPrimary.opacity(0.4))
                 }
+                .frame(height: 300)
             }
-            .frame(height: 340)
-            .padding(.horizontal, 24)
 
-            // Titre avec mot mis en valeur en orange
-            // Text concatenation avec + pour mélanger les styles
+            Spacer().frame(height: 32)
+
+            // Titre avec mot mis en valeur en bleu
             (Text(slide.beforeHighlight)
                 .foregroundColor(Color.amenaText)
              + Text(slide.highlightedWord)
@@ -142,7 +135,7 @@ struct SlideContentView: View {
 
             Spacer()
         }
-        .padding(.top, 16)
+        .padding(.top, 8)
     }
 }
 
