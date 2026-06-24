@@ -1,5 +1,10 @@
 # Secrets — JAMAIS commiter
 Secrets.swift
+GoogleService-Info.plist
+
+# Fichiers internes
+CLAUDE.md
+CAHIER_DES_CHARGES.md
 
 # Xcode
 *.xcworkspace
