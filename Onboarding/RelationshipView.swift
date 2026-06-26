@@ -4,10 +4,10 @@
 import SwiftUI
 
 struct RelationshipView: View {
-    @Binding var value: Double   // 0.0 à 1.0
+    @Binding var value: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // SF Symbol selon la valeur du slider
     private var moodIcon: String {
         switch value {
         case 0.0..<0.33: return "cloud.rain.fill"
@@ -24,13 +24,12 @@ struct RelationshipView: View {
         }
     }
 
-    // Label textuel sous le slider
     private var label: String {
         switch value {
-        case 0.0..<0.25: return "poor"
-        case 0.25..<0.50: return "okay"
-        case 0.50..<0.75: return "good"
-        default: return "amazing"
+        case 0.0..<0.25: return t("poor", "mauvaise")
+        case 0.25..<0.50: return t("okay", "correcte")
+        case 0.50..<0.75: return t("good", "bonne")
+        default: return t("amazing", "excellente")
         }
     }
 
@@ -43,7 +42,7 @@ struct RelationshipView: View {
                 Spacer()
 
                 // Titre en blanc
-                Text("how's your relationship with God today?")
+                Text(t("how's your relationship with God today?", "comment est ta relation avec Dieu aujourd'hui ?"))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -79,7 +78,7 @@ struct RelationshipView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(Color.amenaPrimary)
                         .frame(maxWidth: .infinity)

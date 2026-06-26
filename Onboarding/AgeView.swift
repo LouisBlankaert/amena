@@ -6,8 +6,8 @@ import SwiftUI
 struct AgeView: View {
     @Binding var selectedAge: String
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Les 5 tranches d'âge disponibles
     private let ageRanges = ["14-24", "25-34", "35-44", "45-54", "55+"]
 
     var body: some View {
@@ -19,7 +19,7 @@ struct AgeView: View {
                     .padding(.top, 60)
 
                 VStack(spacing: 32) {
-                    Text("how old are you?")
+                    Text(t("how old are you?", "quel âge as-tu ?"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
@@ -46,7 +46,7 @@ struct AgeView: View {
                     UserDefaults.standard.set(selectedAge, forKey: "userAge")
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .disabled(selectedAge.isEmpty)

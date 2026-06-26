@@ -19,6 +19,7 @@ struct HomeView: View {
     @State private var streakManager = StreakManager()
     @State private var showSettings  = false
     @AppStorage("completedCycles") private var completedCycles: Int = 0
+    @AppStorage("prayerLanguage")  private var prayerLanguage = "English"
     @State private var showCycleBanner = false
     @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
 
@@ -37,10 +38,10 @@ struct HomeView: View {
                         // En-tête : bonjour + nom
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("good \(timeOfDay), \(userName)")
+                                Text(t("good \(timeOfDay), \(userName)", "\(greetingFr), \(userName)"))
                                     .font(.system(size: 22, weight: .bold))
                                     .foregroundColor(Color.amenaText)
-                                Text(hasPrayedToday ? "You've prayed today ✓" : "Don't forget to pray today")
+                                Text(hasPrayedToday ? t("You've prayed today ✓", "Vous avez prié aujourd'hui ✓") : t("Don't forget to pray today", "N'oubliez pas de prier aujourd'hui"))
                                     .font(.system(size: 14))
                                     .foregroundColor(hasPrayedToday ? Color.amenaPrimary : Color.amenaTextSecondary)
                             }
@@ -113,13 +114,21 @@ struct HomeView: View {
         }
     }
 
-    // Détermine si c'est matin/après-midi/soir pour le message de bonjour
     private var timeOfDay: String {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
         case 0..<12: return "morning"
         case 12..<17: return "afternoon"
         default: return "evening"
+        }
+    }
+
+    private var greetingFr: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return "bonjour"
+        case 12..<17: return "bon après-midi"
+        default: return "bonsoir"
         }
     }
 
@@ -140,10 +149,10 @@ struct HomeView: View {
         guard prefetchedPrayer.isEmpty else { return }
         Task {
             let theme = dailyPrayerTheme()
-            if let generated = try? await GeminiService.shared.generatePrayer(theme: theme) {
+            if let generated = try? await GeminiService.shared.generatePrayer(theme: theme, language: prayerLanguage) {
                 await MainActor.run { prefetchedPrayer = generated }
             } else {
-                await MainActor.run { prefetchedPrayer = GeminiService.fallbackPrayer }
+                await MainActor.run { prefetchedPrayer = GeminiService.fallbackPrayerForLanguage(prayerLanguage) }
             }
         }
     }
@@ -167,19 +176,20 @@ struct PrayerStatusCard: View {
     let hasPrayed: Bool
     let streak: Int
     let onPrayNow: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         VStack(spacing: 16) {
             // Statut visuel
             HStack {
                 VStack(alignment: .leading, spacing: 6) {
-                    Text("Today's Prayer")
+                    Text(t("Today's Prayer", "Prière du jour"))
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(Color.amenaText)
                     HStack(spacing: 6) {
                         Image(systemName: hasPrayed ? "checkmark.circle.fill" : "clock.fill")
                             .foregroundColor(hasPrayed ? .green : Color.amenaPrimary)
-                        Text(hasPrayed ? "Completed" : "Pending")
+                        Text(hasPrayed ? t("Completed", "Terminée") : t("Pending", "En attente"))
                             .font(.system(size: 14))
                             .foregroundColor(hasPrayed ? .green : Color.amenaTextSecondary)
                     }
@@ -191,7 +201,7 @@ struct PrayerStatusCard: View {
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(Color.amenaPrimary)
                     HStack(spacing: 2) {
-                        Text("day streak")
+                        Text(t("day streak", "jours d'affilée"))
                         Image(systemName: "flame.fill")
                             .foregroundColor(.orange)
                     }
@@ -205,7 +215,7 @@ struct PrayerStatusCard: View {
                 Button(action: onPrayNow) {
                     HStack(spacing: 8) {
                         Image(systemName: "hands.sparkles.fill")
-                        Text("pray now")
+                        Text(t("pray now", "prier maintenant"))
                     }
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
@@ -303,15 +313,16 @@ struct SheepStatusCard: View {
 struct CycleCompletedBanner: View {
     let cycleNumber: Int
     let onDismiss: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         VStack(spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("30-day journey complete!")
+                    Text(t("30-day journey complete!", "Parcours 30 jours terminé !"))
                         .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.white)
-                    Text("Cycle #\(cycleNumber) done. A new journey begins.")
+                    Text(t("Cycle #\(cycleNumber) done. A new journey begins.", "Cycle #\(cycleNumber) terminé. Un nouveau parcours commence."))
                         .font(.system(size: 12))
                         .foregroundColor(.white.opacity(0.85))
                 }
@@ -340,6 +351,7 @@ struct CycleCompletedBanner: View {
 // Aperçu compact de la grille 90 jours sur l'écran d'accueil
 struct MiniNinetyDayGrid: View {
     @AppStorage("prayedDays") private var prayedDaysData: Data = Data()
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     // Jours priés stockés en JSON dans UserDefaults
     private var prayedDays: Set<Int> {
@@ -351,11 +363,11 @@ struct MiniNinetyDayGrid: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("30-Day Journey")
+                Text(t("30-Day Journey", "Parcours 30 jours"))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color.amenaText)
                 Spacer()
-                Text("\(prayedDays.count)/30 days")
+                Text(t("\(prayedDays.count)/30 days", "\(prayedDays.count)/30 jours"))
                     .font(.system(size: 13))
                     .foregroundColor(Color.amenaTextSecondary)
             }

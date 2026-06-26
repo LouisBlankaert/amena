@@ -6,6 +6,7 @@ import SwiftUI
 struct BibleStatView: View {
     let dailyScreenTime: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     // Calcul : Bible ≈ 777 000 mots, vitesse lecture ≈ 200 mots/min
     // Heures de lecture disponibles = temps screen time converti en prière
@@ -36,21 +37,21 @@ struct BibleStatView: View {
 
                 // Texte principal avec "Bible" et nombre de jours en orange
                 VStack(spacing: 16) {
-                    (Text("you could read the entire ")
+                    (Text(t("you could read the entire ", "tu pourrais lire toute la "))
                         .foregroundColor(Color.amenaText)
                      + Text("Bible")
                         .foregroundColor(Color.amenaPrimary)
                         .fontWeight(.bold)
-                     + Text(" in ")
+                     + Text(t(" in ", " en "))
                         .foregroundColor(Color.amenaText)
-                     + Text("\(daysToReadBible) days.")
+                     + Text(t("\(daysToReadBible) days.", "\(daysToReadBible) jours."))
                         .foregroundColor(Color.amenaPrimary)
                         .fontWeight(.bold))
                     .font(.system(size: 32, weight: .bold))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
 
-                    Text("if you swapped half your screen time for prayer.")
+                    Text(t("if you swapped half your screen time for prayer.", "si tu échangeais la moitié de ton temps d'écran contre la prière."))
                         .font(.system(size: 16))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -62,7 +63,7 @@ struct BibleStatView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)

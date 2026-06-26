@@ -4,8 +4,9 @@
 import SwiftUI
 
 struct ScreenTimeView: View {
-    @Binding var screenTime: Double   // Valeur en heures
+    @Binding var screenTime: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -17,14 +18,14 @@ struct ScreenTimeView: View {
 
                 VStack(spacing: 40) {
                     VStack(spacing: 8) {
-                        Text("how long are you on your phone each day?")
+                        Text(t("how long are you on your phone each day?", "combien de temps passes-tu sur ton téléphone chaque jour ?"))
                             .font(.system(size: 26, weight: .bold))
                             .foregroundColor(Color.amenaText)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 24)
                             .padding(.top, 40)
 
-                        Text("be honest")
+                        Text(t("be honest", "sois honnête"))
                             .font(.system(size: 15))
                             .foregroundColor(Color.amenaTextSecondary)
                     }
@@ -36,7 +37,7 @@ struct ScreenTimeView: View {
                             .font(.system(size: 72, weight: .bold))
                             .foregroundColor(Color.amenaPrimary)
 
-                        Text("hours/day")
+                        Text(t("hours/day", "heures/jour"))
                             .font(.system(size: 17))
                             .foregroundColor(Color.amenaTextSecondary)
                     }
@@ -67,7 +68,7 @@ struct ScreenTimeView: View {
                     UserDefaults.standard.set(screenTime, forKey: "dailyScreenTime")
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)

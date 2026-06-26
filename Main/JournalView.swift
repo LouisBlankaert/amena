@@ -4,8 +4,11 @@
 import SwiftUI
 
 struct JournalView: View {
-    // Prières chargées depuis UserDefaults (SwiftData sera ajouté en étape 9)
     @State private var prayers: [PrayerEntry] = []
+    @State private var displayedCount = 10
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    private var visiblePrayers: [PrayerEntry] { Array(prayers.prefix(displayedCount)) }
 
     var body: some View {
         NavigationStack {
@@ -14,18 +17,18 @@ struct JournalView: View {
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Grille 90 jours
+                        // Grille 30 jours
                         FullNinetyDayGrid(prayedCount: prayers.count)
                             .padding(.horizontal, 24)
                             .padding(.top, 16)
 
                         // Titre historique
                         HStack {
-                            Text("Your Prayers")
+                            Text(t("Your Prayers", "Vos prières"))
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            Text("\(prayers.count) total")
+                            Text(t("\(prayers.count) total", "\(prayers.count) au total"))
                                 .font(.system(size: 14))
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
@@ -34,11 +37,22 @@ struct JournalView: View {
                         if prayers.isEmpty {
                             EmptyJournalView()
                         } else {
-                            // Liste des prières
                             LazyVStack(spacing: 12) {
-                                ForEach(prayers) { prayer in
+                                ForEach(visiblePrayers) { prayer in
                                     JournalPrayerCard(prayer: prayer)
                                         .padding(.horizontal, 24)
+                                }
+                            }
+
+                            // Bouton "voir plus" si il reste des prières
+                            if displayedCount < prayers.count {
+                                Button {
+                                    displayedCount = min(displayedCount + 10, prayers.count)
+                                } label: {
+                                    Text(t("load more (\(prayers.count - displayedCount) remaining)", "voir plus (\(prayers.count - displayedCount) restantes)"))
+                                        .font(.system(size: 14))
+                                        .foregroundColor(Color.amenaPrimary)
+                                        .padding(.vertical, 12)
                                 }
                             }
                         }
@@ -47,45 +61,22 @@ struct JournalView: View {
                     }
                 }
             }
-            .navigationTitle("Journal")
+            .navigationTitle(t("Journal", "Journal"))
             .navigationBarTitleDisplayMode(.large)
         }
         .onAppear(perform: loadPrayers)
-        .onReceive(NotificationCenter.default.publisher(for: .prayerCompleted)) { notification in
-            if let text = notification.userInfo?["prayerText"] as? String,
-               let date = notification.userInfo?["date"] as? Date {
-                let entry = PrayerEntry(id: UUID(), text: text, date: date)
-                prayers.insert(entry, at: 0)
-                savePrayers()
-            }
-        }
     }
 
-    // Charge les prières depuis UserDefaults
     private func loadPrayers() {
         if let data = UserDefaults.standard.data(forKey: "prayerJournal"),
            let decoded = try? JSONDecoder().decode([PrayerEntry].self, from: data) {
-            prayers = decoded
-        }
-    }
-
-    // Sauvegarde dans UserDefaults (SwiftData en étape 9)
-    private func savePrayers() {
-        if let encoded = try? JSONEncoder().encode(prayers) {
-            UserDefaults.standard.set(encoded, forKey: "prayerJournal")
-        }
-        // Met aussi à jour les jours priés pour la grille
-        updatePrayedDays()
-    }
-
-    private func updatePrayedDays() {
-        let calendar = Calendar.current
-        let prayedDayNumbers = prayers.map { prayer -> Int in
-            let start = calendar.startOfDay(for: calendar.date(from: DateComponents(year: calendar.component(.year, from: Date()), month: 1, day: 1)) ?? Date())
-            return calendar.dateComponents([.day], from: start, to: prayer.date).day ?? 0
-        }
-        if let encoded = try? JSONEncoder().encode(Set(prayedDayNumbers)) {
-            UserDefaults.standard.set(encoded, forKey: "prayedDays")
+            // Limite à 90 entrées max — supprime les plus anciennes
+            prayers = Array(decoded.prefix(90))
+            if decoded.count > 90 {
+                if let encoded = try? JSONEncoder().encode(prayers) {
+                    UserDefaults.standard.set(encoded, forKey: "prayerJournal")
+                }
+            }
         }
     }
 }
@@ -101,12 +92,29 @@ struct PrayerEntry: Identifiable, Codable {
         let words = text.split(separator: " ").prefix(15)
         return words.joined(separator: " ") + (text.split(separator: " ").count > 15 ? "..." : "")
     }
+
+    // Extrait la référence biblique — dernière ligne commençant par "— "
+    var biblicalReference: String? {
+        let lines = text.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+        return lines.last(where: { $0.hasPrefix("—") || $0.hasPrefix("–") })
+    }
+
+    // Thème = heure de la prière convertie en label lisible
+    var timeLabel: String {
+        let hour = Calendar.current.component(.hour, from: date)
+        switch hour {
+        case 0..<12: return t("Morning Prayer", "Prière du matin")
+        case 12..<17: return t("Afternoon Prayer", "Prière de l'après-midi")
+        default: return t("Evening Prayer", "Prière du soir")
+        }
+    }
 }
 
 // Grille complète 90 jours avec légende
 struct FullNinetyDayGrid: View {
     let prayedCount: Int
     @AppStorage("prayedDays") private var prayedDaysData: Data = Data()
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     private var prayedDays: Set<Int> {
         (try? JSONDecoder().decode(Set<Int>.self, from: prayedDaysData)) ?? []
@@ -122,11 +130,11 @@ struct FullNinetyDayGrid: View {
         let percent = min(Double(prayedDays.count) / 30.0, 1.0)
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("30 Day Journey")
+                Text(t("30 Day Journey", "Parcours 30 jours"))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color.amenaText)
                 Spacer()
-                Text("\(Int(percent * 100))% Complete")
+                Text(t("\(Int(percent * 100))% Complete", "\(Int(percent * 100))% Terminé"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color.amenaPrimary)
             }
@@ -171,27 +179,35 @@ struct JournalPrayerCard: View {
     }()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
+            // En-tête : thème + date
             HStack {
-                Text("Daily Prayer")
+                Text(prayer.timeLabel)
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 4)
                     .background(Color.amenaPrimary)
                     .cornerRadius(8)
-
                 Spacer()
-
                 Text(dateFormatter.string(from: prayer.date))
                     .font(.system(size: 12))
                     .foregroundColor(Color.amenaTextSecondary)
             }
 
+            // Aperçu du texte
             Text(prayer.preview)
                 .font(.system(size: 15))
                 .foregroundColor(Color.amenaText)
                 .lineSpacing(4)
+
+            // Référence biblique si disponible
+            if let ref = prayer.biblicalReference {
+                Text(ref)
+                    .font(.system(size: 12, weight: .medium, design: .serif))
+                    .foregroundColor(Color.amenaPrimary)
+                    .padding(.top, 2)
+            }
         }
         .padding(16)
         .background(Color.amenaSecondaryBackground)
@@ -205,15 +221,17 @@ struct JournalPrayerCard: View {
 
 // Vue vide quand aucune prière n'a été faite
 struct EmptyJournalView: View {
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: "book.closed.fill")
                 .font(.system(size: 50))
                 .foregroundColor(Color.amenaPrimary.opacity(0.4))
-            Text("Your prayer journey starts here")
+            Text(t("Your prayer journey starts here", "Votre parcours de prière commence ici"))
                 .font(.system(size: 17, weight: .medium))
                 .foregroundColor(Color.amenaText)
-            Text("Your daily prayers will appear here.\nStart praying to fill your journal!")
+            Text(t("Your daily prayers will appear here.\nStart praying to fill your journal!", "Vos prières quotidiennes apparaîtront ici.\nCommencez à prier pour remplir votre journal !"))
                 .font(.system(size: 14))
                 .foregroundColor(Color.amenaTextSecondary)
                 .multilineTextAlignment(.center)

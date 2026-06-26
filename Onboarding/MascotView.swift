@@ -2,12 +2,13 @@
 // Carte "trading card" avec nom, niveau, barre FAITH, verset
 
 import SwiftUI
+import AVKit
 
 struct MascotView: View {
     @Binding var sheepName: String
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Verset biblique affiché sur la carte de la mascotte
     private let verse = "\"I am the good shepherd; I know my sheep and my sheep know me.\" — John 10:14"
 
     var body: some View {
@@ -20,25 +21,68 @@ struct MascotView: View {
 
                 ScrollView {
                     VStack(spacing: 28) {
-                        // Illustration mouton (SF Symbol)
-                        ZStack {
-                            // Fond sombre représentant l'obscurité/addiction
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(hex: "#1a1a2e"))
-                                .frame(height: 200)
-                            VStack(spacing: 8) {
-                                CuteSheepView()
-                                Text("your companion is chained to the phone...")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.white.opacity(0.6))
-                            }
+                        // Accroche au-dessus des cartes
+                        VStack(spacing: 6) {
+                            Text(t("break the chains.", "brisez les chaînes."))
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(Color.amenaText)
+                            Text(t("pray daily. evolve your sheep.", "priez chaque jour. faites évoluer votre mouton."))
+                                .font(.system(size: 14))
+                                .foregroundColor(Color.amenaTextSecondary)
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
+
+                        // Mouton lv1 — vidéo en boucle, triste, enchaîné au téléphone
+                        ZStack(alignment: .bottom) {
+                            if let url = Bundle.main.url(forResource: "sheep_lv1", withExtension: "mp4") {
+                                LoopingVideoView(url: url)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                            } else {
+                                Image("sheep_lv1")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 200)
+                                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                            }
+                            LinearGradient(
+                                colors: [.clear, Color(hex: "#1a1a2e").opacity(0.85)],
+                                startPoint: .center,
+                                endPoint: .bottom
+                            )
+                            .frame(height: 200)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            // Label lv1 en bas à droite (même style que lv5)
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    Text("lv 1")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background(Color.amenaPrimary)
+                                        .cornerRadius(6)
+                                }
+                                .padding(12)
+                            }
+                            Text(t("your companion is chained to the phone...", "ton compagnon est enchaîné au téléphone..."))
+                                .font(.system(size: 12))
+                                .foregroundColor(.white.opacity(0.7))
+                                .padding(.bottom, 14)
+                        }
+                        .frame(height: 200)
                         .padding(.horizontal, 24)
                         .padding(.top, 24)
 
                         // Champ de nom
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("your sheep's name")
+                            Text(t("your sheep's name", "le nom de votre mouton"))
                                 .font(.system(size: 17, weight: .medium))
                                 .foregroundColor(Color.amenaText)
 
@@ -66,7 +110,7 @@ struct MascotView: View {
                     sheepName = name
                     onNext()
                 } label: {
-                    Text("let's go →")
+                    Text(t("let's go →", "c'est parti →"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)
@@ -75,83 +119,84 @@ struct MascotView: View {
     }
 }
 
-// Carte trading card du mouton
+// Carte trading card — vidéo lv5 en plein fond, infos en bas
 struct SheepTradingCard: View {
     let name: String
     let verse: String
 
-    // Niveau FAITH calculé (commence à 2 dans l'onboarding)
-    private let faithLevel = 2
-    private let faithPercent = 0.15   // 15% de progression
+    private let faithPercent = 0.15
 
     var body: some View {
-        VStack(spacing: 0) {
-            // En-tête de la carte : nom + niveau
-            HStack {
-                Text(name)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-                Spacer()
-                Text("lv \(faithLevel)")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Color.amenaPrimary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(8)
+        ZStack(alignment: .bottom) {
+            // Fond bleu profond
+            RoundedRectangle(cornerRadius: 20)
+                .fill(LinearGradient(
+                    colors: [Color(hex: "#1a1a4e"), Color(hex: "#2d2d7e")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
+
+            // Vidéo lv5 en plein fond (montre l'évolution possible)
+            if let url = Bundle.main.url(forResource: "sheep_lv5", withExtension: "mp4") {
+                LoopingVideoView(url: url)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            } else {
+                Image("sheep_lv5")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
 
-            // Illustration mouton au centre (niveau 2 sur la trading card)
-            CuteSheepView(level: 2)
-                .padding(.vertical, 8)
+            // Gradient bas pour lisibilité du texte
+            LinearGradient(
+                colors: [.clear, Color(hex: "#1a1a4e").opacity(0.95)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(height: 130)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
 
-            // Barre FAITH
-            VStack(alignment: .leading, spacing: 6) {
+            // Infos en bas
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("FAITH")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.white.opacity(0.7))
+                    Text(name)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
                     Spacer()
-                    Text("\(Int(faithPercent * 100))%")
-                        .font(.system(size: 11))
-                        .foregroundColor(.white.opacity(0.7))
+                    Text("lv 5")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Color.amenaPrimary)
+                        .cornerRadius(6)
                 }
-                // Barre de progression FAITH
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.white.opacity(0.2))
-                            .frame(height: 6)
+                            .frame(height: 5)
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.amenaPrimary)
-                            .frame(width: geo.size.width * faithPercent, height: 6)
+                            .frame(width: geo.size.width * faithPercent, height: 5)
                     }
                 }
-                .frame(height: 6)
-            }
-            .padding(.horizontal, 16)
+                .frame(height: 5)
 
-            // Verset biblique en bas
-            Text(verse)
-                .font(.system(size: 10, weight: .light))
-                .foregroundColor(.white.opacity(0.6))
-                .multilineTextAlignment(.center)
-                .padding(16)
+                Text(verse)
+                    .font(.system(size: 9, weight: .light))
+                    .foregroundColor(.white.opacity(0.6))
+                    .lineLimit(2)
+            }
+            .padding(16)
         }
-        .background(
-            LinearGradient(
-                colors: [Color(hex: "#1a1a4e"), Color(hex: "#2d2d7e")],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .cornerRadius(20)
-        // Bordure orange subtile
+        .frame(height: 260)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.amenaPrimary.opacity(0.5), lineWidth: 1.5)
+                .stroke(Color.amenaPrimary.opacity(0.4), lineWidth: 1.5)
         )
     }
 }

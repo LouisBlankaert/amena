@@ -4,8 +4,9 @@
 import SwiftUI
 
 struct UserNameView: View {
-    @Binding var userName: String   // Binding = variable partagée avec le parent
+    @Binding var userName: String
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -19,9 +20,9 @@ struct UserNameView: View {
                 ScrollView {
                     VStack(spacing: 32) {
                         // Titre avec "new" en orange
-                        (Text("ready to build a habit that actually ")
+                        (Text(t("ready to build a habit that actually ", "prêt à construire une habitude qui te "))
                             .foregroundColor(Color.amenaText)
-                         + Text("changes you?")
+                         + Text(t("changes you?", "change vraiment ?"))
                             .foregroundColor(Color.amenaPrimary)
                             .fontWeight(.bold))
                         .font(.system(size: 26, weight: .bold))
@@ -35,12 +36,11 @@ struct UserNameView: View {
 
                         // Question + champ de saisie
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("what should we call you?")
+                            Text(t("what should we call you?", "comment t'appelles-tu ?"))
                                 .font(.system(size: 17, weight: .medium))
                                 .foregroundColor(Color.amenaText)
 
-                            // TextField = champ de texte SwiftUI
-                            TextField("enter your name", text: $userName)
+                            TextField(t("enter your name", "entre ton prénom"), text: $userName)
                                 .font(.system(size: 17))
                                 .padding(16)
                                 .background(Color.amenaSecondaryBackground)
@@ -60,7 +60,7 @@ struct UserNameView: View {
                     UserDefaults.standard.set(userName, forKey: "userName")
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 // Désactivé si le nom est vide
@@ -84,10 +84,10 @@ struct NinetyDayGridPreview: View {
             // En-tête de la carte
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("30 day prayer journey")
+                    Text(t("30 day prayer journey", "parcours prière 30 jours"))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(Color.amenaText)
-                    Text("0% Complete")
+                    Text(t("0% Complete", "0% Terminé"))
                         .font(.system(size: 11))
                         .foregroundColor(Color.amenaTextSecondary)
                 }
@@ -96,7 +96,7 @@ struct NinetyDayGridPreview: View {
                     Text(Date(), style: .date)
                         .font(.system(size: 11))
                         .foregroundColor(Color.amenaTextSecondary)
-                    Text(userName.isEmpty ? "Your name" : userName)
+                    Text(userName.isEmpty ? t("Your name", "Votre prénom") : userName)
                         .font(.system(size: 11, weight: .medium))
                         .foregroundColor(Color.amenaPrimary)
                 }

@@ -8,24 +8,29 @@
 
 /* Begin PBXBuildFile section */
 		009590A0E3DD15AC7C818D92 /* MoodView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */; };
-		06583FBB2FE60BDD00B56998 /* amena.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 06583FBA2FE60BDD00B56998 /* amena.storekit */; };
 		066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E90549F213EF3455992887 /* ShockResultView.swift */; };
 		0CFF48F9DE495304260420FC /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E5EB00CA35A5229336CF2D /* JournalView.swift */; };
 		0D592DC305E294614C2EA0C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */; };
 		0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43AB2DE206917B253CE21439 /* StoreKitService.swift */; };
+		119E54C8180E77EF5424710B /* sheep_lv1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B1FF2F6DC1106282D2B15D4C /* sheep_lv1.mp4 */; };
+		2067FABBD41BB2DB33CC5AFE /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F15F80FD4972976A0BB8919 /* Localization.swift */; };
 		21E0E112C634283154685EE7 /* PrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFB620370983A9F272D04E5 /* PrayerView.swift */; };
 		21F5FADEC07780F4DFDDB0A6 /* IntroSlidesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */; };
 		22F955099F1B44811C93CCED /* VerseOfDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7504D6CD9DEB6359D4D48F2 /* VerseOfDayView.swift */; };
 		263DAEB5F60C681C497E1621 /* RelationshipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF69552A2806DFB237933F3 /* RelationshipView.swift */; };
 		279C291AC1030A9E74662DAF /* NotificationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C26F1394867841F292861CA0 /* NotificationsView.swift */; };
+		28145F57981DE37AC5D9CEC9 /* sheep_lv3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 2856E90FE026341CB8CB67B3 /* sheep_lv3.mp4 */; };
 		3B345C411CE33F61F16B21F0 /* GeminiService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F840521E63FE0634524C489C /* GeminiService.swift */; };
 		3DEEC4ED38D9715A5DD77AD2 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */; };
 		486E9466049ED8B7BEE0424E /* HopeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */; };
 		49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24E28D1032D7CE89103E118 /* NotificationService.swift */; };
+		4D6A623C405B6A7D3ED87388 /* sheep_lv7.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = FCCB074FDDBBB85F667F9E00 /* sheep_lv7.mp4 */; };
 		58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */; };
 		62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */; };
+		68E4ED1459F629C6D6F4B6BE /* LoopingVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */; };
 		725C67044AB00B0FC5A77D89 /* PrayerFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */; };
 		7D1CDFDBC765C865171572EB /* AgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EBDE961DF1E850A03458FD /* AgeView.swift */; };
+		8250299DB83D24A6614E73CD /* sheep_lv9.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */; };
 		9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933268950522EF66A869E983 /* PrayerSession.swift */; };
 		A6842FC9F689ECDB4CC8B1F6 /* PrayerTimesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50CBAF20C797189C2FB56C3 /* PrayerTimesView.swift */; };
 		A79C351F7EED54E5E6FBFCD6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */; };
@@ -35,6 +40,7 @@
 		BA89CB232670315AB0759451 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301CE241AA504BA1D9D3F067 /* Secrets.swift */; };
 		BECEC2CF60F15EBC20AD9E53 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2C05680816AEEB8F0292D5 /* ContentView.swift */; };
 		C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843DB842DDC7065A16E943BA /* UserNameView.swift */; };
+		C923944D747AB55E1487A552 /* LanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D443C43E9A49E7E48129A7D /* LanguageView.swift */; };
 		CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4645061C3785261078D504CD /* MascotView.swift */; };
 		DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */; };
 		DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */; };
@@ -42,13 +48,18 @@
 		E5D81750BF5223CDA56500BB /* CongratulationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CFA121547A2DE367D91FE14 /* CongratulationsView.swift */; };
 		F3531A8BB456A27D88F2A056 /* StreakManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4CC7DF638852D8A1970174 /* StreakManager.swift */; };
 		FB5D112998A2E093E0ED8C89 /* Color+Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */; };
+		FBD6387FFF1A033B22909E17 /* SheepMascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26052530DC0D49C578F23B44 /* SheepMascotView.swift */; };
 		FC139439C95194BE919787AB /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54090A82E29D64451FB45E71 /* PaywallView.swift */; };
+		FE9E40B3F039012A06E8E016 /* sheep_lv5.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 0602FEFDDAFE770796C0933B /* sheep_lv5.mp4 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		06583FBA2FE60BDD00B56998 /* amena.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = amena.storekit; sourceTree = "<group>"; };
+		01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingVideoView.swift; sourceTree = "<group>"; };
+		0602FEFDDAFE770796C0933B /* sheep_lv5.mp4 */ = {isa = PBXFileReference; path = sheep_lv5.mp4; sourceTree = "<group>"; };
 		0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodView.swift; sourceTree = "<group>"; };
 		137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstPrayerView.swift; sourceTree = "<group>"; };
+		26052530DC0D49C578F23B44 /* SheepMascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheepMascotView.swift; sourceTree = "<group>"; };
+		2856E90FE026341CB8CB67B3 /* sheep_lv3.mp4 */ = {isa = PBXFileReference; path = sheep_lv3.mp4; sourceTree = "<group>"; };
 		2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSlidesView.swift; sourceTree = "<group>"; };
 		2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Theme.swift"; sourceTree = "<group>"; };
 		2EFB620370983A9F272D04E5 /* PrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerView.swift; sourceTree = "<group>"; };
@@ -60,16 +71,20 @@
 		45E5EB00CA35A5229336CF2D /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		4645061C3785261078D504CD /* MascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotView.swift; sourceTree = "<group>"; };
 		4D4CC7DF638852D8A1970174 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
+		4F15F80FD4972976A0BB8919 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		54090A82E29D64451FB45E71 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
-		5750B9799AAB446B57156C91 /* Amena.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Amena.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5750B9799AAB446B57156C91 /* Amena.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Amena.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */ = {isa = PBXFileReference; path = sheep_lv9.mp4; sourceTree = "<group>"; };
 		6279CFF40C65B2C697121927 /* BibleStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleStatView.swift; sourceTree = "<group>"; };
 		6E720D3060A661D2CD31D930 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7214D62A7895CB277DDDC601 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		843DB842DDC7065A16E943BA /* UserNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNameView.swift; sourceTree = "<group>"; };
 		90E90549F213EF3455992887 /* ShockResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShockResultView.swift; sourceTree = "<group>"; };
 		933268950522EF66A869E983 /* PrayerSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerSession.swift; sourceTree = "<group>"; };
+		9D443C43E9A49E7E48129A7D /* LanguageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageView.swift; sourceTree = "<group>"; };
 		AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenTimeView.swift; sourceTree = "<group>"; };
 		AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingCoordinator.swift; sourceTree = "<group>"; };
+		B1FF2F6DC1106282D2B15D4C /* sheep_lv1.mp4 */ = {isa = PBXFileReference; path = sheep_lv1.mp4; sourceTree = "<group>"; };
 		B7504D6CD9DEB6359D4D48F2 /* VerseOfDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerseOfDayView.swift; sourceTree = "<group>"; };
 		BAF69552A2806DFB237933F3 /* RelationshipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipView.swift; sourceTree = "<group>"; };
 		BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
@@ -82,6 +97,7 @@
 		EC2C05680816AEEB8F0292D5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F840521E63FE0634524C489C /* GeminiService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiService.swift; sourceTree = "<group>"; };
+		FCCB074FDDBBB85F667F9E00 /* sheep_lv7.mp4 */ = {isa = PBXFileReference; path = sheep_lv7.mp4; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +115,6 @@
 		0A54442141A1ECC95931EA43 = {
 			isa = PBXGroup;
 			children = (
-				06583FBA2FE60BDD00B56998 /* amena.storekit */,
 				C55C7C36E537DD35761B285D /* AmenaApp.swift */,
 				36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */,
 				EC2C05680816AEEB8F0292D5 /* ContentView.swift */,
@@ -109,6 +124,7 @@
 				BA0E3D0A01A29F76F649B5A6 /* Main */,
 				3F89B1F076A0594A63F04663 /* Models */,
 				A137B679C681289B348B8432 /* Onboarding */,
+				A12C689078BF44F2DFC5333F /* Resources */,
 				853D84B09C112C083669744B /* Services */,
 				4274A31F9F34384792F94272 /* Products */,
 			);
@@ -118,6 +134,7 @@
 			isa = PBXGroup;
 			children = (
 				933268950522EF66A869E983 /* PrayerSession.swift */,
+				26052530DC0D49C578F23B44 /* SheepMascotView.swift */,
 				4D4CC7DF638852D8A1970174 /* StreakManager.swift */,
 			);
 			path = Models;
@@ -136,10 +153,23 @@
 			children = (
 				BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */,
 				F840521E63FE0634524C489C /* GeminiService.swift */,
+				01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */,
 				D24E28D1032D7CE89103E118 /* NotificationService.swift */,
 				43AB2DE206917B253CE21439 /* StoreKitService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		A12C689078BF44F2DFC5333F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B1FF2F6DC1106282D2B15D4C /* sheep_lv1.mp4 */,
+				2856E90FE026341CB8CB67B3 /* sheep_lv3.mp4 */,
+				0602FEFDDAFE770796C0933B /* sheep_lv5.mp4 */,
+				FCCB074FDDBBB85F667F9E00 /* sheep_lv7.mp4 */,
+				5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		A137B679C681289B348B8432 /* Onboarding */ = {
@@ -151,6 +181,7 @@
 				137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */,
 				DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */,
 				2BBA88F447D1912805B19A4D /* IntroSlidesView.swift */,
+				9D443C43E9A49E7E48129A7D /* LanguageView.swift */,
 				4645061C3785261078D504CD /* MascotView.swift */,
 				0C9EEFC5D41966F9D4AEF62F /* MoodView.swift */,
 				C26F1394867841F292861CA0 /* NotificationsView.swift */,
@@ -182,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				2BFD2210819A96A7EE0E4E6C /* Color+Theme.swift */,
+				4F15F80FD4972976A0BB8919 /* Localization.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -219,6 +251,7 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					5D2A857DDC4D45F0495FBC3D = {
+						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -251,8 +284,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D592DC305E294614C2EA0C0 /* Assets.xcassets in Resources */,
-				06583FBB2FE60BDD00B56998 /* amena.storekit in Resources */,
 				A79C351F7EED54E5E6FBFCD6 /* GoogleService-Info.plist in Resources */,
+				119E54C8180E77EF5424710B /* sheep_lv1.mp4 in Resources */,
+				28145F57981DE37AC5D9CEC9 /* sheep_lv3.mp4 in Resources */,
+				FE9E40B3F039012A06E8E016 /* sheep_lv5.mp4 in Resources */,
+				4D6A623C405B6A7D3ED87388 /* sheep_lv7.mp4 in Resources */,
+				8250299DB83D24A6614E73CD /* sheep_lv9.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +313,9 @@
 				486E9466049ED8B7BEE0424E /* HopeResultView.swift in Sources */,
 				21F5FADEC07780F4DFDDB0A6 /* IntroSlidesView.swift in Sources */,
 				0CFF48F9DE495304260420FC /* JournalView.swift in Sources */,
+				C923944D747AB55E1487A552 /* LanguageView.swift in Sources */,
+				2067FABBD41BB2DB33CC5AFE /* Localization.swift in Sources */,
+				68E4ED1459F629C6D6F4B6BE /* LoopingVideoView.swift in Sources */,
 				CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */,
 				009590A0E3DD15AC7C818D92 /* MoodView.swift in Sources */,
 				49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */,
@@ -290,6 +330,7 @@
 				DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */,
 				BA89CB232670315AB0759451 /* Secrets.swift in Sources */,
 				B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */,
+				FBD6387FFF1A033B22909E17 /* SheepMascotView.swift in Sources */,
 				066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */,
 				0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */,
 				F3531A8BB456A27D88F2A056 /* StreakManager.swift in Sources */,
@@ -307,7 +348,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = J55DB3RJLY;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -385,7 +425,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = J55DB3RJLY;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

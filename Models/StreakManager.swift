@@ -2,11 +2,13 @@
 import Foundation
 
 struct StreakManager {
-    private let lastPrayedDateKey = "lastPrayedDate"
-    private let currentStreakKey  = "currentStreak"
-    private let journeyStartKey   = "journeyStartDate"
-    private let prayedDaysKey     = "prayedDays"
-    static  let totalPrayersKey   = "totalPrayers"
+    private let lastPrayedDateKey    = "lastPrayedDate"
+    private let currentStreakKey     = "currentStreak"
+    private let journeyStartKey      = "journeyStartDate"
+    private let prayedDaysKey        = "prayedDays"
+    static  let totalPrayersKey      = "totalPrayers"
+    static  let completedCyclesKey   = "completedCycles"
+    static  let cycleCompletedTodayKey = "cycleCompletedToday"
 
     // ─── Seuils cumulatifs de prières pour chaque niveau ──────────────────
     // Index 0 = Lv1, index 1 = Lv2, etc.
@@ -85,14 +87,31 @@ struct StreakManager {
         }
         let dayOffset = Calendar.current.dateComponents([.day], from: startDate, to: today).day ?? 0
         var prayedDays = loadPrayedDays()
-        prayedDays.insert(dayOffset)
+        prayedDays.insert(min(dayOffset, 29)) // max jour 29 (index 0-29)
         savePrayedDays(prayedDays)
+
+        // Détection cycle complet (30 jours)
+        if prayedDays.count >= 30 {
+            let cycles = defaults.integer(forKey: StreakManager.completedCyclesKey) + 1
+            defaults.set(cycles, forKey: StreakManager.completedCyclesKey)
+            defaults.set(true, forKey: StreakManager.cycleCompletedTodayKey)
+            // Reset grille + nouveau départ
+            savePrayedDays([])
+            defaults.set(today, forKey: journeyStartKey)
+        } else {
+            defaults.set(false, forKey: StreakManager.cycleCompletedTodayKey)
+        }
 
         // Total de prières cumulatif (utilisé pour les niveaux de Nour)
         let total = defaults.integer(forKey: StreakManager.totalPrayersKey) + 1
         defaults.set(total, forKey: StreakManager.totalPrayersKey)
 
         return newStreak
+    }
+
+    // Nombre de cycles complétés
+    var completedCycles: Int {
+        UserDefaults.standard.integer(forKey: StreakManager.completedCyclesKey)
     }
 
     // ─── Helpers grille ────────────────────────────────────────────────────

@@ -4,8 +4,9 @@
 import SwiftUI
 
 struct PrayerFrequencyView: View {
-    @Binding var frequency: Double   // Valeur en jours par semaine
+    @Binding var frequency: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -16,7 +17,7 @@ struct PrayerFrequencyView: View {
                     .padding(.top, 60)
 
                 VStack(spacing: 40) {
-                    Text("be honest, how often do you pray per week?")
+                    Text(t("be honest, how often do you pray per week?", "honnêtement, combien de fois pries-tu par semaine ?"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
@@ -30,7 +31,7 @@ struct PrayerFrequencyView: View {
                             .font(.system(size: 72, weight: .bold))
                             .foregroundColor(Color.amenaPrimary)
 
-                        Text("days/week")
+                        Text(t("days/week", "jours/semaine"))
                             .font(.system(size: 17))
                             .foregroundColor(Color.amenaTextSecondary)
                     }
@@ -60,7 +61,7 @@ struct PrayerFrequencyView: View {
                     UserDefaults.standard.set(frequency, forKey: "prayerFrequency")
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)

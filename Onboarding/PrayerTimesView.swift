@@ -13,15 +13,14 @@ struct PrayerTimeItem: Identifiable {
 
 struct PrayerTimesView: View {
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Horaires par défaut : matin, midi, soir
     @State private var prayerTimes: [PrayerTimeItem] = [
         PrayerTimeItem(name: "Morning Prayer", time: makeTime(hour: 7, minute: 0), isEnabled: true),
         PrayerTimeItem(name: "Afternoon Prayer", time: makeTime(hour: 12, minute: 0), isEnabled: true),
         PrayerTimeItem(name: "Evening Prayer", time: makeTime(hour: 21, minute: 0), isEnabled: true)
     ]
 
-    // DatePicker shown when editing a time
     @State private var editingIndex: Int? = nil
 
     var body: some View {
@@ -31,22 +30,21 @@ struct PrayerTimesView: View {
             VStack(spacing: 0) {
                 // En-tête
                 VStack(spacing: 8) {
-                    Text("set your prayer times")
+                    Text(t("set your prayer times", "définissez vos heures de prière"))
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .padding(.top, 60)
 
-                    Text("your apps will lock at these times until you pray.")
+                    Text(t("your apps will lock at these times until you pray.", "vos apps se bloqueront à ces horaires jusqu'à ce que vous priiez."))
                         .font(.system(size: 15))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    // Instruction tap
                     HStack(spacing: 4) {
                         Image(systemName: "hand.tap.fill")
                             .font(.system(size: 13))
-                        Text("tap any time to edit it")
+                        Text(t("tap any time to edit it", "appuyez sur un horaire pour le modifier"))
                             .font(.system(size: 14))
                     }
                     .foregroundColor(Color.amenaPrimary)
@@ -80,7 +78,7 @@ struct PrayerTimesView: View {
                         } label: {
                             HStack {
                                 Image(systemName: "plus.circle.fill")
-                                Text("+ add prayer time")
+                                Text(t("+ add prayer time", "+ ajouter une heure de prière"))
                             }
                             .font(.system(size: 16, weight: .medium))
                             .foregroundColor(Color.amenaPrimary)
@@ -101,7 +99,7 @@ struct PrayerTimesView: View {
                     savePrayerTimes()
                     onNext()
                 } label: {
-                    Text("continue →")
+                    Text(t("continue →", "continuer →"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)
@@ -122,8 +120,8 @@ struct PrayerTimeRow: View {
     @Binding var item: PrayerTimeItem
     let isEditing: Bool
     let onTap: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Formateur d'heure en "7:00 AM"
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.timeStyle = .short
@@ -138,7 +136,7 @@ struct PrayerTimeRow: View {
                     Text(item.name)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(Color.amenaText)
-                    Text("every day")
+                    Text(t("every day", "chaque jour"))
                         .font(.system(size: 13))
                         .foregroundColor(Color.amenaTextSecondary)
                 }

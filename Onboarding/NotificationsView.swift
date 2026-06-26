@@ -6,6 +6,7 @@ import UserNotifications  // Framework Apple pour les notifications locales
 
 struct NotificationsView: View {
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -26,13 +27,13 @@ struct NotificationsView: View {
                             .foregroundColor(Color.amenaPrimary)
                     }
 
-                    Text("allow amena to send you notifications")
+                    Text(t("allow amena to send you notifications", "autoriser amena à vous envoyer des notifications"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    Text("we use this to allow you to unblock your apps when you need to pray")
+                    Text(t("we use this to allow you to unblock your apps when you need to pray", "nous utilisons ceci pour vous permettre de débloquer vos apps quand vous devez prier"))
                         .font(.system(size: 15))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -50,13 +51,13 @@ struct NotificationsView: View {
                 Button {
                     requestNotificationPermission()
                 } label: {
-                    Text("allow")
+                    Text(t("allow", "autoriser"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 16)
 
                 // Option pour passer sans autoriser
-                Button("maybe later") {
+                Button(t("maybe later", "peut-être plus tard")) {
                     UserDefaults.standard.set(false, forKey: "notificationsEnabled")
                     onNext()
                 }
@@ -85,6 +86,8 @@ struct NotificationsView: View {
 
 // Mockup d'une notification iOS
 struct NotificationMockup: View {
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
     var body: some View {
         HStack(spacing: 12) {
             // Icône de l'app
@@ -103,11 +106,11 @@ struct NotificationMockup: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(Color.amenaText)
                     Spacer()
-                    Text("now")
+                    Text(t("now", "maintenant"))
                         .font(.system(size: 11))
                         .foregroundColor(Color.amenaTextSecondary)
                 }
-                Text("your apps are blocked! time to pray")
+                Text(t("your apps are blocked! time to pray", "vos apps sont bloquées ! il est temps de prier"))
                     .font(.system(size: 13))
                     .foregroundColor(Color.amenaText)
                     .lineLimit(2)

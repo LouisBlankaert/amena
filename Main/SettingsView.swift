@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("sheepName")          private var sheepName = "Nour"
     @AppStorage("isPremium")          private var isPremium = false
     @AppStorage("onboardingCompleted") private var onboardingCompleted = true
+    @AppStorage("prayerLanguage")      private var prayerLanguage = "English"
 
     @State private var prayerTimes:   [PrayerTimeItem] = []
     @State private var editingIndex:  Int? = nil
@@ -29,20 +30,34 @@ struct SettingsView: View {
                 List {
 
                     // ── PROFIL ───────────────────────────────────────
-                    Section("profile") {
+                    Section(t("prayers language", "langue des prières")) {
                         HStack {
-                            Label("Your name", systemImage: "person.fill")
+                            Label(t("Prayer language", "Langue de prière"), systemImage: "globe")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            TextField("Name", text: $userName)
+                            Picker("", selection: $prayerLanguage) {
+                                Text("English").tag("English")
+                                Text("Français").tag("French")
+                            }
+                            .pickerStyle(.segmented)
+                            .frame(width: 160)
+                        }
+                    }
+
+                    Section(t("profile", "profil")) {
+                        HStack {
+                            Label(t("Your name", "Votre prénom"), systemImage: "person.fill")
+                                .foregroundColor(Color.amenaText)
+                            Spacer()
+                            TextField(t("Name", "Prénom"), text: $userName)
                                 .multilineTextAlignment(.trailing)
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
                         HStack {
-                            Label("Companion's name", systemImage: "hare.fill")
+                            Label(t("Companion's name", "Nom du compagnon"), systemImage: "hare.fill")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            TextField("Sheep name", text: $sheepName)
+                            TextField(t("Sheep name", "Nom du mouton"), text: $sheepName)
                                 .multilineTextAlignment(.trailing)
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
@@ -57,7 +72,7 @@ struct SettingsView: View {
                                         Text(prayerTimes[index].name)
                                             .font(.system(size: 15, weight: .medium))
                                             .foregroundColor(Color.amenaText)
-                                        Text("every day")
+                                        Text(t("every day", "chaque jour"))
                                             .font(.system(size: 12))
                                             .foregroundColor(Color.amenaTextSecondary)
                                     }
@@ -97,20 +112,19 @@ struct SettingsView: View {
                             ))
                             savePrayerTimes()
                         } label: {
-                            Label("Add prayer time", systemImage: "plus.circle.fill")
+                            Label(t("Add prayer time", "Ajouter une heure de prière"), systemImage: "plus.circle.fill")
                                 .foregroundColor(Color.amenaPrimary)
                         }
                     } header: {
-                        Text("prayer times")
+                        Text(t("prayer times", "heures de prière"))
                     }
 
-                    // ── NOTIFICATIONS ─────────────────────────────────
-                    Section("notifications") {
+                    Section(t("notifications", "notifications")) {
                         HStack {
-                            Label("Status", systemImage: "bell.fill")
+                            Label(t("Status", "Statut"), systemImage: "bell.fill")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            Text(notifStatus)
+                            Text(notifStatus == "enabled" ? t("enabled", "activé") : notifStatus == "disabled" ? t("disabled", "désactivé") : t("not set", "non défini"))
                                 .font(.system(size: 13))
                                 .foregroundColor(notifStatus == "enabled" ? .green : Color.amenaTextSecondary)
                         }
@@ -119,18 +133,17 @@ struct SettingsView: View {
                                 UIApplication.shared.open(url)
                             }
                         } label: {
-                            Label("Open notification settings", systemImage: "arrow.up.right.square")
+                            Label(t("Open notification settings", "Ouvrir les paramètres"), systemImage: "arrow.up.right.square")
                                 .foregroundColor(Color.amenaPrimary)
                         }
                     }
 
-                    // ── ABONNEMENT ────────────────────────────────────
-                    Section("subscription") {
+                    Section(t("subscription", "abonnement")) {
                         HStack {
-                            Label("Status", systemImage: "crown.fill")
+                            Label(t("Status", "Statut"), systemImage: "crown.fill")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            Text(isPremium ? "Premium" : "Free")
+                            Text(isPremium ? t("Premium", "Premium") : t("Free", "Gratuit"))
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(isPremium ? Color.amenaPrimary : Color.amenaTextSecondary)
                         }
@@ -139,7 +152,7 @@ struct SettingsView: View {
                             Task { await restorePurchases() }
                         } label: {
                             HStack {
-                                Label(isRestoring ? "Restoring..." : "Restore purchases", systemImage: "arrow.clockwise")
+                                Label(isRestoring ? t("Restoring...", "Restauration...") : t("Restore purchases", "Restaurer les achats"), systemImage: "arrow.clockwise")
                                     .foregroundColor(Color.amenaPrimary)
                                 if isRestoring { Spacer(); ProgressView().tint(Color.amenaPrimary) }
                             }
@@ -153,53 +166,51 @@ struct SettingsView: View {
                         }
                     }
 
-                    // ── À PROPOS ──────────────────────────────────────
-                    Section("about") {
+                    Section(t("about", "à propos")) {
                         HStack {
-                            Label("Version", systemImage: "info.circle")
+                            Label(t("Version", "Version"), systemImage: "info.circle")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
                             Text("1.0.0")
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
-                        Link(destination: URL(string: "https://blankaertlouis.github.io/amena/privacy.html")!) {
-                            Label("Privacy Policy", systemImage: "hand.raised.fill")
+                        Link(destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!) {
+                            Label(t("Privacy Policy", "Politique de confidentialité"), systemImage: "hand.raised.fill")
                                 .foregroundColor(Color.amenaPrimary)
                         }
-                        Link(destination: URL(string: "https://blankaertlouis.github.io/amena/terms.html")!) {
-                            Label("Terms of Use", systemImage: "doc.text.fill")
+                        Link(destination: URL(string: "https://louisblankaert.github.io/amena/terms.html")!) {
+                            Label(t("Terms of Use", "Conditions d'utilisation"), systemImage: "doc.text.fill")
                                 .foregroundColor(Color.amenaPrimary)
                         }
                     }
 
-                    // ── DANGER ────────────────────────────────────────
                     Section {
                         Button(role: .destructive) {
                             showResetAlert = true
                         } label: {
-                            Label("Reset onboarding", systemImage: "arrow.counterclockwise")
+                            Label(t("Reset onboarding", "Réinitialiser l'accueil"), systemImage: "arrow.counterclockwise")
                         }
                     }
                 }
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("settings")
+            .navigationTitle(t("settings", "paramètres"))
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(t("Done", "Fermer")) { dismiss() }
                         .foregroundColor(Color.amenaPrimary)
                         .fontWeight(.semibold)
                 }
             }
-            .alert("Reset onboarding?", isPresented: $showResetAlert) {
-                Button("Cancel", role: .cancel) {}
-                Button("Reset", role: .destructive) {
+            .alert(t("Reset onboarding?", "Réinitialiser l'accueil ?"), isPresented: $showResetAlert) {
+                Button(t("Cancel", "Annuler"), role: .cancel) {}
+                Button(t("Reset", "Réinitialiser"), role: .destructive) {
                     onboardingCompleted = false
                     dismiss()
                 }
             } message: {
-                Text("This will restart the app from the beginning. Your prayers won't be deleted.")
+                Text(t("This will restart the app from the beginning. Your prayers won't be deleted.", "Ceci relancera l'app depuis le début. Vos prières ne seront pas supprimées."))
             }
         }
         .onAppear {
@@ -251,9 +262,9 @@ struct SettingsView: View {
         restoreMessage = nil
         do {
             try await StoreKitService.shared.restorePurchases()
-            restoreMessage = isPremium ? "Premium restored successfully." : "No active subscription found."
+            restoreMessage = isPremium ? t("Premium restored successfully.", "Abonnement restauré avec succès.") : t("No active subscription found.", "Aucun abonnement actif trouvé.")
         } catch {
-            restoreMessage = "Restore failed. Try again later."
+            restoreMessage = t("Restore failed. Try again later.", "Échec de la restauration. Réessayez plus tard.")
         }
         isRestoring = false
     }

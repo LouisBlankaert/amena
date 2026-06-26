@@ -7,6 +7,7 @@ import FirebaseAnalytics
 
 // Enum qui liste toutes les étapes dans l'ordre exact
 enum OnboardingStep: Int, CaseIterable {
+    case language         // Choix de langue
     case introSlides      // 3 slides swipeables
     case userName         // Prénom
     case age              // Âge
@@ -27,7 +28,7 @@ enum OnboardingStep: Int, CaseIterable {
 }
 
 struct OnboardingCoordinator: View {
-    @State private var step: OnboardingStep = .introSlides
+    @State private var step: OnboardingStep = .language
 
     // Données collectées pendant l'onboarding, passées entre les écrans
     @State private var userName: String = ""
@@ -40,11 +41,40 @@ struct OnboardingCoordinator: View {
     @State private var generatedPrayer: String = ""
 
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
+    @AppStorage("prayerLanguage") private var prayerLanguage: String = "English"
+
+    // Thèmes variés selon l'heure et la relation avec Dieu
+    private var prayerTheme: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let morningThemes = ["gratitude for a new day", "seeking God's guidance at the start of the day", "morning surrender and trust in God"]
+        let afternoonThemes = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"]
+        let eveningThemes = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness and releasing the day to God"]
+        let lowRelationshipThemes = ["returning to God and seeking restoration", "breaking free from distraction and reconnecting with God"]
+        let highRelationshipThemes = ["deepening intimacy with God", "rejoicing in God's faithfulness and love"]
+
+        if godRelationship < 0.35 {
+            return lowRelationshipThemes.randomElement()!
+        } else if godRelationship > 0.7 {
+            return highRelationshipThemes.randomElement()!
+        } else if hour < 12 {
+            return morningThemes.randomElement()!
+        } else if hour < 18 {
+            return afternoonThemes.randomElement()!
+        } else {
+            return eveningThemes.randomElement()!
+        }
+    }
 
     var body: some View {
         // Transition en glissement horizontal entre les écrans
         ZStack {
             switch step {
+            case .language:
+                LanguageView(onNext: {
+                    generatedPrayer = ""  // reset si la langue change
+                    next()
+                })
+
             case .introSlides:
                 IntroSlidesView(onNext: next)
 
@@ -81,6 +111,7 @@ struct OnboardingCoordinator: View {
 
             case .mascot:
                 MascotView(sheepName: $sheepName, onNext: next)
+                    .onAppear { prefetchPrayer() }
 
             case .firstPrayer:
                 FirstPrayerView(prayer: $generatedPrayer, onNext: next)
@@ -106,6 +137,19 @@ struct OnboardingCoordinator: View {
         .onAppear {
             // Premier écran de l'onboarding → event "onboarding_started"
             AnalyticsService.shared.log(.onboardingStarted)
+        }
+    }
+
+    // Lance la génération Gemini en arrière-plan pendant que l'utilisateur est sur MascotView
+    private func prefetchPrayer() {
+        guard generatedPrayer.isEmpty else { return }
+        Task {
+            do {
+                let prayer = try await GeminiService.shared.generatePrayer(theme: prayerTheme, language: prayerLanguage)
+                await MainActor.run { generatedPrayer = prayer }
+            } catch {
+                await MainActor.run { generatedPrayer = GeminiService.fallbackPrayerForLanguage(prayerLanguage) }
+            }
         }
     }
 

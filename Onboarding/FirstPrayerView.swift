@@ -8,6 +8,7 @@ import FirebaseAnalytics
 struct FirstPrayerView: View {
     @Binding var prayer: String
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     @State private var isLoading = true
     @State private var isPrayButtonEnabled = false
@@ -20,12 +21,12 @@ struct FirstPrayerView: View {
 
             VStack(spacing: 0) {
                 VStack(spacing: 8) {
-                    Text("let's pray")
+                    Text(t("let's pray", "prions"))
                         .font(.system(size: 32, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .padding(.top, 60)
 
-                    Text("read the prayer, then tap the button below")
+                    Text(t("read the prayer, then tap the button below", "lisez la prière, puis appuyez sur le bouton ci-dessous"))
                         .font(.system(size: 14))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -40,7 +41,7 @@ struct FirstPrayerView: View {
                                 ProgressView()
                                     .tint(Color.amenaPrimary)
                                     .scaleEffect(1.5)
-                                Text("Generating your prayer...")
+                                Text(t("Generating your prayer...", "Génération de votre prière..."))
                                     .font(.system(size: 15))
                                     .foregroundColor(Color.amenaTextSecondary)
                             }
@@ -70,7 +71,7 @@ struct FirstPrayerView: View {
                         savePrayerToJournal()
                         onNext()
                     } label: {
-                        Text("i've prayed today")
+                        Text(t("i've prayed today", "j'ai prié aujourd'hui"))
                             .font(.system(size: 17, weight: .semibold))
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -86,7 +87,7 @@ struct FirstPrayerView: View {
                         ShareLink(item: prayer) {
                             HStack(spacing: 6) {
                                 Image(systemName: "square.and.arrow.up")
-                                Text("share this prayer")
+                                Text(t("share this prayer", "partager cette prière"))
                             }
                             .font(.system(size: 15))
                             .foregroundColor(Color.amenaPrimary)
@@ -120,18 +121,24 @@ struct FirstPrayerView: View {
     }
 
     private func loadPrayer() {
+        // Si la prière a été pré-générée par OnboardingCoordinator, on l'affiche directement
+        if !prayer.isEmpty {
+            isLoading = false
+            startTypewriter()
+            return
+        }
+        // Sinon on la génère maintenant (cas rare si l'utilisateur va trop vite)
         Task {
             do {
-                let generated = try await GeminiService.shared.generatePrayer()
+                let generated = try await GeminiService.shared.generatePrayer(language: lang)
                 await MainActor.run {
                     prayer = generated
                     isLoading = false
                     startTypewriter()
                 }
             } catch {
-                print("⚠️ Gemini fallback: \(error)")
                 await MainActor.run {
-                    prayer = GeminiService.fallbackPrayer
+                    prayer = GeminiService.fallbackPrayerForLanguage(lang)
                     isLoading = false
                     startTypewriter()
                 }
@@ -139,21 +146,32 @@ struct FirstPrayerView: View {
         }
     }
 
-    // Effet machine à écrire : ajoute une lettre toutes les 30ms
-    // Quand toutes les lettres sont affichées → active le bouton
+    // Effet machine à écrire : ajoute 3 lettres toutes les 20ms (≈ 15s pour 200 mots)
     private func startTypewriter() {
         displayedText = ""
+        let chars = Array(prayer)
         animationTask = Task { @MainActor in
-            for character in prayer {
+            var i = 0
+            while i < chars.count {
                 if Task.isCancelled { return }
-                displayedText.append(character)
-                // 30ms par caractère — ajuster ici pour accélérer/ralentir
-                try? await Task.sleep(nanoseconds: 30_000_000)
+                // 3 caractères par tick pour aller plus vite
+                let end = min(i + 3, chars.count)
+                displayedText = String(chars[0..<end])
+                i = end
+                try? await Task.sleep(nanoseconds: 20_000_000)
             }
-            // Animation terminée → bouton actif
             withAnimation(.easeInOut(duration: 0.4)) {
                 isPrayButtonEnabled = true
             }
+        }
+    }
+
+    // Skip : affiche tout le texte immédiatement
+    private func skipTypewriter() {
+        animationTask?.cancel()
+        displayedText = prayer
+        withAnimation(.easeInOut(duration: 0.2)) {
+            isPrayButtonEnabled = true
         }
     }
 

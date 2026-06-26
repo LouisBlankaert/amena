@@ -46,6 +46,7 @@ targets:
       - path: Onboarding
       - path: Services
       - path: Assets.xcassets
+      - path: Resources
     dependencies:
       - package: FirebaseAnalytics
         product: FirebaseAnalytics
@@ -68,3 +69,4 @@ targets:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         NSUserNotificationsUsageDescription: "Amena needs notifications to remind you to pray and unlock your apps."
+        NSPhotoLibraryAddUsageDescription: "Amena saves your app icon to Photos."

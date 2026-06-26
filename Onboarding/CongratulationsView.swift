@@ -6,6 +6,7 @@ import SwiftUI
 struct CongratulationsView: View {
     let prayer: String
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -16,11 +17,11 @@ struct CongratulationsView: View {
 
                 // Titre "congratulations!" en orange
                 VStack(spacing: 8) {
-                    Text("congratulations!")
+                    Text(t("congratulations!", "félicitations !"))
                         .font(.system(size: 36, weight: .bold))
                         .foregroundColor(Color.amenaPrimary)
 
-                    Text("you've completed your first prayer")
+                    Text(t("you've completed your first prayer", "vous avez complété votre première prière"))
                         .font(.system(size: 18))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -31,7 +32,7 @@ struct CongratulationsView: View {
                     .padding(.horizontal, 24)
 
                 // Texte explicatif en bas
-                Text("your prayers will be saved in your journal to help you build a stronger relationship with God.")
+                Text(t("your prayers will be saved in your journal to help you build a stronger relationship with God.", "vos prières seront sauvegardées dans votre journal pour vous aider à construire une relation plus forte avec Dieu."))
                     .font(.system(size: 14))
                     .foregroundColor(Color.amenaTextSecondary)
                     .multilineTextAlignment(.center)
@@ -42,7 +43,7 @@ struct CongratulationsView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)
@@ -54,8 +55,8 @@ struct CongratulationsView: View {
 // Carte récap de la prière
 struct PrayerRecapCard: View {
     let prayer: String
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Extrait les premiers mots de la prière pour le preview
     private var prayerPreview: String {
         let words = prayer.split(separator: " ").prefix(20)
         return words.joined(separator: " ") + (prayer.split(separator: " ").count > 20 ? "..." : "")
@@ -66,7 +67,7 @@ struct PrayerRecapCard: View {
             // En-tête avec thème et date
             HStack {
                 // Badge "Prayer" orange
-                Text("Daily Prayer")
+                Text(t("Daily Prayer", "Prière du jour"))
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 10)

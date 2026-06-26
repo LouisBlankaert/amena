@@ -7,30 +7,31 @@ import SwiftUI
 struct IntroSlidesView: View {
     let onNext: () -> Void
 
-    // @State = variable locale qui, quand elle change, refait l'affichage
+    @AppStorage("prayerLanguage") private var lang: String = "English"
     @State private var currentSlide = 0
 
-    // Les données de chaque slide
-    private let slides: [IntroSlide] = [
-        IntroSlide(
-            highlightedWord: "God",
-            beforeHighlight: "your screen is stealing the time you owe to ",
-            afterHighlight: ".",
-            imageName: "slide1_illustration"
-        ),
-        IntroSlide(
-            highlightedWord: "amena",
-            beforeHighlight: "",
-            afterHighlight: " helps you put God before the scroll.",
-            imageName: "slide2_illustration"
-        ),
-        IntroSlide(
-            highlightedWord: "simple.",
-            beforeHighlight: "the idea is ",
-            afterHighlight: " pray first, then unlock your apps.",
-            imageName: "slide3_illustration"
-        )
-    ]
+    private var slides: [IntroSlide] {
+        [
+            IntroSlide(
+                highlightedWord: t("God", "Dieu"),
+                beforeHighlight: t("your screen is stealing the time you owe to ", "ton écran vole le temps que tu dois à "),
+                afterHighlight: ".",
+                imageName: "slide1_illustration"
+            ),
+            IntroSlide(
+                highlightedWord: "amena",
+                beforeHighlight: "",
+                afterHighlight: t(" helps you put God before the scroll.", " t'aide à mettre Dieu avant le scroll."),
+                imageName: "slide2_illustration"
+            ),
+            IntroSlide(
+                highlightedWord: t("simple.", "simple."),
+                beforeHighlight: t("the idea is ", "l'idée est "),
+                afterHighlight: t(" pray first, then unlock your apps.", " prie d'abord, puis débloque tes apps."),
+                imageName: "slide3_illustration"
+            )
+        ]
+    }
 
     var body: some View {
         ZStack {
@@ -132,6 +133,7 @@ struct SlideContentView: View {
             .font(.system(size: 28, weight: .bold))
             .multilineTextAlignment(.center)
             .padding(.horizontal, 32)
+            .padding(.bottom, 100)
 
             Spacer()
         }

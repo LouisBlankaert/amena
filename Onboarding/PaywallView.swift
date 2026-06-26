@@ -6,8 +6,8 @@ import FirebaseAnalytics
 
 struct PaywallView: View {
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    // Option sélectionnée par défaut : yearly (mis en avant)
     @State private var selectedPlan: SubscriptionPlan = .yearly
     @State private var showPostPaywall = false
     @State private var isPurchasing = false
@@ -46,7 +46,7 @@ struct PaywallView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "laurel.leading")
                                 .foregroundColor(Color.amenaPrimary)
-                            Text("your daily prayer companion")
+                            Text(t("your daily prayer companion", "votre compagnon de prière quotidien"))
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(Color.amenaText)
                             Image(systemName: "laurel.trailing")
@@ -63,7 +63,7 @@ struct PaywallView: View {
                     .padding(.top, 60)
 
                     // Titre : adapté selon le plan
-                    Text(selectedPlan == .yearly ? "try amena free for 3 days" : "start praying today")
+                    Text(selectedPlan == .yearly ? t("try amena free for 3 days", "essayez amena gratuitement 3 jours") : t("start praying today", "commencez à prier aujourd'hui"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
@@ -100,7 +100,7 @@ struct PaywallView: View {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 13, weight: .bold))
                                 .foregroundColor(Color.amenaPrimary)
-                            Text("No Payment Due Now")
+                            Text(t("No Payment Due Now", "Aucun paiement maintenant"))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(Color.amenaText)
                         }
@@ -120,32 +120,32 @@ struct PaywallView: View {
                                 .cornerRadius(16)
                                 .padding(.horizontal, 24)
                         } else {
-                            Text(selectedPlan == .yearly ? "start my free trial" : "subscribe now")
+                            Text(selectedPlan == .yearly ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
                                 .amenaPrimaryButton()
                         }
                     }
 
                     // Texte légal adapté au plan
                     Text(selectedPlan == .yearly
-                         ? "3 days free, then 89,99 €/year (1,73 €/week)"
-                         : "9,99 €/week — billed weekly, cancel anytime")
+                         ? t("3 days free, then 89,99 €/year (1,73 €/week)", "3 jours gratuits, puis 89,99 €/an (1,73 €/semaine)")
+                         : t("9,99 €/week — billed weekly, cancel anytime", "9,99 €/semaine — facturation hebdomadaire, annulation possible"))
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
 
                     // Liens Privacy + Terms
                     HStack(spacing: 16) {
-                        Button("Privacy") {}
+                        Button(t("Privacy", "Confidentialité")) {}
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
                         Text("•")
                             .foregroundColor(Color.amenaTextSecondary)
-                        Button("Terms") {}
+                        Button(t("Terms", "Conditions")) {}
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
                         Text("•")
                             .foregroundColor(Color.amenaTextSecondary)
-                        Button(isRestoring ? "Restoring..." : "Restore") {
+                        Button(isRestoring ? t("Restoring...", "Restauration...") : t("Restore", "Restaurer")) {
                             restorePurchases()
                         }
                         .font(.system(size: 12))
@@ -237,12 +237,15 @@ enum SubscriptionPlan {
 // Timeline verticale "today → in 2 days → in 3 days"
 struct TrialTimeline: View {
     let trialEndDate: String
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    private let steps: [(icon: String, time: String, description: String)] = [
-        ("lock.open.fill", "today", "unlock all the app's features for free during your trial."),
-        ("bell.fill", "in 2 Days", "we'll send you a reminder that your trial is ending soon."),
-        ("crown.fill", "in 3 Days", "you'll be charged unless you cancel anytime before.")
-    ]
+    private var steps: [(icon: String, time: String, description: String)] {
+        [
+            ("lock.open.fill", t("today", "aujourd'hui"), t("unlock all the app's features for free during your trial.", "débloquez toutes les fonctionnalités gratuitement pendant votre essai.")),
+            ("bell.fill", t("in 2 Days", "dans 2 jours"), t("we'll send you a reminder that your trial is ending soon.", "nous vous enverrons un rappel que votre essai se termine bientôt.")),
+            ("crown.fill", t("in 3 Days", "dans 3 jours"), t("you'll be charged unless you cancel anytime before.", "vous serez facturé sauf si vous annulez avant."))
+        ]
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -294,17 +297,18 @@ struct PlanOptionCard: View {
     let plan: SubscriptionPlan
     let isSelected: Bool
     let onSelect: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     private var title: String {
-        plan == .weekly ? "weekly" : "yearly"
+        plan == .weekly ? t("weekly", "hebdomadaire") : t("yearly", "annuel")
     }
 
     private var pricePerWeek: String {
-        plan == .weekly ? "9,99€/week" : "1,73€/week"
+        plan == .weekly ? t("9,99€/week", "9,99€/semaine") : t("1,73€/week", "1,73€/semaine")
     }
 
     private var totalPrice: String {
-        plan == .weekly ? "9,99€/week" : "89,99€/year"
+        plan == .weekly ? t("9,99€/week", "9,99€/semaine") : t("89,99€/year", "89,99€/an")
     }
 
     var body: some View {
@@ -329,7 +333,7 @@ struct PlanOptionCard: View {
                             .foregroundColor(Color.amenaText)
                         // Badge "3-day free trial" uniquement sur l'option yearly
                         if plan == .yearly {
-                            Text("3-day free trial")
+                            Text(t("3-day free trial", "3 jours gratuits"))
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 8)
@@ -368,6 +372,7 @@ struct PlanOptionCard: View {
 struct PostPaywallView: View {
     let plan: SubscriptionPlan
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
         ZStack {
@@ -399,8 +404,8 @@ struct PostPaywallView: View {
 
                 VStack(spacing: 12) {
                     Text(plan == .yearly
-                         ? "we'll send you a reminder before your free trial ends"
-                         : "you're all set! welcome to amena.")
+                         ? t("we'll send you a reminder before your free trial ends", "nous vous enverrons un rappel avant la fin de votre essai gratuit")
+                         : t("you're all set! welcome to amena.", "tout est prêt ! bienvenue sur amena."))
                         .font(.system(size: 24, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
@@ -411,7 +416,7 @@ struct PostPaywallView: View {
                             Image(systemName: "checkmark")
                                 .foregroundColor(Color.amenaPrimary)
                                 .fontWeight(.bold)
-                            Text("No Payment Due Now")
+                            Text(t("No Payment Due Now", "Aucun paiement maintenant"))
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(Color.amenaText)
                         }
@@ -424,13 +429,13 @@ struct PostPaywallView: View {
                     Button {
                         onNext()
                     } label: {
-                        Text(plan == .yearly ? "continue for FREE" : "start praying")
+                        Text(plan == .yearly ? t("continue for FREE", "continuer GRATUITEMENT") : t("start praying", "commencer à prier"))
                             .amenaPrimaryButton()
                     }
 
                     Text(plan == .yearly
-                         ? "just 89,99 € per year (1,73 €/week)"
-                         : "9,99 €/week — cancel anytime")
+                         ? t("just 89,99 € per year (1,73 €/week)", "seulement 89,99 € par an (1,73 €/semaine)")
+                         : t("9,99 €/week — cancel anytime", "9,99 €/semaine — annulation possible"))
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                 }

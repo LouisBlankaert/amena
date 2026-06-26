@@ -6,7 +6,9 @@ import SwiftUI
 import FirebaseAnalytics
 
 struct PrayerView: View {
+    var prefetchedPrayer: String = ""
     let onPrayerCompleted: () -> Void
+    @AppStorage("prayerLanguage") private var prayerLanguage = "English"
 
     @State private var prayer = ""
     @State private var isLoading = true
@@ -24,10 +26,10 @@ struct PrayerView: View {
                 VStack(spacing: 0) {
                     // En-tête dans la NavigationStack
                     VStack(spacing: 8) {
-                        Text("let's pray")
+                        Text(t("let's pray", "prions"))
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(Color.amenaText)
-                        Text("read the prayer, then tap the button below")
+                        Text(t("read the prayer, then tap the button below", "lisez la prière, puis appuyez sur le bouton ci-dessous"))
                             .font(.system(size: 14))
                             .foregroundColor(Color.amenaTextSecondary)
                             .multilineTextAlignment(.center)
@@ -43,7 +45,7 @@ struct PrayerView: View {
                                     ProgressView()
                                         .tint(Color.amenaPrimary)
                                         .scaleEffect(1.5)
-                                    Text("Generating your prayer...")
+                                    Text(t("Generating your prayer...", "Génération de votre prière..."))
                                         .font(.system(size: 15))
                                         .foregroundColor(Color.amenaTextSecondary)
                                 }
@@ -76,7 +78,7 @@ struct PrayerView: View {
                             onPrayerCompleted()
                             dismiss()
                         } label: {
-                            Text("i've prayed today")
+                            Text(t("i've prayed today", "j'ai prié aujourd'hui"))
                                 .font(.system(size: 17, weight: .semibold))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -92,7 +94,7 @@ struct PrayerView: View {
                             ShareLink(item: prayer) {
                                 HStack(spacing: 6) {
                                     Image(systemName: "square.and.arrow.up")
-                                    Text("share this prayer")
+                                    Text(t("share this prayer", "partager cette prière"))
                                 }
                                 .font(.system(size: 15))
                                 .foregroundColor(Color.amenaPrimary)
@@ -124,19 +126,38 @@ struct PrayerView: View {
         }
     }
 
+    private var prayerTheme: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let themes: [String]
+        if hour < 12 {
+            themes = ["gratitude for a new day", "seeking God's guidance at the start of the day", "morning surrender and trust in God"]
+        } else if hour < 18 {
+            themes = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"]
+        } else {
+            themes = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness and releasing the day to God"]
+        }
+        return themes.randomElement()!
+    }
+
     private func loadPrayer() {
+        // Si une prière pré-générée est disponible, on l'utilise immédiatement
+        if !prefetchedPrayer.isEmpty {
+            prayer = prefetchedPrayer
+            isLoading = false
+            startTypewriter()
+            return
+        }
         Task {
             do {
-                let generated = try await GeminiService.shared.generatePrayer()
+                let generated = try await GeminiService.shared.generatePrayer(theme: prayerTheme, language: prayerLanguage)
                 await MainActor.run {
                     prayer = generated
                     isLoading = false
                     startTypewriter()
                 }
             } catch {
-                print("⚠️ Gemini fallback: \(error)")
                 await MainActor.run {
-                    prayer = GeminiService.fallbackPrayer
+                    prayer = GeminiService.fallbackPrayerForLanguage(prayerLanguage)
                     isLoading = false
                     startTypewriter()
                 }
@@ -146,16 +167,27 @@ struct PrayerView: View {
 
     private func startTypewriter() {
         displayedText = ""
+        let chars = Array(prayer)
         animationTask = Task { @MainActor in
-            for character in prayer {
+            var i = 0
+            while i < chars.count {
                 if Task.isCancelled { return }
-                displayedText.append(character)
-                try? await Task.sleep(nanoseconds: 30_000_000) // 30ms par lettre
+                let end = min(i + 3, chars.count)
+                displayedText = String(chars[0..<end])
+                i = end
+                try? await Task.sleep(nanoseconds: 20_000_000)
             }
             withAnimation(.easeInOut(duration: 0.4)) {
                 isPrayButtonEnabled = true
             }
         }
+    }
+
+    private func skipTypewriter() {
+        guard !isLoading else { return }  // ne rien faire si la prière n'est pas encore chargée
+        animationTask?.cancel()
+        displayedText = prayer
+        withAnimation(.easeInOut(duration: 0.2)) { isPrayButtonEnabled = true }
     }
 
     // Sauvegarde directement dans UserDefaults (plus fiable que NotificationCenter seul)

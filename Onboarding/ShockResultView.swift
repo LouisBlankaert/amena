@@ -5,8 +5,9 @@ import SwiftUI
 
 struct ShockResultView: View {
     let userName: String
-    let dailyScreenTime: Double   // heures/jour
+    let dailyScreenTime: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     // Calcul : heures par jour × 365 jours × 50 ans de vie restante / (24h × 365)
     // = proportion de la vie restante passée sur le téléphone
@@ -45,17 +46,16 @@ struct ShockResultView: View {
 
                 // Texte principal avec les années en orange
                 VStack(spacing: 8) {
-                    Text("\(userName.isEmpty ? "hey" : userName.lowercased()), you're on track to spend")
+                    Text(t("\(userName.isEmpty ? "hey" : userName.lowercased()), you're on track to spend", "\(userName.isEmpty ? "hey" : userName.lowercased()), tu es en route pour passer"))
                         .font(.system(size: 22, weight: .medium))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
 
-                    // Années en bleu très grand
-                    (Text("\(yearsOnPhone) years")
+                    (Text(t("\(yearsOnPhone) years", "\(yearsOnPhone) ans"))
                         .foregroundColor(Color.amenaPrimary)
                         .fontWeight(.bold)
                         .font(.system(size: 48, weight: .bold))
-                     + Text("\nstaring at a screen.")
+                     + Text(t("\nstaring at a screen.", "\nà fixer un écran."))
                         .foregroundColor(Color.amenaText)
                         .font(.system(size: 22, weight: .medium)))
                     .multilineTextAlignment(.center)
@@ -67,7 +67,7 @@ struct ShockResultView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)

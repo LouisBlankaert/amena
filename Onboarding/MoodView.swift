@@ -6,6 +6,7 @@ import SwiftUI
 struct MoodView: View {
     @Binding var value: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     private var moodIcon: String {
         switch value {
@@ -25,10 +26,10 @@ struct MoodView: View {
 
     private var label: String {
         switch value {
-        case 0.0..<0.25: return "not great"
-        case 0.25..<0.50: return "okay"
-        case 0.50..<0.75: return "good"
-        default: return "great!"
+        case 0.0..<0.25: return t("not great", "pas terrible")
+        case 0.25..<0.50: return t("okay", "ça va")
+        case 0.50..<0.75: return t("good", "bien")
+        default: return t("great!", "super !")
         }
     }
 
@@ -40,7 +41,7 @@ struct MoodView: View {
             VStack(spacing: 48) {
                 Spacer()
 
-                Text("how are you feeling today?")
+                Text(t("how are you feeling today?", "comment te sens-tu aujourd'hui ?"))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)
@@ -73,7 +74,7 @@ struct MoodView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(Color.amenaSkyBlue)
                         .frame(maxWidth: .infinity)

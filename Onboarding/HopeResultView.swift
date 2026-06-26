@@ -6,6 +6,7 @@ import SwiftUI
 struct HopeResultView: View {
     let dailyScreenTime: Double
     let onNext: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     // Même calcul que ShockResultView
     private var yearsToGiveBack: Int {
@@ -29,17 +30,16 @@ struct HopeResultView: View {
 
                 // Texte principal
                 VStack(spacing: 16) {
-                    Text("with amena, you could reclaim")
+                    Text(t("with amena, you could reclaim", "avec amena, tu pourrais récupérer"))
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    // Nombre d'années en très grand, bleu
-                    (Text("\(yearsToGiveBack) years")
+                    (Text(t("\(yearsToGiveBack) years", "\(yearsToGiveBack) ans"))
                         .foregroundColor(Color.amenaPrimary)
                         .fontWeight(.bold)
-                     + Text(" for God.")
+                     + Text(t(" for God.", " pour Dieu."))
                         .foregroundColor(Color.amenaText))
                     .font(.system(size: 42, weight: .bold))
                     .multilineTextAlignment(.center)
@@ -51,7 +51,7 @@ struct HopeResultView: View {
                 Button {
                     onNext()
                 } label: {
-                    Text("continue")
+                    Text(t("continue", "continuer"))
                         .amenaPrimaryButton()
                 }
                 .padding(.bottom, 48)
