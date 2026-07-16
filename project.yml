@@ -65,6 +65,9 @@ targets:
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         LSRequiresIPhoneOS: true
+        # L'app n'utilise que du chiffrement standard exempté (HTTPS via URLSession/Firebase/StoreKit),
+        # aucune cryptographie propriétaire — évite les questions de conformité export à chaque soumission
+        ITSAppUsesNonExemptEncryption: false
         UILaunchScreen:
           UIColorName: ""
         UISupportedInterfaceOrientations:
