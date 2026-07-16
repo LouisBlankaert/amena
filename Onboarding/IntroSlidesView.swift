@@ -14,20 +14,20 @@ struct IntroSlidesView: View {
         [
             IntroSlide(
                 highlightedWord: t("God", "Dieu"),
-                beforeHighlight: t("your screen is stealing the time you owe to ", "ton écran vole le temps que tu dois à "),
+                beforeHighlight: t("your screen is stealing the time you owe to ", "votre écran vole le temps que vous devez à "),
                 afterHighlight: ".",
                 imageName: "slide1_illustration"
             ),
             IntroSlide(
                 highlightedWord: "amena",
                 beforeHighlight: "",
-                afterHighlight: t(" helps you put God before the scroll.", " t'aide à mettre Dieu avant le scroll."),
+                afterHighlight: t(" helps you put God before the scroll.", " vous aide à mettre Dieu avant le scroll."),
                 imageName: "slide2_illustration"
             ),
             IntroSlide(
                 highlightedWord: t("simple.", "simple."),
                 beforeHighlight: t("the idea is ", "l'idée est "),
-                afterHighlight: t(" pray first, then unlock your apps.", " prie d'abord, puis débloque tes apps."),
+                afterHighlight: t(" pray first, then use your apps with peace.", " priez d'abord, puis utilisez vos apps en paix."),
                 imageName: "slide3_illustration"
             )
         ]

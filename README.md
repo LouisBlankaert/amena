@@ -7,10 +7,11 @@ Application iOS de prière chrétienne inspirée de PrayerLock.
 ## Stack
 
 - **Swift 6 / SwiftUI** — iOS 16+
-- **Gemini API** (Google AI) — génération de prières personnalisées
+- **Groq API** (`llama-3.3-70b-versatile`) — génération de prières personnalisées, appelée directement depuis l'app
 - **StoreKit 2** — abonnements In-App Purchase
 - **Firebase Analytics** — suivi du comportement utilisateur
 - **AVKit** — animations mouton en boucle (MP4 silencieux)
+- Français / Anglais — toute l'UI, les prières et les notifications sont bilingues
 - Stockage local uniquement (UserDefaults) — pas de compte utilisateur
 
 ## Setup
@@ -25,7 +26,7 @@ cd amena
 ```swift
 // Secrets.swift
 enum Secrets {
-    static let geminiAPIKey = "VOTRE_CLE_GEMINI"
+    static let groqAPIKey = "VOTRE_CLE_GROQ"
 }
 ```
 
@@ -46,8 +47,8 @@ xcodebuild -scheme Amena -destination 'platform=iOS Simulator,name=iPhone 15' bu
 
 | ID | Type | Prix | Essai |
 |----|------|------|-------|
-| com.louis.Amena.yearly | Auto-renewable | 89,99 €/an | 3 jours |
-| com.louis.Amena.weekly | Auto-renewable | 9,99 €/sem | Aucun |
+| com.louis.Amena.yearly | Auto-renewable | 29,99 €/an | 3 jours |
+| com.louis.Amena.weekly | Auto-renewable | 4,99 €/sem | Aucun |
 
 ## Pages légales
 
@@ -69,16 +70,16 @@ xcodebuild -scheme Amena -destination 'platform=iOS Simulator,name=iPhone 15' bu
 ## Architecture
 
 ```
-Amena/
+amena/
 ├── AmenaApp.swift
 ├── ContentView.swift
-├── Secrets.swift              ← .gitignore
-├── Onboarding/                ← 15 écrans
-├── Main/                      ← Home, Prayer, Journal, Settings
-├── Models/                    ← StreakManager, PrayerSession
-├── Services/                  ← Gemini, StoreKit, Notifications, LoopingVideo
-├── Extensions/                ← Color+Theme
-├── Resources/                 ← Vidéos mouton (MP4)
-├── Assets.xcassets/           ← Illustrations Midjourney
-└── docs/                      ← Privacy Policy + Terms (GitHub Pages)
+├── Secrets.swift               ← .gitignore
+├── Onboarding/                 ← 18 écrans (langue, intro, questions, mouton, paywall...)
+├── Main/                       ← Home, Prayer, Journal, Settings
+├── Models/                     ← StreakManager
+├── Services/                   ← Groq, StoreKit, Notifications, Analytics, LoopingVideo
+├── Extensions/                 ← Color+Theme, Localization (t())
+├── Resources/                  ← Vidéos mouton (MP4)
+├── Assets.xcassets/            ← Illustrations Midjourney
+└── docs/                       ← Privacy Policy + Terms (GitHub Pages)
 ```

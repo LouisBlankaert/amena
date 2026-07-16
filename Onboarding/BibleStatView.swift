@@ -37,7 +37,7 @@ struct BibleStatView: View {
 
                 // Texte principal avec "Bible" et nombre de jours en orange
                 VStack(spacing: 16) {
-                    (Text(t("you could read the entire ", "tu pourrais lire toute la "))
+                    (Text(t("you could read the entire ", "vous pourriez lire toute la "))
                         .foregroundColor(Color.amenaText)
                      + Text("Bible")
                         .foregroundColor(Color.amenaPrimary)
@@ -51,7 +51,7 @@ struct BibleStatView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 24)
 
-                    Text(t("if you swapped half your screen time for prayer.", "si tu échangeais la moitié de ton temps d'écran contre la prière."))
+                    Text(t("if you swapped half your screen time for prayer.", "si vous échangiez la moitié de votre temps d'écran contre la prière."))
                         .font(.system(size: 16))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)

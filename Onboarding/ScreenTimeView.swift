@@ -18,7 +18,7 @@ struct ScreenTimeView: View {
 
                 VStack(spacing: 40) {
                     VStack(spacing: 8) {
-                        Text(t("how long are you on your phone each day?", "combien de temps passes-tu sur ton téléphone chaque jour ?"))
+                        Text(t("how long are you on your phone each day?", "combien de temps passez-vous sur votre téléphone chaque jour ?"))
                             .font(.system(size: 26, weight: .bold))
                             .foregroundColor(Color.amenaText)
                             .multilineTextAlignment(.center)

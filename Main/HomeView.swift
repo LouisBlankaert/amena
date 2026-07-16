@@ -22,6 +22,7 @@ struct HomeView: View {
     @AppStorage("prayerLanguage")  private var prayerLanguage = "English"
     @State private var showCycleBanner = false
     @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
+    @State private var prayers: [PrayerEntry] = []
 
     // Niveau et % FAITH calculés dynamiquement depuis totalPrayers
     private var levelData: (level: Int, faithPercent: Double) {
@@ -82,8 +83,8 @@ struct HomeView: View {
                         )
                         .padding(.horizontal, 24)
 
-                        // Grille 30 jours (aperçu compact)
-                        MiniNinetyDayGrid()
+                        // Historique de prière façon GitHub
+                        PrayerContributionGrid(prayers: prayers)
                             .padding(.horizontal, 24)
 
                         Spacer(minLength: 40)
@@ -100,6 +101,7 @@ struct HomeView: View {
                     if UserDefaults.standard.bool(forKey: StreakManager.cycleCompletedTodayKey) {
                         showCycleBanner = true
                     }
+                    loadPrayers()
                     // Pré-génère la prochaine prière immédiatement après
                     prefetchedPrayer = ""
                     prefetchNextPrayer()
@@ -143,6 +145,14 @@ struct HomeView: View {
 
         NotificationService.shared.schedulePrayerNotifications()
         prefetchNextPrayer()
+        loadPrayers()
+    }
+
+    private func loadPrayers() {
+        if let data = UserDefaults.standard.data(forKey: "prayerJournal"),
+           let decoded = try? JSONDecoder().decode([PrayerEntry].self, from: data) {
+            prayers = decoded
+        }
     }
 
     private func prefetchNextPrayer() {
@@ -348,43 +358,6 @@ struct CycleCompletedBanner: View {
 
 // LoopingVideoView et PlayerContainerView définis dans Services/LoopingVideoView.swift
 
-// Aperçu compact de la grille 90 jours sur l'écran d'accueil
-struct MiniNinetyDayGrid: View {
-    @AppStorage("prayedDays") private var prayedDaysData: Data = Data()
-    @AppStorage("prayerLanguage") private var lang: String = "English"
-
-    // Jours priés stockés en JSON dans UserDefaults
-    private var prayedDays: Set<Int> {
-        (try? JSONDecoder().decode(Set<Int>.self, from: prayedDaysData)) ?? []
-    }
-
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 9)
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(t("30-Day Journey", "Parcours 30 jours"))
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color.amenaText)
-                Spacer()
-                Text(t("\(prayedDays.count)/30 days", "\(prayedDays.count)/30 jours"))
-                    .font(.system(size: 13))
-                    .foregroundColor(Color.amenaTextSecondary)
-            }
-
-            LazyVGrid(columns: columns, spacing: 4) {
-                ForEach(0..<30, id: \.self) { day in
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(prayedDays.contains(day) ? Color.amenaPrimary : Color.amenaUnselectedBackground)
-                        .frame(height: 16)
-                }
-            }
-        }
-        .padding(16)
-        .background(Color.amenaSecondaryBackground)
-        .cornerRadius(16)
-    }
-}
 
 // Extension pour clamp (limiter une valeur entre min et max)
 extension Comparable {

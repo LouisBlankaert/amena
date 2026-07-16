@@ -10,8 +10,8 @@ settings:
     SWIFT_VERSION: "6.0"
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "1"
-    DEVELOPMENT_TEAM: ""
+    CURRENT_PROJECT_VERSION: "2"
+    DEVELOPMENT_TEAM: "J55DB3RJLY"
 
 packages:
   FirebaseAnalytics:
@@ -56,6 +56,7 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
         SWIFT_STRICT_CONCURRENCY: targeted
+        TARGETED_DEVICE_FAMILY: "1"
     info:
       path: Info.plist
       properties:
@@ -69,4 +70,3 @@ targets:
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         NSUserNotificationsUsageDescription: "Amena needs notifications to remind you to pray and unlock your apps."
-        NSPhotoLibraryAddUsageDescription: "Amena saves your app icon to Photos."

@@ -37,8 +37,8 @@ final class NotificationService: @unchecked Sendable {
     // Planifie une notification quotidienne à une heure précise
     private func scheduleDailyNotification(at time: Date, identifier: String) {
         let content = UNMutableNotificationContent()
-        content.title = "Time to Pray"
-        content.body = "Your apps are blocked! Take a moment to pray with Amena."
+        content.title = t("Time to Pray", "C'est l'heure de prier")
+        content.body = t("Take a moment to pray with Amena before opening your apps.", "Prenez un moment pour prier avec Amena avant d'ouvrir vos apps.")
         content.sound = .default
         content.badge = 1
 
@@ -69,8 +69,8 @@ final class NotificationService: @unchecked Sendable {
     // Planifie une notification de rappel de fin d'essai (J+2)
     func scheduleTrialEndingReminder() {
         let content = UNMutableNotificationContent()
-        content.title = "Your free trial ends tomorrow 🔔"
-        content.body = "Don't forget — your Amena trial ends in 1 day. Keep praying daily!"
+        content.title = t("Your free trial ends tomorrow 🔔", "Votre essai gratuit se termine demain 🔔")
+        content.body = t("Don't forget — your Amena trial ends in 1 day. Keep praying daily!", "N'oubliez pas — votre essai Amena se termine dans 1 jour. Continuez à prier chaque jour !")
         content.sound = .default
 
         // Se déclenche dans exactement 2 jours (48h)

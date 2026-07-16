@@ -42,7 +42,7 @@ struct RelationshipView: View {
                 Spacer()
 
                 // Titre en blanc
-                Text(t("how's your relationship with God today?", "comment est ta relation avec Dieu aujourd'hui ?"))
+                Text(t("how's your relationship with God today?", "comment est votre relation avec Dieu aujourd'hui ?"))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)

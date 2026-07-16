@@ -14,6 +14,7 @@ struct PaywallView: View {
     @State private var isRestoring = false
     @State private var restoreMessage = ""
     @State private var purchasedPlan: SubscriptionPlan = .yearly
+    @State private var purchaseErrorMessage = ""
 
     // Date de fin d'essai = aujourd'hui + 3 jours
     private var trialEndDate: String {
@@ -35,30 +36,27 @@ struct PaywallView: View {
         ZStack {
             Color.amenaBackground.ignoresSafeArea()
                 .onAppear {
+                    // Si l'utilisateur est déjà abonné (ex: reset onboarding après un achat réel),
+                    // on ne lui redemande pas de payer — StoreKit sait déjà qu'il est premium.
+                    guard !StoreKitService.shared.isPremium else {
+                        onNext()
+                        return
+                    }
                     // Paywall affiché → event "paywall_shown"
                     AnalyticsService.shared.log(.paywallShown)
                 }
 
             ScrollView {
                 VStack(spacing: 24) {
-                    // En-tête : laurier + étoiles
-                    VStack(spacing: 8) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "laurel.leading")
-                                .foregroundColor(Color.amenaPrimary)
-                            Text(t("your daily prayer companion", "votre compagnon de prière quotidien"))
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(Color.amenaText)
-                            Image(systemName: "laurel.trailing")
-                                .foregroundColor(Color.amenaPrimary)
-                        }
-                        HStack(spacing: 2) {
-                            ForEach(0..<5, id: \.self) { _ in
-                                Image(systemName: "star.fill")
-                                    .font(.system(size: 12))
-                                    .foregroundColor(.yellow)
-                            }
-                        }
+                    // En-tête : laurier (étoiles retirées — pas encore assez d'avis réels pour les afficher)
+                    HStack(spacing: 6) {
+                        Image(systemName: "laurel.leading")
+                            .foregroundColor(Color.amenaPrimary)
+                        Text(t("your daily prayer companion", "votre compagnon de prière quotidien"))
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(Color.amenaText)
+                        Image(systemName: "laurel.trailing")
+                            .foregroundColor(Color.amenaPrimary)
                     }
                     .padding(.top, 60)
 
@@ -103,6 +101,8 @@ struct PaywallView: View {
                             Text(t("No Payment Due Now", "Aucun paiement maintenant"))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(Color.amenaText)
+                            Text("👇")
+                                .font(.system(size: 14))
                         }
                         .transition(.opacity)
                     }
@@ -127,20 +127,20 @@ struct PaywallView: View {
 
                     // Texte légal adapté au plan
                     Text(selectedPlan == .yearly
-                         ? t("3 days free, then 89,99 €/year (1,73 €/week)", "3 jours gratuits, puis 89,99 €/an (1,73 €/semaine)")
-                         : t("9,99 €/week — billed weekly, cancel anytime", "9,99 €/semaine — facturation hebdomadaire, annulation possible"))
+                         ? t("3 days free, then 29,99 €/year (0,58 €/week)", "3 jours gratuits, puis 29,99 €/an (0,58 €/semaine)")
+                         : t("4,99 €/week — billed weekly, cancel anytime", "4,99 €/semaine — facturation hebdomadaire, annulation possible"))
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
 
                     // Liens Privacy + Terms
                     HStack(spacing: 16) {
-                        Button(t("Privacy", "Confidentialité")) {}
+                        Link(t("Privacy", "Confidentialité"), destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!)
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
                         Text("•")
                             .foregroundColor(Color.amenaTextSecondary)
-                        Button(t("Terms", "Conditions")) {}
+                        Link(t("Terms", "Conditions"), destination: URL(string: "https://louisblankaert.github.io/amena/terms.html")!)
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
                         Text("•")
@@ -157,6 +157,13 @@ struct PaywallView: View {
                             .font(.system(size: 12))
                             .foregroundColor(StoreKitService.shared.isPremium ? .green : Color.amenaTextSecondary)
                             .multilineTextAlignment(.center)
+                    }
+                    if !purchaseErrorMessage.isEmpty {
+                        Text(purchaseErrorMessage)
+                            .font(.system(size: 12))
+                            .foregroundColor(.red)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
                     }
                     Spacer().frame(height: 40)
                 }
@@ -193,6 +200,7 @@ struct PaywallView: View {
     // Lance le processus d'achat via StoreKit
     private func startTrial() {
         isPurchasing = true
+        purchaseErrorMessage = ""
         Task {
             do {
                 try await StoreKitService.shared.purchase(plan: selectedPlan)
@@ -212,10 +220,21 @@ struct PaywallView: View {
                     isPurchasing = false
                     // L'utilisateur a annulé → on reste sur le paywall
                 }
+            } catch StoreKitError.productNotFound {
+                await MainActor.run {
+                    isPurchasing = false
+                    purchaseErrorMessage = t(
+                        "Couldn't reach the App Store. Please check your connection and try again.",
+                        "Impossible de contacter l'App Store. Vérifiez votre connexion et réessayez."
+                    )
+                }
             } catch {
                 await MainActor.run {
                     isPurchasing = false
-                    // Erreur → on reste sur le paywall
+                    purchaseErrorMessage = t(
+                        "Something went wrong. Please try again.",
+                        "Une erreur est survenue. Veuillez réessayer."
+                    )
                 }
             }
         }
@@ -304,11 +323,11 @@ struct PlanOptionCard: View {
     }
 
     private var pricePerWeek: String {
-        plan == .weekly ? t("9,99€/week", "9,99€/semaine") : t("1,73€/week", "1,73€/semaine")
+        plan == .weekly ? t("4,99€/week", "4,99€/semaine") : t("0,58€/week", "0,58€/semaine")
     }
 
     private var totalPrice: String {
-        plan == .weekly ? t("9,99€/week", "9,99€/semaine") : t("89,99€/year", "89,99€/an")
+        plan == .weekly ? t("4,99€/week", "4,99€/semaine") : t("29,99€/year", "29,99€/an")
     }
 
     var body: some View {
@@ -434,8 +453,8 @@ struct PostPaywallView: View {
                     }
 
                     Text(plan == .yearly
-                         ? t("just 89,99 € per year (1,73 €/week)", "seulement 89,99 € par an (1,73 €/semaine)")
-                         : t("9,99 €/week — cancel anytime", "9,99 €/semaine — annulation possible"))
+                         ? t("just 29,99 € per year (0,58 €/week)", "seulement 29,99 € par an (0,58 €/semaine)")
+                         : t("4,99 €/week — cancel anytime", "4,99 €/semaine — annulation possible"))
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                 }

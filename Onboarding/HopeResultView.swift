@@ -30,7 +30,7 @@ struct HopeResultView: View {
 
                 // Texte principal
                 VStack(spacing: 16) {
-                    Text(t("with amena, you could reclaim", "avec amena, tu pourrais récupérer"))
+                    Text(t("with amena, you could reclaim", "avec amena, vous pourriez récupérer"))
                         .font(.system(size: 20, weight: .medium))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)

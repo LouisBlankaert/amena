@@ -17,7 +17,7 @@ struct PrayerFrequencyView: View {
                     .padding(.top, 60)
 
                 VStack(spacing: 40) {
-                    Text(t("be honest, how often do you pray per week?", "honnêtement, combien de fois pries-tu par semaine ?"))
+                    Text(t("be honest, how often do you pray per week?", "honnêtement, combien de fois priez-vous par semaine ?"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)

@@ -41,7 +41,7 @@ struct MoodView: View {
             VStack(spacing: 48) {
                 Spacer()
 
-                Text(t("how are you feeling today?", "comment te sens-tu aujourd'hui ?"))
+                Text(t("how are you feeling today?", "comment vous sentez-vous aujourd'hui ?"))
                     .font(.system(size: 28, weight: .bold))
                     .foregroundColor(.white)
                     .multilineTextAlignment(.center)

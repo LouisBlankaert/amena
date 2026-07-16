@@ -22,8 +22,6 @@
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Amena saves your app icon to Photos.</string>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>Amena needs notifications to remind you to pray and unlock your apps.</string>
 	<key>UILaunchScreen</key>

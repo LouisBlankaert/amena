@@ -87,13 +87,13 @@ final class GeminiService: @unchecked Sendable {
         """
         Père céleste,
 
-        Je viens à Toi en ce nouveau matin, le cœur plein de gratitude. Tu m'as accordé une nouvelle journée — un cadeau que je n'ai pas mérité, et pourtant Tu me le donnes librement. Avant que le monde me réclame, je choisis de m'asseoir avec Toi.
+        Je viens à Vous en ce nouveau matin, le cœur plein de gratitude. Vous m'avez accordé une nouvelle journée — un cadeau que je n'ai pas mérité, et pourtant Vous me le donnez librement. Avant que le monde me réclame, je choisis de m'asseoir avec Vous.
 
-        Apaise le bruit en moi, Seigneur. Fais taire les peurs, les soucis, les distractions qui encombrent mon esprit. Accorde-moi cette paix qui dépasse toute compréhension — une paix que le monde ne peut ni fabriquer ni reprendre.
+        Apaisez le bruit en moi, Seigneur. Faites taire les peurs, les soucis, les distractions qui encombrent mon esprit. Accordez-moi cette paix qui dépasse toute compréhension — une paix que le monde ne peut ni fabriquer ni reprendre.
 
-        Guide chacun de mes pas aujourd'hui. Que mes paroles soient douces, mes pensées nobles, et mes actions reflet de Ton amour. Je Te donne cette journée entière — les réunions, les repas, les moments entre les deux. Utilise-les tous pour Ta gloire.
+        Guidez chacun de mes pas aujourd'hui. Que mes paroles soient douces, mes pensées nobles, et mes actions reflet de Votre amour. Je Vous donne cette journée entière — les réunions, les repas, les moments entre les deux. Utilisez-les tous pour Votre gloire.
 
-        Je choisis Ton visage avant l'écran, Ta voix avant le bruit. Reste proche de moi, Père.
+        Je choisis Votre visage avant l'écran, Votre voix avant le bruit. Restez proche de moi, Père.
 
         Au nom de Jésus, Amen.
 
@@ -102,13 +102,13 @@ final class GeminiService: @unchecked Sendable {
         """
         Seigneur,
 
-        Ta fidélité est nouvelle chaque matin — et j'en ai besoin chaque matin. Merci de ne pas m'avoir abandonné, de me poursuivre même dans mes moments de distraction et de faiblesse.
+        Votre fidélité est nouvelle chaque matin — et j'en ai besoin chaque matin. Merci de ne pas m'avoir abandonné, de me poursuivre même dans mes moments de distraction et de faiblesse.
 
-        Aujourd'hui, aide-moi à Te chercher avant toute chose. Avant les notifications, avant les réseaux, avant la précipitation — que je sois immobile dans Ta présence. Remplis mon cœur de force et de lumière pour affronter cette journée.
+        Aujourd'hui, aidez-moi à Vous chercher avant toute chose. Avant les notifications, avant les réseaux, avant la précipitation — que je sois immobile dans Votre présence. Remplissez mon cœur de force et de lumière pour affronter cette journée.
 
-        Que Ta lumière brille à travers moi dans chaque rencontre. Là où il y a du conflit, fais de moi un artisan de paix. Là où il y a de l'obscurité, fais de moi une lumière. Je veux regarder en arrière sur cette journée et voir Tes empreintes partout.
+        Que Votre lumière brille à travers moi dans chaque rencontre. Là où il y a du conflit, faites de moi un artisan de paix. Là où il y a de l'obscurité, faites de moi une lumière. Je veux regarder en arrière sur cette journée et voir Vos empreintes partout.
 
-        Tu es Dieu. Cela change tout.
+        Vous êtes Dieu. Cela change tout.
 
         Au nom de Jésus, Amen.
 
@@ -142,6 +142,7 @@ final class GeminiService: @unchecked Sendable {
         - Write at least 4 full paragraphs with rich, poetic language.
         - Be personal, warm, and deeply emotional.
         - If French: use correct French grammar. Never write 'je me prostre' — use 'je m'incline' or 'je me prosterne' instead.
+        - If French: when addressing God, use the formal 'vous' (vouvoiement) consistently throughout the entire prayer — never switch to 'tu' (tutoiement) mid-prayer.
         - End with 'Au nom de Jésus, Amen.' if French, or 'In Jesus' name, Amen.' if English.
         - Add the Biblical reference on the last line starting with '— '.
         """

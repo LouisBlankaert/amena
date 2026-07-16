@@ -46,7 +46,7 @@ struct ShockResultView: View {
 
                 // Texte principal avec les années en orange
                 VStack(spacing: 8) {
-                    Text(t("\(userName.isEmpty ? "hey" : userName.lowercased()), you're on track to spend", "\(userName.isEmpty ? "hey" : userName.lowercased()), tu es en route pour passer"))
+                    Text(t("\(userName.isEmpty ? "hey" : userName.lowercased()), you're on track to spend", "\(userName.isEmpty ? "hey" : userName.lowercased()), vous êtes en route pour passer"))
                         .font(.system(size: 22, weight: .medium))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)

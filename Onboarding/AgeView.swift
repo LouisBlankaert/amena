@@ -19,7 +19,7 @@ struct AgeView: View {
                     .padding(.top, 60)
 
                 VStack(spacing: 32) {
-                    Text(t("how old are you?", "quel âge as-tu ?"))
+                    Text(t("how old are you?", "quel âge avez-vous ?"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)

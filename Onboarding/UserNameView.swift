@@ -20,7 +20,7 @@ struct UserNameView: View {
                 ScrollView {
                     VStack(spacing: 32) {
                         // Titre avec "new" en orange
-                        (Text(t("ready to build a habit that actually ", "prêt à construire une habitude qui te "))
+                        (Text(t("ready to build a habit that actually ", "prêt à construire une habitude qui vous "))
                             .foregroundColor(Color.amenaText)
                          + Text(t("changes you?", "change vraiment ?"))
                             .foregroundColor(Color.amenaPrimary)
@@ -36,11 +36,11 @@ struct UserNameView: View {
 
                         // Question + champ de saisie
                         VStack(alignment: .leading, spacing: 12) {
-                            Text(t("what should we call you?", "comment t'appelles-tu ?"))
+                            Text(t("what should we call you?", "comment vous appelez-vous ?"))
                                 .font(.system(size: 17, weight: .medium))
                                 .foregroundColor(Color.amenaText)
 
-                            TextField(t("enter your name", "entre ton prénom"), text: $userName)
+                            TextField(t("enter your name", "entrez votre prénom"), text: $userName)
                                 .font(.system(size: 17))
                                 .padding(16)
                                 .background(Color.amenaSecondaryBackground)

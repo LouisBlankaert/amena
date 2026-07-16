@@ -17,8 +17,8 @@ struct JournalView: View {
 
                 ScrollView {
                     VStack(spacing: 24) {
-                        // Grille 30 jours
-                        FullNinetyDayGrid(prayedCount: prayers.count)
+                        // Historique complet façon GitHub — ne se réinitialise jamais
+                        PrayerContributionGrid(prayers: prayers)
                             .padding(.horizontal, 24)
                             .padding(.top, 16)
 
@@ -110,60 +110,73 @@ struct PrayerEntry: Identifiable, Codable {
     }
 }
 
-// Grille complète 90 jours avec légende
-struct FullNinetyDayGrid: View {
-    let prayedCount: Int
-    @AppStorage("prayedDays") private var prayedDaysData: Data = Data()
+// Historique de prière façon GitHub : une colonne par semaine, une case par jour,
+// remplie si l'utilisateur a prié ce jour-là. Contrairement à FullNinetyDayGrid,
+// ne se réinitialise jamais — basé directement sur les dates réelles du journal.
+struct PrayerContributionGrid: View {
+    let prayers: [PrayerEntry]
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    private var prayedDays: Set<Int> {
-        (try? JSONDecoder().decode(Set<Int>.self, from: prayedDaysData)) ?? []
+    private let weeksToShow = 12
+
+    // Jours distincts où au moins une prière a été faite
+    private var prayedDates: Set<Date> {
+        Set(prayers.map { Calendar.current.startOfDay(for: $0.date) })
     }
 
-    let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 9)
+    // Grille alignée sur les semaines (dimanche → samedi), la plus récente à droite
+    private var weeks: [[Date]] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let todayWeekday = calendar.component(.weekday, from: today) // 1 = dimanche
+        guard let startOfThisWeek = calendar.date(byAdding: .day, value: -(todayWeekday - 1), to: today),
+              let firstWeekStart = calendar.date(byAdding: .day, value: -7 * (weeksToShow - 1), to: startOfThisWeek) else {
+            return []
+        }
 
-    init(prayedCount: Int) {
-        self.prayedCount = prayedCount
+        return (0..<weeksToShow).map { w in
+            (0..<7).compactMap { d in
+                calendar.date(byAdding: .day, value: w * 7 + d, to: firstWeekStart)
+            }
+        }
     }
 
     var body: some View {
-        let percent = min(Double(prayedDays.count) / 30.0, 1.0)
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(t("30 Day Journey", "Parcours 30 jours"))
+                Text(t("Prayer History", "Historique de prière"))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color.amenaText)
                 Spacer()
-                Text(t("\(Int(percent * 100))% Complete", "\(Int(percent * 100))% Terminé"))
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(Color.amenaPrimary)
+                Text(t("\(prayedDates.count) days prayed", "\(prayedDates.count) jours priés"))
+                    .font(.system(size: 13))
+                    .foregroundColor(Color.amenaTextSecondary)
             }
 
-            // Barre de progression globale
-            GeometryReader { geo in
-                ZStack(alignment: .leading) {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.amenaUnselectedBackground)
-                        .frame(height: 8)
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color.amenaPrimary)
-                        .frame(width: geo.size.width * percent, height: 8)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 4) {
+                    ForEach(weeks.indices, id: \.self) { w in
+                        VStack(spacing: 4) {
+                            ForEach(weeks[w], id: \.self) { day in
+                                RoundedRectangle(cornerRadius: 3)
+                                    .fill(cellColor(for: day))
+                                    .frame(width: 14, height: 14)
+                            }
+                        }
+                    }
                 }
-            }
-            .frame(height: 8)
-
-            // Grille 90 cases
-            LazyVGrid(columns: columns, spacing: 6) {
-                ForEach(0..<30, id: \.self) { day in
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(prayedDays.contains(day) ? Color.amenaPrimary : Color.amenaUnselectedBackground)
-                        .frame(height: 20)
-                }
+                .padding(.vertical, 2)
             }
         }
         .padding(16)
         .background(Color.amenaSecondaryBackground)
         .cornerRadius(16)
+    }
+
+    private func cellColor(for day: Date) -> Color {
+        // Jours futurs (fin de la semaine en cours) — case invisible
+        guard day <= Calendar.current.startOfDay(for: Date()) else { return .clear }
+        return prayedDates.contains(day) ? Color.amenaPrimary : Color.amenaUnselectedBackground
     }
 }
 

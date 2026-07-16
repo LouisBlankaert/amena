@@ -35,7 +35,7 @@ struct PrayerTimesView: View {
                         .foregroundColor(Color.amenaText)
                         .padding(.top, 60)
 
-                    Text(t("your apps will lock at these times until you pray.", "vos apps se bloqueront à ces horaires jusqu'à ce que vous priiez."))
+                    Text(t("you'll get a reminder to pray at these times each day.", "vous recevrez un rappel pour prier à ces horaires chaque jour."))
                         .font(.system(size: 15))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)

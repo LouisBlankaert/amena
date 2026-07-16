@@ -1,0 +1,69 @@
+AMENA — FICHE DE PRÉSENTATION POUR CRÉATEURS / PARTENAIRES
+=============================================================
+(document à personnaliser avant envoi — voir les [À COMPLÉTER] ci-dessous)
+
+
+L'APP EN UNE PHRASE
+--------------------
+Amena aide les chrétiens à reprendre le contrôle de leur temps d'écran en
+les invitant à prier avant d'ouvrir leurs réseaux sociaux — chaque jour.
+
+
+LE PROBLÈME QU'ON RÉSOUT
+--------------------------
+Beaucoup de chrétiens passent largement plus de temps sur leur téléphone
+que dans la prière, souvent sans s'en rendre compte. Amena rend ce temps
+visible dès l'inscription et propose un rituel quotidien simple pour le
+rediriger vers Dieu, plutôt que vers le scroll.
+
+
+COMMENT ÇA MARCHE
+-------------------
+- Un onboarding personnalisé calcule combien d'années de vie l'utilisateur
+  risque de passer sur son écran — et combien il pourrait "rendre à Dieu"
+  en priant à la place.
+- Chaque jour, l'app génère une prière chrétienne originale (IA), adaptée
+  au moment de la journée, avec référence biblique.
+- Une mascotte (un mouton) progresse visuellement au fil des prières — un
+  système de niveaux qui donne une vraie raison de revenir chaque jour.
+- Streak quotidien + journal des 30 derniers jours pour suivre sa régularité.
+- Rappels programmables aux heures de prière choisies par l'utilisateur.
+- Verset du jour, avec possibilité de le partager.
+
+
+POUR QUI
+---------
+Public chrétien pratiquant, plutôt 18-45 ans, préoccupé par son temps
+d'écran et en recherche d'un rituel spirituel quotidien simple et non
+culpabilisant. Disponible en français et en anglais.
+
+
+DISPONIBILITÉ
+---------------
+iOS (iPhone), App Store — [À COMPLÉTER : lien App Store]
+
+Modèle : téléchargement gratuit + abonnement Premium
+  - Hebdomadaire : 9,99 €/semaine
+  - Annuel : 89,99 €/an (1,73 €/semaine), avec 3 jours d'essai gratuit
+
+
+CE QUI REND AMENA DIFFÉRENTE
+-------------------------------
+Ce n'est pas juste une appli de versets ou un minuteur de méditation :
+Amena combine la logique de "gestion du temps d'écran" (comme les apps de
+blocage d'apps) avec un rituel de prière quotidien, pensé spécifiquement
+pour un public chrétien.
+
+
+CE QU'ON PROPOSE AUX CRÉATEURS
+---------------------------------
+[À COMPLÉTER — exemples de formats possibles à choisir/adapter :]
+- Code promo / offre code App Store personnalisé pour votre audience
+- Commission par abonnement généré (montant/pourcentage à définir)
+- Accès Premium gratuit à vie pour le créateur
+- Lien ou code de tracking dédié pour mesurer les conversions
+
+
+CONTACT
+--------
+[À COMPLÉTER — nom, email, Instagram/TikTok de contact]

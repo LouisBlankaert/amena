@@ -33,7 +33,7 @@ struct NotificationsView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    Text(t("we use this to allow you to unblock your apps when you need to pray", "nous utilisons ceci pour vous permettre de débloquer vos apps quand vous devez prier"))
+                    Text(t("we use this to remind you to pray at your chosen times each day", "nous utilisons ceci pour vous rappeler de prier à vos horaires choisis chaque jour"))
                         .font(.system(size: 15))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
@@ -110,7 +110,7 @@ struct NotificationMockup: View {
                         .font(.system(size: 11))
                         .foregroundColor(Color.amenaTextSecondary)
                 }
-                Text(t("your apps are blocked! time to pray", "vos apps sont bloquées ! il est temps de prier"))
+                Text(t("time to pray! open amena for your daily prayer", "il est temps de prier ! ouvrez amena pour votre prière"))
                     .font(.system(size: 13))
                     .foregroundColor(Color.amenaText)
                     .lineLimit(2)

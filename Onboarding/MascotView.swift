@@ -16,37 +16,36 @@ struct MascotView: View {
             Color.amenaBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                OnboardingProgressBar(currentStep: 9, totalSteps: 9)
-                    .padding(.top, 60)
-
                 ScrollView {
-                    VStack(spacing: 28) {
+                    VStack(spacing: 20) {
                         // Accroche au-dessus des cartes
                         VStack(spacing: 6) {
                             Text(t("break the chains.", "brisez les chaînes."))
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(Color.amenaText)
+                                .multilineTextAlignment(.center)
                             Text(t("pray daily. evolve your sheep.", "priez chaque jour. faites évoluer votre mouton."))
                                 .font(.system(size: 14))
                                 .foregroundColor(Color.amenaTextSecondary)
+                                .multilineTextAlignment(.center)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .frame(maxWidth: .infinity)
                         .padding(.horizontal, 24)
-                        .padding(.top, 8)
+                        .padding(.top, 32)
 
                         // Mouton lv1 — vidéo en boucle, triste, enchaîné au téléphone
                         ZStack(alignment: .bottom) {
                             if let url = Bundle.main.url(forResource: "sheep_lv1", withExtension: "mp4") {
                                 LoopingVideoView(url: url)
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 200)
+                                    .frame(height: 160)
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
                             } else {
                                 Image("sheep_lv1")
                                     .resizable()
                                     .scaledToFill()
                                     .frame(maxWidth: .infinity)
-                                    .frame(height: 200)
+                                    .frame(height: 160)
                                     .clipShape(RoundedRectangle(cornerRadius: 20))
                             }
                             LinearGradient(
@@ -54,7 +53,7 @@ struct MascotView: View {
                                 startPoint: .center,
                                 endPoint: .bottom
                             )
-                            .frame(height: 200)
+                            .frame(height: 160)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             // Label lv1 en bas à droite (même style que lv5)
                             VStack {
@@ -71,37 +70,65 @@ struct MascotView: View {
                                 }
                                 .padding(12)
                             }
-                            Text(t("your companion is chained to the phone...", "ton compagnon est enchaîné au téléphone..."))
+                            Text(t("your companion is chained to the phone...", "votre compagnon est enchaîné au téléphone..."))
                                 .font(.system(size: 12))
                                 .foregroundColor(.white.opacity(0.7))
                                 .padding(.bottom, 14)
                         }
-                        .frame(height: 200)
+                        .frame(height: 160)
                         .padding(.horizontal, 24)
-                        .padding(.top, 24)
 
                         // Champ de nom
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(t("your sheep's name", "le nom de votre mouton"))
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(t("give your sheep a name", "donnez un nom à votre mouton"))
                                 .font(.system(size: 17, weight: .medium))
                                 .foregroundColor(Color.amenaText)
+                            Text(t("you can change it anytime in Settings", "vous pourrez le changer à tout moment dans les réglages"))
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.amenaTextSecondary)
 
-                            TextField("Nour", text: $sheepName)
+                            TextField(t("enter a name", "entrez un nom"), text: $sheepName)
                                 .font(.system(size: 17))
                                 .padding(16)
                                 .background(Color.amenaSecondaryBackground)
                                 .cornerRadius(12)
                                 .autocorrectionDisabled()
                                 .textInputAutocapitalization(.words)
+                                .padding(.top, 4)
                         }
+                        .padding(.horizontal, 24)
+
+                        // Contexte : explique que la carte ci-dessous est un aperçu,
+                        // pas l'état actuel du mouton (qui commence toujours niveau 1)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(t("this is what \(sheepName.isEmpty ? "your sheep" : sheepName) could become", "voici ce que \(sheepName.isEmpty ? "votre mouton" : sheepName) pourrait devenir"))
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(Color.amenaText)
+                            Text(t("every prayer grows your sheep's FAITH meter and unlocks the next level. Miss a day and it just waits for you — nothing is lost.", "chaque prière fait grandir la barre FAITH de votre mouton et débloque le niveau suivant. Si vous manquez un jour, il vous attend simplement — rien n'est perdu."))
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.amenaTextSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 24)
 
                         // Carte style "trading card"
                         SheepTradingCard(name: sheepName.isEmpty ? "Nour" : sheepName, verse: verse)
                             .padding(.horizontal, 24)
 
-                        Spacer(minLength: 100)
+                        Spacer(minLength: 24)
                     }
+                }
+                // Dégradé en bas de la ScrollView : indique clairement qu'il y a
+                // du contenu à découvrir plus bas (la carte n'est pas "coupée"/cassée)
+                .overlay(alignment: .bottom) {
+                    LinearGradient(
+                        colors: [Color.amenaBackground.opacity(0), Color.amenaBackground],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    .frame(height: 28)
+                    .allowsHitTesting(false)
                 }
 
                 Button {

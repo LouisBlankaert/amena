@@ -15,6 +15,10 @@ struct AmenaApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                // L'ap p est conçue uniquement en light mode (palette fixe dans Color+Theme.swift).
+                // Sans ça, les éléments système sans couleur explicite (ex: DatePicker wheel)
+                // passent en texte blanc sous iOS Dark Mode, illisible sur nos fonds blancs codés en dur.
+                .preferredColorScheme(.light)
                 .task {
                     // Vérifie l'état de l'abonnement à chaque lancement
                     await StoreKitService.shared.checkCurrentSubscription()

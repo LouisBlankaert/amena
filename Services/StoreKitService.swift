@@ -68,9 +68,12 @@ final class StoreKitService: @unchecked Sendable {
         }
 
         guard let product = products.first(where: { $0.id == plan.productId }) else {
-            print("⚠️ StoreKit product not found for \(plan.productId) — falling back to simulation")
-            simulatePurchase(plan: plan)
-            return
+            // Ne JAMAIS accorder le premium sans achat réel validé par Apple.
+            // Si on arrive ici, les produits ne sont pas chargés (souci réseau ou
+            // configuration App Store Connect) — on remonte une erreur claire
+            // plutôt que de simuler un achat gratuit.
+            print("❌ StoreKit product not found for \(plan.productId)")
+            throw StoreKitError.productNotFound
         }
 
         let result = try await product.purchase()
@@ -91,11 +94,6 @@ final class StoreKitService: @unchecked Sendable {
     func restorePurchases() async throws {
         try await AppStore.sync()
         await checkCurrentSubscription()
-    }
-
-    private func simulatePurchase(plan: SubscriptionPlan) {
-        UserDefaults.standard.set(true, forKey: "isPremium")
-        UserDefaults.standard.set(plan.productId, forKey: "activePlanId")
     }
 
     var isPremium: Bool {

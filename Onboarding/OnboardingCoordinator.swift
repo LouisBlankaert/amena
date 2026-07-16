@@ -37,7 +37,7 @@ struct OnboardingCoordinator: View {
     @State private var prayerFrequency: Double = 2.0
     @State private var godRelationship: Double = 0.5
     @State private var todayMood: Double = 0.5
-    @State private var sheepName: String = "Nour"
+    @State private var sheepName: String = ""
     @State private var generatedPrayer: String = ""
 
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
