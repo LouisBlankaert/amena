@@ -24,6 +24,7 @@
 		3DEEC4ED38D9715A5DD77AD2 /* AnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */; };
 		486E9466049ED8B7BEE0424E /* HopeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */; };
 		49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24E28D1032D7CE89103E118 /* NotificationService.swift */; };
+		4BED45EBC5072E43A7D79291 /* DailyVerse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FA63C78B6005928C1E7148 /* DailyVerse.swift */; };
 		4D6A623C405B6A7D3ED87388 /* sheep_lv7.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = FCCB074FDDBBB85F667F9E00 /* sheep_lv7.mp4 */; };
 		58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */; };
 		62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */; };
@@ -76,6 +77,7 @@
 		5750B9799AAB446B57156C91 /* Amena.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Amena.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */ = {isa = PBXFileReference; path = sheep_lv9.mp4; sourceTree = "<group>"; };
 		6279CFF40C65B2C697121927 /* BibleStatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibleStatView.swift; sourceTree = "<group>"; };
+		68FA63C78B6005928C1E7148 /* DailyVerse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyVerse.swift; sourceTree = "<group>"; };
 		6E720D3060A661D2CD31D930 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		7214D62A7895CB277DDDC601 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		843DB842DDC7065A16E943BA /* UserNameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNameView.swift; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */,
+				68FA63C78B6005928C1E7148 /* DailyVerse.swift */,
 				F840521E63FE0634524C489C /* GeminiService.swift */,
 				01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */,
 				D24E28D1032D7CE89103E118 /* NotificationService.swift */,
@@ -307,6 +310,7 @@
 				FB5D112998A2E093E0ED8C89 /* Color+Theme.swift in Sources */,
 				E5D81750BF5223CDA56500BB /* CongratulationsView.swift in Sources */,
 				BECEC2CF60F15EBC20AD9E53 /* ContentView.swift in Sources */,
+				4BED45EBC5072E43A7D79291 /* DailyVerse.swift in Sources */,
 				58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */,
 				3B345C411CE33F61F16B21F0 /* GeminiService.swift in Sources */,
 				DE881F67ABC0A7C34C537D77 /* HomeView.swift in Sources */,

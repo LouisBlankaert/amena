@@ -83,6 +83,10 @@ struct HomeView: View {
                         )
                         .padding(.horizontal, 24)
 
+                        // Verset du jour
+                        VerseOfDayCard()
+                            .padding(.horizontal, 24)
+
                         // Historique de prière façon GitHub
                         PrayerContributionGrid(prayers: prayers)
                             .padding(.horizontal, 24)
@@ -353,6 +357,50 @@ struct CycleCompletedBanner: View {
             )
         )
         .cornerRadius(16)
+    }
+}
+
+// Carte "verset du jour" — même verset que celui montré pendant l'onboarding,
+// mais recalculé chaque jour (voir Services/DailyVerse.swift)
+struct VerseOfDayCard: View {
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    private var verse: (text: String, reference: String) { DailyVerse.today }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text(t("VERSE OF THE DAY", "VERSET DU JOUR"))
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color.amenaPrimary)
+                    .kerning(1.5)
+                Spacer()
+                Button(action: shareVerse) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 14))
+                        .foregroundColor(Color.amenaTextSecondary)
+                }
+            }
+            Text(verse.text)
+                .font(.system(size: 15))
+                .foregroundColor(Color.amenaText)
+                .lineSpacing(4)
+            Text(verse.reference)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(Color.amenaPrimary)
+        }
+        .padding(16)
+        .background(Color.amenaSecondaryBackground)
+        .cornerRadius(16)
+    }
+
+    private func shareVerse() {
+        let text = "\(verse.text)\n— \(verse.reference)"
+        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
     }
 }
 
