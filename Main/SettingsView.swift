@@ -16,6 +16,12 @@ struct SettingsView: View {
     @State private var restoreMessage: String? = nil
     @State private var showResetAlert = false
 
+    // Lit la vraie version depuis Info.plist plutôt que de la coder en dur
+    // (source de vérité unique : MARKETING_VERSION dans project.yml)
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
+    }
+
     private let timeFormatter: DateFormatter = {
         let f = DateFormatter()
         f.timeStyle = .short
@@ -171,7 +177,7 @@ struct SettingsView: View {
                             Label(t("Version", "Version"), systemImage: "info.circle")
                                 .foregroundColor(Color.amenaText)
                             Spacer()
-                            Text("1.0.0")
+                            Text(appVersion)
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
                         Link(destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!) {
