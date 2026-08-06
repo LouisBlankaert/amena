@@ -4,5 +4,14 @@
 <dict>
 	<key>aps-environment</key>
 	<string>development</string>
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<!-- TODO: remplacer par le vrai domaine une fois le compte Branch créé
+		     (dashboard.branch.io → Link Settings → Default Link Domain).
+		     "amena.app.link" est le nom générique attendu par défaut par Branch,
+		     mais Branch peut en attribuer un différent : à vérifier avant la prod. -->
+		<string>applinks:amena.app.link</string>
+		<string>applinks:amena-alternate.app.link</string>
+	</array>
 </dict>
 </plist>
