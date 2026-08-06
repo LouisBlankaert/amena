@@ -38,7 +38,7 @@ struct PaywallView: View {
                 .onAppear {
                     // Si l'utilisateur est déjà abonné (ex: reset onboarding après un achat réel),
                     // on ne lui redemande pas de payer — StoreKit sait déjà qu'il est premium.
-                    guard !StoreKitService.shared.isPremium else {
+                    guard !RevenueCatService.shared.isPremium else {
                         onNext()
                         return
                     }
@@ -155,7 +155,7 @@ struct PaywallView: View {
                     if !restoreMessage.isEmpty {
                         Text(restoreMessage)
                             .font(.system(size: 12))
-                            .foregroundColor(StoreKitService.shared.isPremium ? .green : Color.amenaTextSecondary)
+                            .foregroundColor(RevenueCatService.shared.isPremium ? .green : Color.amenaTextSecondary)
                             .multilineTextAlignment(.center)
                     }
                     if !purchaseErrorMessage.isEmpty {
@@ -175,10 +175,10 @@ struct PaywallView: View {
         isRestoring = true
         Task {
             do {
-                try await StoreKitService.shared.restorePurchases()
+                try await RevenueCatService.shared.restorePurchases()
                 await MainActor.run {
                     isRestoring = false
-                    if StoreKitService.shared.isPremium {
+                    if RevenueCatService.shared.isPremium {
                         restoreMessage = "Purchase restored successfully!"
                         // Redirige vers l'app après un court délai
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -203,7 +203,7 @@ struct PaywallView: View {
         purchaseErrorMessage = ""
         Task {
             do {
-                try await StoreKitService.shared.purchase(plan: selectedPlan)
+                try await RevenueCatService.shared.purchase(plan: selectedPlan)
                 await MainActor.run {
                     isPurchasing = false
                     purchasedPlan = selectedPlan
@@ -215,12 +215,12 @@ struct PaywallView: View {
                     }
                     showPostPaywall = true
                 }
-            } catch StoreKitError.userCancelled {
+            } catch PurchaseError.userCancelled {
                 await MainActor.run {
                     isPurchasing = false
                     // L'utilisateur a annulé → on reste sur le paywall
                 }
-            } catch StoreKitError.productNotFound {
+            } catch PurchaseError.productNotFound {
                 await MainActor.run {
                     isPurchasing = false
                     purchaseErrorMessage = t(
@@ -322,8 +322,10 @@ struct PlanOptionCard: View {
         plan == .weekly ? t("weekly", "hebdomadaire") : t("yearly", "annuel")
     }
 
-    private var pricePerWeek: String {
-        plan == .weekly ? t("4,99€/week", "4,99€/semaine") : t("0,58€/week", "0,58€/semaine")
+    // Prix par semaine : affiché en subordonné (Apple 3.1.2(c) — le montant facturé
+    // doit être l'élément le plus visible, le calcul par semaine passe en second plan)
+    private var pricePerWeekSubordinate: String {
+        plan == .weekly ? "" : t("(0,58€/week)", "(0,58€/semaine)")
     }
 
     private var totalPrice: String {
@@ -361,17 +363,22 @@ struct PlanOptionCard: View {
                                 .cornerRadius(6)
                         }
                     }
-                    Text(totalPrice)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.amenaTextSecondary)
                 }
 
                 Spacer()
 
-                // Prix par semaine
-                Text(pricePerWeek)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(isSelected ? Color.amenaPrimary : Color.amenaText)
+                // Montant réellement facturé : élément dominant (gros, bold, couleur primaire)
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text(totalPrice)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(isSelected ? Color.amenaPrimary : Color.amenaText)
+                    // Équivalent hebdo : subordonné (petit, gris)
+                    if !pricePerWeekSubordinate.isEmpty {
+                        Text(pricePerWeekSubordinate)
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.amenaTextSecondary)
+                    }
+                }
             }
             .padding(16)
             .background(isSelected ? Color.white : Color.amenaSecondaryBackground)

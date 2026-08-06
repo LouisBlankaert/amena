@@ -8,10 +8,6 @@ import FirebaseCore
 struct AmenaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
 
-    // Stocke le listener pour éviter qu'il soit désalloué
-    // Il tourne en background pendant toute la vie de l'app
-    private let transactionListener = StoreKitService.shared.startTransactionListener()
-
     var body: some Scene {
         WindowGroup {
             ContentView()
@@ -21,14 +17,21 @@ struct AmenaApp: App {
                 .preferredColorScheme(.light)
                 .task {
                     // Vérifie l'état de l'abonnement à chaque lancement
-                    await StoreKitService.shared.checkCurrentSubscription()
+                    await RevenueCatService.shared.checkCurrentSubscription()
+                }
+                .onOpenURL { url in
+                    _ = AffiliateService.shared.handleOpenURL(url)
+                }
+                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
+                    _ = AffiliateService.shared.continueUserActivity(activity)
                 }
         }
     }
 }
 
 // AppDelegate : classe de cycle de vie de l'app (style UIKit)
-// Firebase a besoin d'être configuré ici, avant que quoi que ce soit d'autre se charge
+// Firebase, RevenueCat et Branch ont besoin d'être configurés ici,
+// avant que quoi que ce soit d'autre se charge.
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
         _ application: UIApplication,
@@ -37,6 +40,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Configure Firebase avec le fichier GoogleService-Info.plist
         // Ce fichier doit être ajouté manuellement dans Xcode (voir instructions ci-dessous)
         FirebaseApp.configure()
+        RevenueCatService.shared.configure()
+        AffiliateService.shared.initSession(launchOptions: launchOptions)
         return true
     }
 }

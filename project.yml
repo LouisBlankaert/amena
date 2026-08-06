@@ -10,13 +10,19 @@ settings:
     SWIFT_VERSION: "6.0"
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     MARKETING_VERSION: "1.1"
-    CURRENT_PROJECT_VERSION: "3"
+    CURRENT_PROJECT_VERSION: "4"
     DEVELOPMENT_TEAM: "J55DB3RJLY"
 
 packages:
   FirebaseAnalytics:
     url: https://github.com/firebase/firebase-ios-sdk
     from: "11.0.0"
+  RevenueCat:
+    url: https://github.com/RevenueCat/purchases-ios
+    from: "5.0.0"
+  BranchSDK:
+    url: https://github.com/BranchMetrics/ios-branch-deep-linking-attribution
+    from: "3.0.0"
 
 schemes:
   Amena:
@@ -50,6 +56,10 @@ targets:
     dependencies:
       - package: FirebaseAnalytics
         product: FirebaseAnalytics
+      - package: RevenueCat
+        product: RevenueCat
+      - package: BranchSDK
+        product: BranchSDK
     settings:
       base:
         INFOPLIST_FILE: Info.plist

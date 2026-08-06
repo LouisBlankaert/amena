@@ -1,0 +1,271 @@
+AMENA — DOCUMENT DE RÉFÉRENCE COMPLET
+=============================================================
+Dernière mise à jour : 27 juillet 2026
+(voir aussi CAHIER_DES_CHARGES.md pour le suivi d'avancement/todo,
+ce document-ci est la référence "comment tout est construit")
+
+
+1. LE CONCEPT
+=============================================================
+Amena est une app iOS de prière chrétienne, inspirée de PrayerLock.
+Idée : "les réseaux sociaux t'éloignent de Dieu — prie avant de scroller."
+L'app ne bloque pas réellement les autres apps (pas d'entitlement Screen
+Time demandé) ; c'est un rituel quotidien de prière avec streak, mascotte
+et journal, pensé pour créer une habitude de prière quotidienne sans
+culpabiliser l'utilisateur (voir section 6 — refonte du ton).
+
+Bundle ID : com.louis.Amena
+Pas de compte utilisateur — tout est stocké en local (UserDefaults).
+Disponible en français et en anglais (UI, prières générées, notifications).
+
+
+2. STACK TECHNIQUE
+=============================================================
+| Élément              | Choix                                              |
+|----------------------|-----------------------------------------------------|
+| Langage              | Swift 6 / SwiftUI                                   |
+| Cible                | iOS 16+, iPhone uniquement                          |
+| Génération du projet | XcodeGen (project.yml) — ne JAMAIS éditer .pbxproj  |
+|                       | à la main, toujours passer par project.yml puis     |
+|                       | `xcodegen generate`                                 |
+| Paiements            | RevenueCat (au-dessus de StoreKit 2)                |
+| Attribution/affilié  | Branch (deferred deep linking)                      |
+| IA prières           | Groq (`llama-3.3-70b-versatile`), HTTP direct        |
+| Analytics            | Firebase Analytics                                  |
+| Stockage             | UserDefaults uniquement, pas de backend             |
+| Mode sombre          | Désactivé (`.preferredColorScheme(.light)` forcé)    |
+
+Pourquoi RevenueCat et pas StoreKit 2 nu : suivre le revenu par créateur
+(programme d'affiliation, section 7) demande de rattacher un attribut
+custom à chaque abonné et de pouvoir filtrer le revenu par ce tag —
+c'est ce que fait RevenueCat nativement. StoreKit 2 seul n'offre pas ça.
+
+
+3. STRUCTURE DU PROJET
+=============================================================
+
+AmenaApp.swift
+    Point d'entrée (@main). Configure Firebase, RevenueCat et Branch au
+    démarrage (dans AppDelegate). Gère les Universal Links et les liens
+    custom scheme pour Branch (.onOpenURL / .onContinueUserActivity).
+    Force le mode clair sur toute l'app.
+
+ContentView.swift
+    Aiguillage : onboarding pas terminé → IntroSlidesView,
+    onboarding terminé → écran principal (Home + Journal).
+
+Secrets.swift  [jamais commité — voir .gitignore]
+    groqAPIKey, revenueCatAPIKey, branchKey.
+
+project.yml
+    Config XcodeGen : cible iOS 16, dépendances SPM (FirebaseAnalytics,
+    RevenueCat, BranchSDK), numéro de version/build.
+
+
+--- Extensions/ ---
+Color+Theme.swift
+    Palette bleue de l'app (#4B8BF5), fonds, textes.
+Localization.swift
+    Fonction t(anglais, français) utilisée partout dans l'UI pour
+    basculer selon la langue choisie par l'utilisateur.
+
+
+--- Onboarding/ (18 écrans, FR/EN) ---
+Ordre du flow : LanguageView → IntroSlidesView (3 slides) →
+UserNameView → AgeView → ScreenTimeView → PrayerFrequencyView →
+ShockResultView (écran choc + réassurance) → HopeResultView →
+BibleStatView → RelationshipView → MoodView → MascotView →
+FirstPrayerView → CongratulationsView → VerseOfDayView →
+PrayerTimesView → NotificationsView → PaywallView → PostPaywallView.
+
+OnboardingCoordinator.swift pilote la navigation entre ces écrans via un
+simple @State "step" qui avance à chaque appel de next().
+
+PaywallView.swift
+    Abonnement Yearly (29,99€/an, 3 jours d'essai, mis en avant) vs
+    Weekly (4,99€/semaine, ancrage psychologique). Le montant facturé
+    est l'élément visuel dominant (corrigé suite au rejet Apple
+    Guideline 3.1.2(c), voir CAHIER_DES_CHARGES.md). Passe par
+    RevenueCatService pour l'achat/restore.
+
+
+--- Main/ ---
+HomeView.swift
+    Écran principal : statut de prière du jour, streak + compteur
+    cumulatif de prières (jamais remis à zéro), mascotte mouton
+    (niveau/FAITH), verset du jour, grille de contribution façon GitHub.
+    Affiche une bannière "Content de te revoir 🤍" (Lamentations 3.23)
+    lors d'un retour après une pause — jamais de message punitif.
+JournalView.swift
+    Historique complet des prières, grille 90 jours.
+PrayerView.swift
+    Prière générée par Groq, affichée en sheet, sauvegarde au journal.
+SettingsView.swift
+    Profil, langue, heures de prière, notifications, statut abonnement
+    (RevenueCatService), reset onboarding.
+
+
+--- Models/ ---
+StreakManager.swift
+    Streak quotidien, grille 30 jours par cycle, niveaux de la mascotte
+    (seuils cumulatifs de prières, jamais de régression de niveau).
+    Jour de grâce hebdomadaire : un jour manqué ne casse pas le streak
+    si aucun jour de grâce n'a été utilisé dans les 7 jours précédents.
+    markPrayedToday() retourne (streak, isReturningAfterBreak) pour que
+    l'UI sache quand afficher le message de bienvenue non punitif.
+PrayerSession.swift
+    Modèle Codable d'une session de prière (préparé pour SwiftData,
+    actuellement simple struct + UserDefaults).
+SheepMascotView.swift
+    Rendu visuel de la mascotte selon son niveau (5 comportements).
+
+
+--- Services/ ---
+GeminiService.swift
+    Génère les prières via Groq (le nom du fichier est historique, il
+    n'appelle plus l'API Gemini). 200-250 mots, référence biblique,
+    vouvoiement forcé en français, fallback local si l'API échoue.
+RevenueCatService.swift
+    Remplace l'ancien StoreKitService. Configure le SDK RevenueCat au
+    lancement, expose purchase(plan:), restorePurchases(), isPremium
+    (lu depuis l'entitlement "premium" configuré côté dashboard).
+    Après un achat réussi, déclenche AffiliateService pour rattacher
+    le code créateur éventuel à ce nouvel abonné.
+AffiliateService.swift
+    Programme d'affiliation — voir section 7 ci-dessous en détail.
+NotificationService.swift
+    Notifications quotidiennes de rappel, localisées FR/EN.
+AnalyticsService.swift
+    Wrapper Firebase Analytics — centralise les events (onboarding_*,
+    prayer_*, paywall_shown, trial_started, subscription_purchased).
+DailyVerse.swift
+    31 versets bibliques, rotation quotidienne (utilisé à l'onboarding
+    et sur Home).
+LoopingVideoView.swift
+    Lecture en boucle silencieuse des vidéos MP4 de la mascotte.
+
+
+4. SYSTÈME DE PAIEMENT (IAP)
+=============================================================
+Deux abonnements auto-renouvelables, pas de plan mensuel :
+  - com.louis.Amena.yearly : 29,99€/an, 3 jours d'essai gratuit
+  - com.louis.Amena.weekly : 4,99€/semaine, aucun essai
+
+RevenueCatService.swift gère tout l'achat/restore/vérification via le
+SDK RevenueCat, qui s'appuie sur StoreKit 2 en interne.
+
+État au 27 juillet 2026 : le dashboard RevenueCat est entièrement
+configuré et testé côté "Test Store" (magasin virtuel de RevenueCat,
+pas de vraie transaction Apple) :
+  - Entitlement "premium" créé, attaché aux deux produits.
+  - Produits Test Store créés avec les VRAIS identifiants
+    (com.louis.Amena.weekly / com.louis.Amena.yearly — important,
+    les identifiants courts suggérés par défaut par RevenueCat ne
+    matchent pas le code).
+  - Offering "default" avec les 2 packages correctement rattachés.
+  - Achat testé dans le simulateur avec la clé Test Store
+    (préfixe test_ dans Secrets.swift) : succès confirmé.
+
+Ce qui manque encore pour que ce soit réel (bloqué le 27/07 par une
+panne d'App Store Connect, à reprendre dès que ça remarche) :
+  1. Connecter l'app à App Store Connect dans RevenueCat (App-Specific
+     Shared Secret, trouvable dans App Store Connect → l'app →
+     App Information → tout en bas — ou une API Key App Store Connect
+     pour plus de détails financiers).
+  2. Créer un second groupe de produits "Apple App Store" (en plus du
+     groupe Test Store existant) avec les mêmes identifiants réels,
+     les rattacher à l'entitlement "premium".
+  3. Remplacer Secrets.revenueCatAPIKey (actuellement une clé test_,
+     temporaire) par la vraie clé publique SDK (préfixe appl_,
+     Project Settings → API Keys → Apple App Store).
+  4. Créer un compte Sandbox Apple (App Store Connect → Users and
+     Access → Sandbox) pour tester un vrai achat avant la mise en prod
+     — ne jamais tester avec un vrai Apple ID, ça facturerait pour de
+     vrai.
+
+
+5. SYSTÈME D'AFFILIATION (50% de reversion créateurs)
+=============================================================
+Objectif : un créateur/influenceur partage un lien unique ; si un
+utilisateur venu par ce lien s'abonne, le créateur touche 50% du
+revenu net généré par cet abonné.
+
+Comment ça marche techniquement, de bout en bout :
+
+  1. Un lien Branch unique est créé manuellement pour chaque créateur
+     dans dashboard.branch.io, avec un paramètre "referral_code"
+     (ex: referral_code = "nomducreateur"). Pas de portail self-serve
+     pour le MVP — c'est toi qui crées le lien à la main par créateur.
+
+  2. Quand quelqu'un tape ce lien : Branch route vers l'App Store si
+     l'app n'est pas installée (deferred deep link — le paramètre
+     survit à l'installation), ou ouvre directement l'app si déjà
+     installée.
+
+  3. Au premier lancement de l'app, AffiliateService.initSession()
+     (appelé depuis AppDelegate) récupère ce paramètre via le SDK
+     Branch et le stocke dans UserDefaults ("referralCode") — une
+     seule fois : le premier lien qui touche l'utilisateur gagne,
+     jamais réécrasé ensuite.
+
+  4. Quand l'utilisateur achète un abonnement (RevenueCatService.
+     purchase()), AffiliateService.attachReferralCodeToCurrentUser()
+     envoie ce code comme attribut subscriber custom ("referral_code")
+     à RevenueCat, une seule fois par utilisateur.
+
+  5. Dans le dashboard RevenueCat, le revenu est filtrable par cet
+     attribut — donc par créateur. C'est cette vue qui sert à calculer
+     les 50% dus à chaque créateur.
+
+  6. Le paiement des 50% est manuel, hors circuit Apple (virement /
+     PayPal), calculé à partir des rapports RevenueCat. Aucune
+     automatisation de payout prévue pour le MVP.
+
+État au 27 juillet 2026 : le code est intégré et démarre correctement
+(confirmé par les logs au lancement : Branch déclenche bien un appel
+réseau vers api3.branch.io/v1/install dès l'ouverture de l'app, sans
+crash). Le compte Branch lui-même n'a pas encore été créé.
+
+Pour que ça fonctionne réellement, il faut (côté dashboards, pas du
+code) :
+  1. Compte sur dashboard.branch.io, bundle ID com.louis.Amena déclaré,
+     domaine de lien (ex: amena.app.link) + Universal Links configurés.
+  2. Remplacer Secrets.branchKey (actuellement un placeholder) par la
+     vraie clé live.
+  3. Ajouter l'entitlement Associated Domains dans Xcode (nécessaire
+     pour que les Universal Links s'ouvrent dans l'app).
+  4. Créer un lien par créateur dans le dashboard Branch, tester qu'un
+     referral_code est bien capté et transmis à RevenueCat comme
+     attribut subscriber.
+
+Fiche de présentation aux créateurs : MARKETING_INFLUENCEURS.txt
+(à mettre à jour pour refléter le modèle 50% + lien Branch une fois
+le programme actif).
+
+
+6. REFONTE DU TON — CULPABILITÉ → GRÂCE
+=============================================================
+Contexte : l'onboarding original utilisait un levier de culpabilité
+("tu vas perdre X années que tu pourrais rendre à Dieu"), alors que
+l'app se positionne comme un rituel non culpabilisant — contradiction
+qui nuit à la fois à la rétention (la honte fait télécharger mais pas
+revenir) et à l'adéquation avec une audience chrétienne sensible au
+langage de honte religieuse (Romains 8.1, Éphésiens 5.16).
+
+Changements faits :
+  - Écran de révélation (ShockResultView) : le chiffre choc reste mais
+    est immédiatement désamorcé par une phrase de réassurance.
+  - Jour de grâce hebdomadaire (StreakManager) : un jour manqué ne
+    casse plus le streak.
+  - Retour non punitif (HomeView) : message bienveillant + Lamentations
+    3.23, jamais de "tu as cassé ta série".
+  - Compteur cumulatif de prières rendu visible (ne redescend jamais).
+
+Détails complets et suivi dans CAHIER_DES_CHARGES.md.
+
+
+7. FICHIERS DE RÉFÉRENCE CONNEXES
+=============================================================
+CAHIER_DES_CHARGES.md    → état d'avancement, todo, rejet Apple en cours
+README.md                → setup rapide (clone, Secrets.swift, xcodegen)
+MARKETING_INFLUENCEURS.txt → fiche de présentation aux créateurs

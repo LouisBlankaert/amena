@@ -21,6 +21,7 @@ struct HomeView: View {
     @AppStorage("completedCycles") private var completedCycles: Int = 0
     @AppStorage("prayerLanguage")  private var prayerLanguage = "English"
     @State private var showCycleBanner = false
+    @State private var showWelcomeBackBanner = false
     @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
     @State private var prayers: [PrayerEntry] = []
 
@@ -62,9 +63,16 @@ struct HomeView: View {
                         PrayerStatusCard(
                             hasPrayed: hasPrayedToday,
                             streak: currentStreak,
+                            totalPrayers: totalPrayers,
                             onPrayNow: { showPrayerView = true }
                         )
                         .padding(.horizontal, 24)
+
+                        // Bannière de retour bienveillante après une pause (jamais punitive)
+                        if showWelcomeBackBanner {
+                            WelcomeBackBanner(onDismiss: { showWelcomeBackBanner = false })
+                                .padding(.horizontal, 24)
+                        }
 
                         // Bannière cycle complet (30 jours)
                         if showCycleBanner {
@@ -99,7 +107,9 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .sheet(isPresented: $showPrayerView) {
                 PrayerView(prefetchedPrayer: prefetchedPrayer) {
-                    currentStreak  = streakManager.markPrayedToday()
+                    let result = streakManager.markPrayedToday()
+                    currentStreak  = result.streak
+                    showWelcomeBackBanner = result.isReturningAfterBreak
                     hasPrayedToday = true
                     totalPrayers   = UserDefaults.standard.integer(forKey: StreakManager.totalPrayersKey)
                     if UserDefaults.standard.bool(forKey: StreakManager.cycleCompletedTodayKey) {
@@ -189,6 +199,7 @@ struct HomeView: View {
 struct PrayerStatusCard: View {
     let hasPrayed: Bool
     let streak: Int
+    let totalPrayers: Int
     let onPrayNow: () -> Void
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
@@ -221,6 +232,11 @@ struct PrayerStatusCard: View {
                     }
                     .font(.system(size: 11))
                     .foregroundColor(Color.amenaTextSecondary)
+                    // Compteur cumulatif : ne redescend jamais à 0, même si le streak est cassé.
+                    Text(t("\(totalPrayers) prayers total", "\(totalPrayers) prières au total"))
+                        .font(.system(size: 10))
+                        .foregroundColor(Color.amenaTextSecondary.opacity(0.7))
+                        .padding(.top, 2)
                 }
             }
 
@@ -320,6 +336,39 @@ struct SheepStatusCard: View {
         }
         .frame(height: 220)
         .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+}
+
+// Bannière affichée au retour après une pause : jamais punitive, jamais "streak cassé".
+// L'app pardonne comme elle prêche que Dieu pardonne (Lamentations 3.23).
+struct WelcomeBackBanner: View {
+    let onDismiss: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(t("Good to see you again 🤍", "Content de te revoir 🤍"))
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundColor(Color.amenaText)
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(Color.amenaTextSecondary.opacity(0.6))
+                }
+            }
+            Text(t(
+                "\"His mercies are new every morning.\" — Lamentations 3:23",
+                "« Ses compassions se renouvellent chaque matin. » — Lamentations 3.23"
+            ))
+                .font(.system(size: 13))
+                .italic()
+                .foregroundColor(Color.amenaTextSecondary)
+        }
+        .padding(16)
+        .background(Color.amenaSecondaryBackground)
+        .cornerRadius(16)
     }
 }
 

@@ -8,7 +8,8 @@ Application iOS de prière chrétienne inspirée de PrayerLock.
 
 - **Swift 6 / SwiftUI** — iOS 16+
 - **Groq API** (`llama-3.3-70b-versatile`) — génération de prières personnalisées, appelée directement depuis l'app
-- **StoreKit 2** — abonnements In-App Purchase
+- **RevenueCat** — abonnements In-App Purchase (au-dessus de StoreKit 2)
+- **Branch** — attribution des liens d'affiliation créateurs (deferred deep linking)
 - **Firebase Analytics** — suivi du comportement utilisateur
 - **AVKit** — animations mouton en boucle (MP4 silencieux)
 - Français / Anglais — toute l'UI, les prières et les notifications sont bilingues
@@ -27,6 +28,13 @@ cd amena
 // Secrets.swift
 enum Secrets {
     static let groqAPIKey = "VOTRE_CLE_GROQ"
+
+    // dashboard.revenuecat.com → Project Settings → API Keys → Apple App Store
+    // (clé test_ acceptée pour développer sans App Store Connect connecté)
+    static let revenueCatAPIKey = "VOTRE_CLE_REVENUECAT"
+
+    // dashboard.branch.io → App Settings → Branch Key → live key
+    static let branchKey = "VOTRE_CLE_BRANCH"
 }
 ```
 
@@ -77,7 +85,7 @@ amena/
 ├── Onboarding/                 ← 18 écrans (langue, intro, questions, mouton, paywall...)
 ├── Main/                       ← Home, Prayer, Journal, Settings
 ├── Models/                     ← StreakManager
-├── Services/                   ← Groq, StoreKit, Notifications, Analytics, LoopingVideo
+├── Services/                   ← Groq, RevenueCat, Branch (affiliation), Notifications, Analytics, LoopingVideo
 ├── Extensions/                 ← Color+Theme, Localization (t())
 ├── Resources/                  ← Vidéos mouton (MP4)
 ├── Assets.xcassets/            ← Illustrations Midjourney

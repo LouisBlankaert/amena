@@ -6,6 +6,7 @@ struct StreakManager {
     private let currentStreakKey     = "currentStreak"
     private let journeyStartKey      = "journeyStartDate"
     private let prayedDaysKey        = "prayedDays"
+    private let graceDayUsedAtKey    = "graceDayUsedAt"
     static  let totalPrayersKey      = "totalPrayers"
     static  let completedCyclesKey   = "completedCycles"
     static  let cycleCompletedTodayKey = "cycleCompletedToday"
@@ -53,24 +54,47 @@ struct StreakManager {
         let saved = UserDefaults.standard.integer(forKey: currentStreakKey)
         guard let last = UserDefaults.standard.object(forKey: lastPrayedDateKey) as? Date else { return 0 }
         let days = Calendar.current.dateComponents([.day], from: last, to: Date()).day ?? 0
-        if days > 1 && !Calendar.current.isDateInToday(last) { return 0 }
-        return saved
+        // 1 jour d'écart max, ou 2 jours si le jour de grâce est encore disponible : le streak tient.
+        if days <= 1 { return saved }
+        if days == 2 && isGraceDayAvailable { return saved }
+        return 0
+    }
+
+    // Le jour de grâce se "recharge" 7 jours après avoir été utilisé la dernière fois.
+    private var isGraceDayAvailable: Bool {
+        guard let usedAt = UserDefaults.standard.object(forKey: graceDayUsedAtKey) as? Date else { return true }
+        let days = Calendar.current.dateComponents([.day], from: usedAt, to: Date()).day ?? 0
+        return days >= 7
     }
 
     // ─── Action principale : prier aujourd'hui ─────────────────────────────
 
+    // Retourne le nouveau streak, et si l'utilisateur revient après une vraie rupture
+    // (pour afficher un message d'accueil bienveillant plutôt qu'une simple continuité).
     @discardableResult
-    mutating func markPrayedToday() -> Int {
-        guard !hasPrayedToday else { return currentStreak }
+    mutating func markPrayedToday() -> (streak: Int, isReturningAfterBreak: Bool) {
+        guard !hasPrayedToday else { return (currentStreak, false) }
 
         let today    = Date()
         let defaults = UserDefaults.standard
+        let previousStreak = defaults.integer(forKey: currentStreakKey)
+        let hadPreviousPrayer = defaults.object(forKey: lastPrayedDateKey) != nil
 
         // Streak
         var newStreak: Int
+        var isReturningAfterBreak = false
         if let last = defaults.object(forKey: lastPrayedDateKey) as? Date {
             let days = Calendar.current.dateComponents([.day], from: last, to: today).day ?? 0
-            newStreak = (days == 1) ? currentStreak + 1 : 1
+            if days == 1 {
+                newStreak = previousStreak + 1
+            } else if days == 2 && isGraceDayAvailable {
+                // Un jour manqué, mais le jour de grâce protège le streak.
+                newStreak = previousStreak + 1
+                defaults.set(today, forKey: graceDayUsedAtKey)
+            } else {
+                newStreak = 1
+                isReturningAfterBreak = hadPreviousPrayer && previousStreak > 0
+            }
         } else {
             newStreak = 1
         }
@@ -106,7 +130,7 @@ struct StreakManager {
         let total = defaults.integer(forKey: StreakManager.totalPrayersKey) + 1
         defaults.set(total, forKey: StreakManager.totalPrayersKey)
 
-        return newStreak
+        return (newStreak, isReturningAfterBreak)
     }
 
     // Nombre de cycles complétés

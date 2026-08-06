@@ -11,7 +11,6 @@
 		066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E90549F213EF3455992887 /* ShockResultView.swift */; };
 		0CFF48F9DE495304260420FC /* JournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45E5EB00CA35A5229336CF2D /* JournalView.swift */; };
 		0D592DC305E294614C2EA0C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */; };
-		0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43AB2DE206917B253CE21439 /* StoreKitService.swift */; };
 		119E54C8180E77EF5424710B /* sheep_lv1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B1FF2F6DC1106282D2B15D4C /* sheep_lv1.mp4 */; };
 		2067FABBD41BB2DB33CC5AFE /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F15F80FD4972976A0BB8919 /* Localization.swift */; };
 		21E0E112C634283154685EE7 /* PrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFB620370983A9F272D04E5 /* PrayerView.swift */; };
@@ -28,8 +27,10 @@
 		4D6A623C405B6A7D3ED87388 /* sheep_lv7.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = FCCB074FDDBBB85F667F9E00 /* sheep_lv7.mp4 */; };
 		58E97E1F4586AF2D08684BEA /* FirstPrayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 137149D02ED1EBA6048BD3D6 /* FirstPrayerView.swift */; };
 		62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */; };
+		6344F57B3A2734B3C9277001 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 1F849288D338D008ED3F52A6 /* RevenueCat */; };
 		68E4ED1459F629C6D6F4B6BE /* LoopingVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */; };
 		725C67044AB00B0FC5A77D89 /* PrayerFrequencyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */; };
+		74999A9806B0F6859BFE003A /* AffiliateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A31EBBECAC06C869B2631D /* AffiliateService.swift */; };
 		7D1CDFDBC765C865171572EB /* AgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38EBDE961DF1E850A03458FD /* AgeView.swift */; };
 		8250299DB83D24A6614E73CD /* sheep_lv9.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */; };
 		9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933268950522EF66A869E983 /* PrayerSession.swift */; };
@@ -39,10 +40,12 @@
 		B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E720D3060A661D2CD31D930 /* SettingsView.swift */; };
 		B6AA12DD112C5A00E96A4339 /* AmenaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C55C7C36E537DD35761B285D /* AmenaApp.swift */; };
 		BA89CB232670315AB0759451 /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 301CE241AA504BA1D9D3F067 /* Secrets.swift */; };
+		BBFEB274A287377028AA0B40 /* RevenueCatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C682DBF7AB40A33ACE4A5463 /* RevenueCatService.swift */; };
 		BECEC2CF60F15EBC20AD9E53 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2C05680816AEEB8F0292D5 /* ContentView.swift */; };
 		C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843DB842DDC7065A16E943BA /* UserNameView.swift */; };
 		C923944D747AB55E1487A552 /* LanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D443C43E9A49E7E48129A7D /* LanguageView.swift */; };
 		CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4645061C3785261078D504CD /* MascotView.swift */; };
+		CC72E3D477756C3D820CF64A /* BranchSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 647CF52857A795C8F1C6FB3E /* BranchSDK */; };
 		DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */; };
 		DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */; };
 		DE881F67ABC0A7C34C537D77 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214D62A7895CB277DDDC601 /* HomeView.swift */; };
@@ -68,7 +71,6 @@
 		36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		38EBDE961DF1E850A03458FD /* AgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgeView.swift; sourceTree = "<group>"; };
 		3CFA121547A2DE367D91FE14 /* CongratulationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CongratulationsView.swift; sourceTree = "<group>"; };
-		43AB2DE206917B253CE21439 /* StoreKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitService.swift; sourceTree = "<group>"; };
 		45E5EB00CA35A5229336CF2D /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		4645061C3785261078D504CD /* MascotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MascotView.swift; sourceTree = "<group>"; };
 		4D4CC7DF638852D8A1970174 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
@@ -92,9 +94,11 @@
 		BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsService.swift; sourceTree = "<group>"; };
 		C26F1394867841F292861CA0 /* NotificationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsView.swift; sourceTree = "<group>"; };
 		C55C7C36E537DD35761B285D /* AmenaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmenaApp.swift; sourceTree = "<group>"; };
+		C682DBF7AB40A33ACE4A5463 /* RevenueCatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RevenueCatService.swift; sourceTree = "<group>"; };
 		CC54C33A3466859BED8D22F1 /* PrayerFrequencyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerFrequencyView.swift; sourceTree = "<group>"; };
 		D24E28D1032D7CE89103E118 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		D50CBAF20C797189C2FB56C3 /* PrayerTimesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerTimesView.swift; sourceTree = "<group>"; };
+		D8A31EBBECAC06C869B2631D /* AffiliateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AffiliateService.swift; sourceTree = "<group>"; };
 		DBBCEFE3B66889CD8069E289 /* HopeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HopeResultView.swift; sourceTree = "<group>"; };
 		EC2C05680816AEEB8F0292D5 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -108,6 +112,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */,
+				6344F57B3A2734B3C9277001 /* RevenueCat in Frameworks */,
+				CC72E3D477756C3D820CF64A /* BranchSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,12 +159,13 @@
 		853D84B09C112C083669744B /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D8A31EBBECAC06C869B2631D /* AffiliateService.swift */,
 				BD6E0A6B4307AD58AC68CA83 /* AnalyticsService.swift */,
 				68FA63C78B6005928C1E7148 /* DailyVerse.swift */,
 				F840521E63FE0634524C489C /* GeminiService.swift */,
 				01C44256915C55DB1DFB47F3 /* LoopingVideoView.swift */,
 				D24E28D1032D7CE89103E118 /* NotificationService.swift */,
-				43AB2DE206917B253CE21439 /* StoreKitService.swift */,
+				C682DBF7AB40A33ACE4A5463 /* RevenueCatService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -239,6 +246,8 @@
 			name = Amena;
 			packageProductDependencies = (
 				0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */,
+				1F849288D338D008ED3F52A6 /* RevenueCat */,
+				647CF52857A795C8F1C6FB3E /* BranchSDK */,
 			);
 			productName = Amena;
 			productReference = 5750B9799AAB446B57156C91 /* Amena.app */;
@@ -269,7 +278,9 @@
 			mainGroup = 0A54442141A1ECC95931EA43;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */,
 				EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				C27A3CFAFCAD257BD7F837BB /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4274A31F9F34384792F94272 /* Products */;
@@ -303,6 +314,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74999A9806B0F6859BFE003A /* AffiliateService.swift in Sources */,
 				7D1CDFDBC765C865171572EB /* AgeView.swift in Sources */,
 				B6AA12DD112C5A00E96A4339 /* AmenaApp.swift in Sources */,
 				3DEEC4ED38D9715A5DD77AD2 /* AnalyticsService.swift in Sources */,
@@ -331,12 +343,12 @@
 				A6842FC9F689ECDB4CC8B1F6 /* PrayerTimesView.swift in Sources */,
 				21E0E112C634283154685EE7 /* PrayerView.swift in Sources */,
 				263DAEB5F60C681C497E1621 /* RelationshipView.swift in Sources */,
+				BBFEB274A287377028AA0B40 /* RevenueCatService.swift in Sources */,
 				DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */,
 				BA89CB232670315AB0759451 /* Secrets.swift in Sources */,
 				B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */,
 				FBD6387FFF1A033B22909E17 /* SheepMascotView.swift in Sources */,
 				066E921CFC638B306E85DEB7 /* ShockResultView.swift in Sources */,
-				0D7B3CBA498C0C3F960C4C1C /* StoreKitService.swift in Sources */,
 				F3531A8BB456A27D88F2A056 /* StreakManager.swift in Sources */,
 				C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */,
 				22F955099F1B44811C93CCED /* VerseOfDayView.swift in Sources */,
@@ -398,7 +410,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = J55DB3RJLY;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -475,7 +487,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = J55DB3RJLY;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -531,12 +543,28 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		C27A3CFAFCAD257BD7F837BB /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
 		EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 11.0.0;
+			};
+		};
+		FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/BranchMetrics/ios-branch-deep-linking-attribution";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -546,6 +574,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		1F849288D338D008ED3F52A6 /* RevenueCat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C27A3CFAFCAD257BD7F837BB /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
+		};
+		647CF52857A795C8F1C6FB3E /* BranchSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */;
+			productName = BranchSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

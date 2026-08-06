@@ -59,6 +59,18 @@ struct ShockResultView: View {
                         .foregroundColor(Color.amenaText)
                         .font(.system(size: 22, weight: .medium)))
                     .multilineTextAlignment(.center)
+
+                    // Désamorce immédiatement le chiffre choc : pas de culpabilité,
+                    // juste une action possible et minime.
+                    Text(t(
+                        "Good news: you don't need to change everything. Just 5 minutes of prayer a day, and this time starts counting differently.",
+                        "Bonne nouvelle : tu n'as pas besoin de tout changer. 5 minutes de prière par jour, et ce temps commence à compter autrement."
+                    ))
+                        .font(.system(size: 15))
+                        .foregroundColor(Color.amenaTextSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
                 }
                 .padding(.horizontal, 32)
 

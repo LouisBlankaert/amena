@@ -267,7 +267,7 @@ struct SettingsView: View {
         isRestoring = true
         restoreMessage = nil
         do {
-            try await StoreKitService.shared.restorePurchases()
+            try await RevenueCatService.shared.restorePurchases()
             restoreMessage = isPremium ? t("Premium restored successfully.", "Abonnement restauré avec succès.") : t("No active subscription found.", "Aucun abonnement actif trouvé.")
         } catch {
             restoreMessage = t("Restore failed. Try again later.", "Échec de la restauration. Réessayez plus tard.")
