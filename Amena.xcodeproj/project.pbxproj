@@ -45,7 +45,6 @@
 		C1F38C0EE3892556DA6EDA66 /* UserNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 843DB842DDC7065A16E943BA /* UserNameView.swift */; };
 		C923944D747AB55E1487A552 /* LanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D443C43E9A49E7E48129A7D /* LanguageView.swift */; };
 		CC4E88BF172E33EEF519BD96 /* MascotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4645061C3785261078D504CD /* MascotView.swift */; };
-		CC72E3D477756C3D820CF64A /* BranchSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 647CF52857A795C8F1C6FB3E /* BranchSDK */; };
 		DAA55A395F916B9BD6CA3216 /* ScreenTimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE98B0B67768B4E2D4AF99B /* ScreenTimeView.swift */; };
 		DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED9E6420F58E54ECFFBFF0E /* OnboardingCoordinator.swift */; };
 		DE881F67ABC0A7C34C537D77 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214D62A7895CB277DDDC601 /* HomeView.swift */; };
@@ -113,7 +112,6 @@
 			files = (
 				62CD9BDC0092E6201D50A12C /* FirebaseAnalytics in Frameworks */,
 				6344F57B3A2734B3C9277001 /* RevenueCat in Frameworks */,
-				CC72E3D477756C3D820CF64A /* BranchSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -247,7 +245,6 @@
 			packageProductDependencies = (
 				0C25A22A7A81BB9B0ABE3892 /* FirebaseAnalytics */,
 				1F849288D338D008ED3F52A6 /* RevenueCat */,
-				647CF52857A795C8F1C6FB3E /* BranchSDK */,
 			);
 			productName = Amena;
 			productReference = 5750B9799AAB446B57156C91 /* Amena.app */;
@@ -278,7 +275,6 @@
 			mainGroup = 0A54442141A1ECC95931EA43;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */,
 				EDBC35C04FE558E98383EBA5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				C27A3CFAFCAD257BD7F837BB /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
@@ -362,7 +358,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Amena.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Info.plist;
@@ -440,7 +435,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = Amena.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = Info.plist;
@@ -561,14 +555,6 @@
 				minimumVersion = 11.0.0;
 			};
 		};
-		FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/BranchMetrics/ios-branch-deep-linking-attribution";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.0.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -581,11 +567,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C27A3CFAFCAD257BD7F837BB /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = RevenueCat;
-		};
-		647CF52857A795C8F1C6FB3E /* BranchSDK */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FCC54640BCE88BC5CED7B83A /* XCRemoteSwiftPackageReference "ios-branch-deep-linking-attribution" */;
-			productName = BranchSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

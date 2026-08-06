@@ -19,18 +19,12 @@ struct AmenaApp: App {
                     // Vérifie l'état de l'abonnement à chaque lancement
                     await RevenueCatService.shared.checkCurrentSubscription()
                 }
-                .onOpenURL { url in
-                    _ = AffiliateService.shared.handleOpenURL(url)
-                }
-                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { activity in
-                    _ = AffiliateService.shared.continueUserActivity(activity)
-                }
         }
     }
 }
 
 // AppDelegate : classe de cycle de vie de l'app (style UIKit)
-// Firebase, RevenueCat et Branch ont besoin d'être configurés ici,
+// Firebase et RevenueCat ont besoin d'être configurés ici,
 // avant que quoi que ce soit d'autre se charge.
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
@@ -41,7 +35,6 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Ce fichier doit être ajouté manuellement dans Xcode (voir instructions ci-dessous)
         FirebaseApp.configure()
         RevenueCatService.shared.configure()
-        AffiliateService.shared.initSession(launchOptions: launchOptions)
         return true
     }
 }

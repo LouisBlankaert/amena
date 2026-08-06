@@ -20,9 +20,6 @@ packages:
   RevenueCat:
     url: https://github.com/RevenueCat/purchases-ios
     from: "5.0.0"
-  BranchSDK:
-    url: https://github.com/BranchMetrics/ios-branch-deep-linking-attribution
-    from: "3.0.0"
 
 schemes:
   Amena:
@@ -58,14 +55,11 @@ targets:
         product: FirebaseAnalytics
       - package: RevenueCat
         product: RevenueCat
-      - package: BranchSDK
-        product: BranchSDK
     settings:
       base:
         INFOPLIST_FILE: Info.plist
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
-        CODE_SIGN_ENTITLEMENTS: Amena.entitlements
         SWIFT_STRICT_CONCURRENCY: targeted
         TARGETED_DEVICE_FAMILY: "1"
     info:

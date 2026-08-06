@@ -15,6 +15,8 @@ struct PaywallView: View {
     @State private var restoreMessage = ""
     @State private var purchasedPlan: SubscriptionPlan = .yearly
     @State private var purchaseErrorMessage = ""
+    @State private var showReferralField = false
+    @State private var referralCode = ""
 
     // Date de fin d'essai = aujourd'hui + 3 jours
     private var trialEndDate: String {
@@ -133,6 +135,26 @@ struct PaywallView: View {
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
 
+                    // Code de parrainage (optionnel) — discret, replié par défaut
+                    VStack(spacing: 8) {
+                        if showReferralField {
+                            TextField(t("referral code", "code de parrainage"), text: $referralCode)
+                                .textInputAutocapitalization(.characters)
+                                .autocorrectionDisabled()
+                                .multilineTextAlignment(.center)
+                                .padding(12)
+                                .background(Color.amenaSecondaryBackground)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 24)
+                        } else {
+                            Button(t("have a referral code?", "un code de parrainage ?")) {
+                                withAnimation { showReferralField = true }
+                            }
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.amenaTextSecondary)
+                        }
+                    }
+
                     // Liens Privacy + Terms
                     HStack(spacing: 16) {
                         Link(t("Privacy", "Confidentialité"), destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!)
@@ -201,6 +223,9 @@ struct PaywallView: View {
     private func startTrial() {
         isPurchasing = true
         purchaseErrorMessage = ""
+        if !referralCode.isEmpty {
+            AffiliateService.shared.setReferralCode(referralCode)
+        }
         Task {
             do {
                 try await RevenueCatService.shared.purchase(plan: selectedPlan)
