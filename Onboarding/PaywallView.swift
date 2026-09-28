@@ -125,23 +125,26 @@ struct PaywallView: View {
                             .transition(.opacity)
                         }
 
-                        // Bouton principal orange
+                        // Bouton principal
                         Button {
                             startTrial()
                         } label: {
-                            if isPurchasing {
-                                ProgressView()
-                                    .tint(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .frame(height: 56)
-                                    .background(Color.amenaNightBlue)
-                                    .cornerRadius(16)
-                                    .padding(.horizontal, 24)
-                            } else {
-                                Text(showsTrial ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
-                                    .amenaPrimaryButton()
+                            Group {
+                                if isPurchasing {
+                                    ProgressView().tint(.white)
+                                } else {
+                                    Text(showsTrial ? t("Start my free trial", "Commencer mon essai gratuit") : t("Subscribe", "S'abonner"))
+                                        .font(.system(size: 20, weight: .regular, design: .serif))
+                                        .foregroundColor(.white)
+                                }
                             }
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 58)
+                            .background(Color.amenaNightBlue)
+                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .padding(.horizontal, 24)
                         }
+                        .disabled(isPurchasing)
 
                         // Texte légal adapté au plan
                         Text(legalText)

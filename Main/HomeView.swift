@@ -433,22 +433,18 @@ struct PrayerActionSection: View {
     }
 }
 
-// La semaine en cours : un soleil par jour de prière
+// Les 7 derniers jours, aujourd'hui à droite : un soleil par jour de prière.
+// Glissant plutôt que "semaine calendaire" : un lundi, la bande n'est jamais vide.
 struct WeekStrip: View {
     let prayers: [PrayerEntry]
     let streak: Int
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
-    private var calendar: Calendar {
-        var c = Calendar.current
-        c.firstWeekday = 2  // la semaine commence le lundi (Belgique, France)
-        return c
-    }
+    private var calendar: Calendar { Calendar.current }
 
     private var days: [Date] {
         let today = calendar.startOfDay(for: Date())
-        guard let start = calendar.dateInterval(of: .weekOfYear, for: today)?.start else { return [] }
-        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+        return (-6...0).compactMap { calendar.date(byAdding: .day, value: $0, to: today) }
     }
 
     private var prayedDays: Set<Date> { Set(prayers.map { calendar.startOfDay(for: $0.date) }) }
@@ -456,7 +452,7 @@ struct WeekStrip: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
-                Text(t("This week", "Cette semaine"))
+                Text(t("Last 7 days", "Vos 7 derniers jours"))
                     .font(.system(size: 20, design: .serif))
                     .foregroundColor(Color.amenaText)
                 Spacer()
