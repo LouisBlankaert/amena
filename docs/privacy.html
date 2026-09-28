@@ -16,36 +16,49 @@
 <body>
 
 <h1>Privacy Policy</h1>
-<p class="date">Last updated: June 24, 2026</p>
+<p class="date">Last updated: September 28, 2026</p>
 
-<p>Amena ("we", "our", or "the app") is a Christian prayer app developed by Louis Blankaert. This Privacy Policy explains how we handle your information when you use Amena.</p>
+<p>Amena ("we", "our", or "the app") is a Christian prayer app developed by Louis Blankaert, based in Belgium. This Privacy Policy explains what information the app handles, where it goes, and why.</p>
 
-<h2>1. Data We Collect</h2>
-<p>Amena is designed with privacy in mind. <strong>We do not collect or store any personal data on our servers.</strong> All your data (name, prayer times, prayer history, preferences) is stored locally on your device using Apple's standard storage (UserDefaults).</p>
+<h2>1. Data stored on your device</h2>
+<p>Amena does not require an account. The following stays on your device (Apple's standard app storage) and is never sent to us:</p>
+<ul>
+  <li>your first name and your sheep's name;</li>
+  <li>the daily screen time you enter during onboarding;</li>
+  <li>your reminder times and language;</li>
+  <li>your prayer history, your prayer streak and your notebook of intentions (including the ones marked as answered).</li>
+</ul>
+<p>Deleting the app deletes this data.</p>
 
-<h2>2. Analytics</h2>
-<p>We use <strong>Firebase Analytics</strong> (Google) to collect anonymous usage data such as app opens, prayer completions, and onboarding steps. This data helps us improve the app. No personally identifiable information is included. You can learn more at <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</p>
+<h2>2. Prayer generation (AI)</h2>
+<p>Each prayer is written by an AI model. To write it, the app sends a short request to our own server (a Google Cloud Function hosted by Firebase, in the United States), which forwards it to <a href="https://groq.com/privacy-policy/">Groq</a>, the AI provider. This request contains:</p>
+<ul>
+  <li>the language of the prayer and a theme based on the time of day;</li>
+  <li>the topics you selected as weighing on your heart (for example "anxiety" or "my family");</li>
+  <li>up to two intentions you wrote in your notebook, shortened to 80 characters (for example "Sarah's exam").</li>
+</ul>
+<p>Your name, your device identifiers and your prayer history are never sent. Our server does not store these requests: it passes them to Groq and returns the prayer. Because notebook intentions are written freely, please avoid entering information you would not want processed by an AI service (such as full names or detailed health information).</p>
 
-<h2>3. AI-Generated Prayers</h2>
-<p>Amena uses the <strong>Google Gemini API</strong> to generate personalized prayers. When a prayer is generated, a prompt describing your prayer preferences (time of day, general mood) is sent to Google's API. No personal identifiers (name, email, etc.) are included in these requests. See Google's privacy policy at <a href="https://policies.google.com/privacy">policies.google.com/privacy</a>.</p>
+<h2>3. Analytics</h2>
+<p>We use Firebase Analytics (Google) to understand how the app is used: app opens, onboarding steps, prayers started and completed, paywall views and subscriptions. This data is linked to a random app identifier, not to your name or email, and never includes the text of your prayers or intentions. See <a href="https://firebase.google.com/support/privacy">firebase.google.com/support/privacy</a>.</p>
 
 <h2>4. Subscriptions</h2>
-<p>Amena offers auto-renewable subscriptions (weekly and yearly) managed entirely by <strong>Apple's App Store and StoreKit</strong>. We never see or store your payment information. Apple handles all billing. See Apple's privacy policy at <a href="https://www.apple.com/legal/privacy">apple.com/legal/privacy</a>.</p>
+<p>Subscriptions are sold and billed by Apple through the App Store. We never see your payment details. We use <a href="https://www.revenuecat.com/privacy">RevenueCat</a> to check whether your subscription is active; RevenueCat receives your purchase information from Apple together with a random app user identifier. If you enter a referral code on the paywall, that code is attached to your subscription so the creator who referred you can be credited.</p>
 
 <h2>5. Notifications</h2>
-<p>With your permission, Amena sends local push notifications to remind you to pray. These notifications are generated on your device and are never sent to our servers.</p>
+<p>With your permission, Amena sends a verse of the day at 10 a.m. and prayer reminders at the times you choose. These notifications are scheduled on your device and are not sent through our servers.</p>
 
-<h2>6. No Account Required</h2>
-<p>Amena does not require you to create an account. There is no login, no email, no password.</p>
+<h2>6. Your rights</h2>
+<p>If you live in the European Union or Switzerland, you have the right to access, correct or delete personal data about you, and to object to its processing. Since the data listed in section 1 stays on your device, you control it directly. For anything else, contact us at the address below. You can also lodge a complaint with your data protection authority (in Belgium: the Autorité de protection des données / Gegevensbeschermingsautoriteit).</p>
 
-<h2>7. Children's Privacy</h2>
-<p>Amena is not directed at children under 13. We do not knowingly collect personal information from children.</p>
+<h2>7. Children's privacy</h2>
+<p>Amena is not directed at children under 13, and we do not knowingly collect personal information from children.</p>
 
-<h2>8. Changes to This Policy</h2>
-<p>We may update this Privacy Policy from time to time. Changes will be reflected on this page with an updated date.</p>
+<h2>8. Changes to this policy</h2>
+<p>We may update this Privacy Policy. Changes will be published on this page with a new date.</p>
 
 <h2>9. Contact</h2>
-<p>If you have any questions about this Privacy Policy, contact us at: <a href="mailto:blankaertlouis@outlook.com">blankaertlouis@outlook.com</a></p>
+<p>Questions about this policy: <a href="mailto:blankaertlouis@outlook.com">blankaertlouis@outlook.com</a></p>
 
 </body>
 </html>
