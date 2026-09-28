@@ -1,81 +1,341 @@
-// Vue Journal : historique des prières et grille 90 jours complète
-// Accessible via une tab bar depuis HomeView (future v2) ou navigation
+// Carnet : les intentions de prière de l'utilisateur, celles qui ont été exaucées,
+// et les prières passées. C'est l'écran qui donne une raison de revenir : on y
+// écrit pour qui on prie, et on y voit, semaine après semaine, ce qui a été exaucé.
 
 import SwiftUI
 
 struct JournalView: View {
     @State private var prayers: [PrayerEntry] = []
+    @State private var requests: [PrayerRequest] = []
+    @State private var newRequest = ""
     @State private var displayedCount = 10
+    @State private var readingPrayer: PrayerEntry?
+    @FocusState private var isWriting: Bool
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
+    private var active: [PrayerRequest] { requests.filter { !$0.isAnswered } }
+    private var answered: [PrayerRequest] {
+        requests.filter(\.isAnswered).sorted { ($0.answeredAt ?? .distantPast) > ($1.answeredAt ?? .distantPast) }
+    }
     private var visiblePrayers: [PrayerEntry] { Array(prayers.prefix(displayedCount)) }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.amenaBackground.ignoresSafeArea()
+        ZStack {
+            VStack(spacing: 0) {
+                SkyMoment.current.colors.first!.frame(height: 300)
+                Color.amenaBackground
+            }
+            .ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Historique complet façon GitHub — ne se réinitialise jamais
-                        PrayerContributionGrid(prayers: prayers)
-                            .padding(.horizontal, 24)
-                            .padding(.top, 16)
+            ScrollView {
+                VStack(spacing: 0) {
+                    header
 
-                        // Titre historique
-                        HStack {
-                            Text(t("Your Prayers", "Vos prières"))
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            Text(t("\(prayers.count) total", "\(prayers.count) au total"))
-                                .font(.system(size: 14))
-                                .foregroundColor(Color.amenaTextSecondary)
-                        }
-                        .padding(.horizontal, 24)
+                    VStack(alignment: .leading, spacing: 32) {
+                        requestsSection
+                        if !answered.isEmpty { answeredSection }
+                        prayersSection
+                        Spacer(minLength: 80)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 28)
+                    .background(Color.amenaBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                    .padding(.top, -32)
+                }
+            }
+            .scrollDismissesKeyboard(.interactively)
+        }
+        .onAppear(perform: load)
+        .sheet(item: $readingPrayer) { prayer in
+            PrayerReadingView(prayer: prayer)
+        }
+    }
 
-                        if prayers.isEmpty {
-                            EmptyJournalView()
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(visiblePrayers) { prayer in
-                                    JournalPrayerCard(prayer: prayer)
-                                        .padding(.horizontal, 24)
+    // MARK: - En-tête sous le ciel
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(t("Notebook", "Carnet"))
+                .font(.system(size: 34, weight: .regular, design: .serif))
+                .foregroundColor(.white)
+            Text(answered.isEmpty
+                 ? t("Write down who you pray for. Mark it answered when it happens.",
+                     "Écrivez pour qui vous priez. Marquez-le exaucé quand ça arrive.")
+                 : t("\(answered.count) answered \(answered.count > 1 ? "prayers" : "prayer"). Keep going.",
+                     "\(answered.count) \(answered.count > 1 ? "prières exaucées" : "prière exaucée"). Continuez."))
+                .font(.system(size: 16))
+                .foregroundColor(.white.opacity(0.85))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 24)
+        .padding(.top, 24)
+        .padding(.bottom, 64)
+        .background(SkyBackground(moment: SkyMoment.current).ignoresSafeArea(edges: .top))
+    }
+
+    // MARK: - Intentions en cours
+
+    private var requestsSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionTitle(t("I'm praying for", "Je prie pour"))
+
+            HStack(spacing: 10) {
+                TextField(t("Sarah's exam, my father's health…", "L'examen de Sarah, la santé de papa…"), text: $newRequest)
+                    .font(.system(size: 17, design: .serif))
+                    .focused($isWriting)
+                    .submitLabel(.done)
+                    .onSubmit(addRequest)
+                Button(action: addRequest) {
+                    Image(systemName: "plus")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 36, height: 36)
+                        .background(canAdd ? Color.amenaNightBlue : Color.amenaTextSecondary.opacity(0.4))
+                        .clipShape(Circle())
+                }
+                .disabled(!canAdd)
+                .accessibilityLabel(t("Add", "Ajouter"))
+            }
+            .padding(.leading, 16)
+            .padding(.trailing, 8)
+            .padding(.vertical, 8)
+            .background(Color.amenaSecondaryBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+
+            if active.isEmpty {
+                Text(t("Your daily prayer will name them, until they're answered.",
+                       "Votre prière du jour les nommera, jusqu'à ce qu'elles soient exaucées."))
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.amenaTextSecondary)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(active) { request in
+                        RequestRow(request: request, onAnswered: { markAnswered(request) })
+                            .contextMenu {
+                                Button(role: .destructive) { delete(request) } label: {
+                                    Label(t("Delete", "Supprimer"), systemImage: "trash")
                                 }
                             }
-
-                            // Bouton "voir plus" si il reste des prières
-                            if displayedCount < prayers.count {
-                                Button {
-                                    displayedCount = min(displayedCount + 10, prayers.count)
-                                } label: {
-                                    Text(t("load more (\(prayers.count - displayedCount) remaining)", "voir plus (\(prayers.count - displayedCount) restantes)"))
-                                        .font(.system(size: 14))
-                                        .foregroundColor(Color.amenaPrimary)
-                                        .padding(.vertical, 12)
-                                }
-                            }
-                        }
-
-                        Spacer(minLength: 40)
+                        if request.id != active.last?.id { Divider() }
                     }
                 }
             }
-            .navigationTitle(t("Journal", "Journal"))
-            .navigationBarTitleDisplayMode(.large)
         }
-        .onAppear(perform: loadPrayers)
     }
 
-    private func loadPrayers() {
+    // MARK: - Exaucées
+
+    private var answeredSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionTitle(t("Answered", "Exaucées"))
+            VStack(spacing: 0) {
+                ForEach(answered) { request in
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "sun.max.fill")
+                            .foregroundColor(Color.amenaGold)
+                            .padding(.top, 2)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(request.text)
+                                .font(.system(size: 17, design: .serif))
+                                .foregroundColor(Color.amenaText)
+                            Text(answeredCaption(request))
+                                .font(.system(size: 13))
+                                .foregroundColor(Color.amenaTextSecondary)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 12)
+                    .contextMenu {
+                        Button { reopen(request) } label: {
+                            Label(t("Not answered yet", "Pas encore exaucée"), systemImage: "arrow.uturn.backward")
+                        }
+                        Button(role: .destructive) { delete(request) } label: {
+                            Label(t("Delete", "Supprimer"), systemImage: "trash")
+                        }
+                    }
+                    if request.id != answered.last?.id { Divider() }
+                }
+            }
+        }
+    }
+
+    // MARK: - Prières passées
+
+    private var prayersSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            SectionTitle(t("Your prayers", "Vos prières"))
+            if prayers.isEmpty {
+                Text(t("Your prayers will be kept here, to read again whenever you want.",
+                       "Vos prières seront gardées ici, pour les relire quand vous voulez."))
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.amenaTextSecondary)
+            } else {
+                ForEach(visiblePrayers) { prayer in
+                    Button { readingPrayer = prayer } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(prayer.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(appLocale)).capitalizedFirst)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(Color.amenaTextSecondary)
+                            Text(prayer.preview)
+                                .font(.system(size: 16, design: .serif))
+                                .foregroundColor(Color.amenaText)
+                                .multilineTextAlignment(.leading)
+                                .lineSpacing(3)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(Color.amenaSecondaryBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+                if displayedCount < prayers.count {
+                    Button(t("Show more", "Voir plus")) {
+                        displayedCount = min(displayedCount + 10, prayers.count)
+                    }
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color.amenaNightBlue)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+            }
+        }
+    }
+
+    // MARK: - Actions
+
+    private var canAdd: Bool { !newRequest.trimmingCharacters(in: .whitespaces).isEmpty }
+
+    private func addRequest() {
+        let text = newRequest.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return }
+        withAnimation { requests.insert(PrayerRequest(text: text), at: 0) }
+        PrayerRequestStore.save(requests)
+        newRequest = ""
+        isWriting = false
+    }
+
+    private func markAnswered(_ request: PrayerRequest) {
+        guard let i = requests.firstIndex(where: { $0.id == request.id }) else { return }
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        withAnimation(.easeInOut(duration: 0.35)) { requests[i].answeredAt = Date() }
+        PrayerRequestStore.save(requests)
+    }
+
+    private func reopen(_ request: PrayerRequest) {
+        guard let i = requests.firstIndex(where: { $0.id == request.id }) else { return }
+        withAnimation { requests[i].answeredAt = nil }
+        PrayerRequestStore.save(requests)
+    }
+
+    private func delete(_ request: PrayerRequest) {
+        withAnimation { requests.removeAll { $0.id == request.id } }
+        PrayerRequestStore.save(requests)
+    }
+
+    private func answeredCaption(_ request: PrayerRequest) -> String {
+        let date = (request.answeredAt ?? Date()).formatted(.dateTime.day().month(.wide).locale(appLocale))
+        let days = request.daysPrayed
+        return t("Answered on \(date), after \(days) \(days > 1 ? "days" : "day") of prayer",
+                 "Exaucée le \(date), après \(days) \(days > 1 ? "jours" : "jour") de prière")
+    }
+
+    private func load() {
+        requests = PrayerRequestStore.load()
         if let data = UserDefaults.standard.data(forKey: "prayerJournal"),
            let decoded = try? JSONDecoder().decode([PrayerEntry].self, from: data) {
             // Limite à 90 entrées max — supprime les plus anciennes
             prayers = Array(decoded.prefix(90))
-            if decoded.count > 90 {
-                if let encoded = try? JSONEncoder().encode(prayers) {
-                    UserDefaults.standard.set(encoded, forKey: "prayerJournal")
+            if decoded.count > 90, let encoded = try? JSONEncoder().encode(prayers) {
+                UserDefaults.standard.set(encoded, forKey: "prayerJournal")
+            }
+        }
+    }
+}
+
+// Titre de section du Carnet
+private struct SectionTitle: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 22, weight: .regular, design: .serif))
+            .foregroundColor(Color.amenaText)
+    }
+}
+
+// Une intention en cours, avec le bouton pour la marquer exaucée
+private struct RequestRow: View {
+    let request: PrayerRequest
+    let onAnswered: () -> Void
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(request.text)
+                    .font(.system(size: 17, design: .serif))
+                    .foregroundColor(Color.amenaText)
+                Text(t("Praying for \(request.daysPrayed) \(request.daysPrayed > 1 ? "days" : "day")",
+                       "Vous priez depuis \(request.daysPrayed) \(request.daysPrayed > 1 ? "jours" : "jour")"))
+                    .font(.system(size: 13))
+                    .foregroundColor(Color.amenaTextSecondary)
+            }
+            Spacer(minLength: 0)
+            Button(action: onAnswered) {
+                Text(t("Answered", "Exaucée"))
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color.amenaNightBlue)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .overlay(Capsule().stroke(Color.amenaNightBlue.opacity(0.3), lineWidth: 1))
+            }
+            .accessibilityHint(t("Moves this intention to your answered prayers", "Range cette intention dans vos prières exaucées"))
+        }
+        .padding(.vertical, 12)
+    }
+}
+
+// Relire une prière passée, en plein texte, sous le ciel
+private struct PrayerReadingView: View {
+    let prayer: PrayerEntry
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        ZStack {
+            SkyBackground(moment: SkyMoment.current).ignoresSafeArea()
+            Color.black.opacity(0.35).ignoresSafeArea()
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        Text(prayer.date.formatted(.dateTime.weekday(.wide).day().month(.wide).locale(appLocale)).capitalizedFirst)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(.white.opacity(0.8))
+                        Spacer()
+                        Button { dismiss() } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 40, height: 40)
+                                .background(Color.white.opacity(0.15))
+                                .clipShape(Circle())
+                        }
+                        .accessibilityLabel(t("Close", "Fermer"))
+                    }
+                    Text(prayer.text)
+                        .font(.system(size: 19, design: .serif))
+                        .foregroundColor(.white)
+                        .lineSpacing(9)
+                    ShareLink(item: prayer.text) {
+                        Label(t("Share this prayer", "Partager cette prière"), systemImage: "square.and.arrow.up")
+                            .font(.system(size: 15))
+                            .foregroundColor(.white.opacity(0.85))
+                    }
+                    .padding(.top, 8)
                 }
+                .padding(24)
             }
         }
     }
@@ -90,152 +350,7 @@ struct PrayerEntry: Identifiable, Codable {
     // Extrait les premiers mots comme résumé
     var preview: String {
         let words = text.split(separator: " ").prefix(15)
-        return words.joined(separator: " ") + (text.split(separator: " ").count > 15 ? "..." : "")
-    }
-
-    // Thème = heure de la prière convertie en label lisible
-    var timeLabel: String {
-        let hour = Calendar.current.component(.hour, from: date)
-        switch hour {
-        case 0..<12: return t("Morning Prayer", "Prière du matin")
-        case 12..<17: return t("Afternoon Prayer", "Prière de l'après-midi")
-        default: return t("Evening Prayer", "Prière du soir")
-        }
-    }
-}
-
-// Historique de prière façon GitHub : une colonne par semaine, une case par jour,
-// remplie si l'utilisateur a prié ce jour-là. Contrairement à FullNinetyDayGrid,
-// ne se réinitialise jamais — basé directement sur les dates réelles du journal.
-struct PrayerContributionGrid: View {
-    let prayers: [PrayerEntry]
-    @AppStorage("prayerLanguage") private var lang: String = "English"
-
-    private let weeksToShow = 12
-
-    // Jours distincts où au moins une prière a été faite
-    private var prayedDates: Set<Date> {
-        Set(prayers.map { Calendar.current.startOfDay(for: $0.date) })
-    }
-
-    // Grille alignée sur les semaines (dimanche → samedi), la plus récente à droite
-    private var weeks: [[Date]] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        let todayWeekday = calendar.component(.weekday, from: today) // 1 = dimanche
-        guard let startOfThisWeek = calendar.date(byAdding: .day, value: -(todayWeekday - 1), to: today),
-              let firstWeekStart = calendar.date(byAdding: .day, value: -7 * (weeksToShow - 1), to: startOfThisWeek) else {
-            return []
-        }
-
-        return (0..<weeksToShow).map { w in
-            (0..<7).compactMap { d in
-                calendar.date(byAdding: .day, value: w * 7 + d, to: firstWeekStart)
-            }
-        }
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(t("Prayer History", "Historique de prière"))
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color.amenaText)
-                Spacer()
-                Text(t("\(prayedDates.count) days prayed", "\(prayedDates.count) jours priés"))
-                    .font(.system(size: 13))
-                    .foregroundColor(Color.amenaTextSecondary)
-            }
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 4) {
-                    ForEach(weeks.indices, id: \.self) { w in
-                        VStack(spacing: 4) {
-                            ForEach(weeks[w], id: \.self) { day in
-                                RoundedRectangle(cornerRadius: 3)
-                                    .fill(cellColor(for: day))
-                                    .frame(width: 14, height: 14)
-                            }
-                        }
-                    }
-                }
-                .padding(.vertical, 2)
-            }
-        }
-        .padding(16)
-        .background(Color.amenaSecondaryBackground)
-        .cornerRadius(16)
-    }
-
-    private func cellColor(for day: Date) -> Color {
-        // Jours futurs (fin de la semaine en cours) — case invisible
-        guard day <= Calendar.current.startOfDay(for: Date()) else { return .clear }
-        return prayedDates.contains(day) ? Color.amenaPrimary : Color.amenaUnselectedBackground
-    }
-}
-
-// Carte d'une prière dans le journal
-struct JournalPrayerCard: View {
-    let prayer: PrayerEntry
-
-    private let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateStyle = .medium
-        f.timeStyle = .short
-        return f
-    }()
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // En-tête : thème + date
-            HStack {
-                Text(prayer.timeLabel)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Color.amenaPrimary)
-                    .cornerRadius(8)
-                Spacer()
-                Text(dateFormatter.string(from: prayer.date))
-                    .font(.system(size: 12))
-                    .foregroundColor(Color.amenaTextSecondary)
-            }
-
-            // Aperçu du texte
-            Text(prayer.preview)
-                .font(.system(size: 15))
-                .foregroundColor(Color.amenaText)
-                .lineSpacing(4)
-        }
-        .padding(16)
-        .background(Color.amenaSecondaryBackground)
-        .cornerRadius(14)
-        .overlay(
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(Color.amenaPrimary.opacity(0.15), lineWidth: 1)
-        )
-    }
-}
-
-// Vue vide quand aucune prière n'a été faite
-struct EmptyJournalView: View {
-    @AppStorage("prayerLanguage") private var lang: String = "English"
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "book.closed.fill")
-                .font(.system(size: 50))
-                .foregroundColor(Color.amenaPrimary.opacity(0.4))
-            Text(t("Your prayer journey starts here", "Votre parcours de prière commence ici"))
-                .font(.system(size: 17, weight: .medium))
-                .foregroundColor(Color.amenaText)
-            Text(t("Your daily prayers will appear here.\nStart praying to fill your journal!", "Vos prières quotidiennes apparaîtront ici.\nCommencez à prier pour remplir votre journal !"))
-                .font(.system(size: 14))
-                .foregroundColor(Color.amenaTextSecondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(40)
+        return words.joined(separator: " ") + (text.split(separator: " ").count > 15 ? "…" : "")
     }
 }
 

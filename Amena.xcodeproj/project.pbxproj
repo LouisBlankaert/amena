@@ -24,6 +24,7 @@
 		74999A9806B0F6859BFE003A /* AffiliateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A31EBBECAC06C869B2631D /* AffiliateService.swift */; };
 		8250299DB83D24A6614E73CD /* sheep_lv9.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5EEF751B44DFFB5584C9257E /* sheep_lv9.mp4 */; };
 		9847D78A342994E3F86E5D41 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC828022A9E4CD03812EB395 /* KeychainHelper.swift */; };
+		9D4927D84C480778C71A0C51 /* PrayerRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ECF74C819E9DA032DD2C70B /* PrayerRequest.swift */; };
 		9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933268950522EF66A869E983 /* PrayerSession.swift */; };
 		A79C351F7EED54E5E6FBFCD6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = EEF19ED5DF77097FBA0BF3A7 /* GoogleService-Info.plist */; };
 		B4C2FC9472BC9F24EDEE7F19 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E720D3060A661D2CD31D930 /* SettingsView.swift */; };
@@ -49,6 +50,7 @@
 		2EFB620370983A9F272D04E5 /* PrayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerView.swift; sourceTree = "<group>"; };
 		301CE241AA504BA1D9D3F067 /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 		36EE3C74D9B15A9ED1A53E4E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3ECF74C819E9DA032DD2C70B /* PrayerRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrayerRequest.swift; sourceTree = "<group>"; };
 		45E5EB00CA35A5229336CF2D /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		4D4CC7DF638852D8A1970174 /* StreakManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakManager.swift; sourceTree = "<group>"; };
 		4F15F80FD4972976A0BB8919 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 		3F89B1F076A0594A63F04663 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3ECF74C819E9DA032DD2C70B /* PrayerRequest.swift */,
 				933268950522EF66A869E983 /* PrayerSession.swift */,
 				26052530DC0D49C578F23B44 /* SheepMascotView.swift */,
 				4D4CC7DF638852D8A1970174 /* StreakManager.swift */,
@@ -277,6 +280,7 @@
 				49386D38438E3C812B058BB1 /* NotificationService.swift in Sources */,
 				DBFAF2D9BE3C692D5CA85E96 /* OnboardingCoordinator.swift in Sources */,
 				FC139439C95194BE919787AB /* PaywallView.swift in Sources */,
+				9D4927D84C480778C71A0C51 /* PrayerRequest.swift in Sources */,
 				9F046868CF3816E0E3A81D8F /* PrayerSession.swift in Sources */,
 				21E0E112C634283154685EE7 /* PrayerView.swift in Sources */,
 				BBFEB274A287377028AA0B40 /* RevenueCatService.swift in Sources */,

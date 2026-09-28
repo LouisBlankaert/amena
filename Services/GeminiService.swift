@@ -223,9 +223,18 @@ enum DailyPrayerTheme {
         } else {
             base = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness and releasing the day to God"].randomElement()!
         }
+        var theme = base
         // 2 intentions au plus par prière, tirées au hasard, pour varier d'un jour à l'autre
         let picked = PrayerIntention.saved.shuffled().prefix(2).map(\.promptText)
-        guard !picked.isEmpty else { return base }
-        return "\(base). The person praying is currently carrying: \(picked.joined(separator: " and ")). Speak to this gently and concretely, as if you knew them"
+        if !picked.isEmpty {
+            theme += ". The person praying is currently carrying: \(picked.joined(separator: " and ")). Speak to this gently and concretely, as if you knew them"
+        }
+        // Les demandes écrites dans le Carnet ("Pour l'examen de Sarah") : 2 au plus,
+        // coupées à 80 caractères pour rester sous la limite du serveur
+        let requests = PrayerRequestStore.active.shuffled().prefix(2).map { "\"\($0.text.prefix(80))\"" }
+        if !requests.isEmpty {
+            theme += ". They also asked to pray for: \(requests.joined(separator: " and ")). Name these intentions explicitly in the prayer"
+        }
+        return theme
     }
 }

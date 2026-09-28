@@ -25,6 +25,9 @@ struct HomeView: View {
     @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
     @State private var prayers: [PrayerEntry] = []
     @State private var moment = SkyMoment.current
+    @State private var levelUpTo: Int?   // niveau atteint à l'instant, pour la bannière de fête
+    // Onglet affiché (0 = Accueil, 1 = Carnet), partagé avec MainTabView
+    @AppStorage("selectedTab") private var selectedTab = 0
 
     // Niveau et % FAITH calculés dynamiquement depuis totalPrayers
     private var levelData: (level: Int, faithPercent: Double) {
@@ -55,14 +58,18 @@ struct HomeView: View {
                             PrayerActionSection(
                                 hasPrayed: hasPrayedToday,
                                 userName: userName,
-                                streak: currentStreak,
-                                totalPrayers: totalPrayers,
                                 onPrayNow: { showPrayerView = true }
                             )
 
                             // Bannière de retour bienveillante après une pause (jamais punitive)
                             if showWelcomeBackBanner {
                                 WelcomeBackBanner(onDismiss: { showWelcomeBackBanner = false })
+                            }
+
+                            // Le mouton vient de monter de niveau : un moment de fête
+                            if let level = levelUpTo {
+                                LevelUpBanner(sheepName: sheepName, level: level, onDismiss: { levelUpTo = nil })
+                                    .transition(.scale(scale: 0.95).combined(with: .opacity))
                             }
 
                             // Bannière cycle complet (30 jours)
@@ -73,14 +80,17 @@ struct HomeView: View {
                                 )
                             }
 
+                            WeekStrip(prayers: prayers, streak: currentStreak)
+
+                            IntentionsCard(onOpenNotebook: { selectedTab = 1 })
+
                             SheepRow(
                                 sheepName: sheepName,
                                 level: levelData.level,
-                                faithPercent: levelData.faithPercent
+                                faithPercent: levelData.faithPercent,
+                                totalPrayers: totalPrayers
                             )
 
-                            // Historique de prière façon GitHub
-                            PrayerContributionGrid(prayers: prayers)
 
                             Spacer(minLength: 80)
                         }
@@ -96,11 +106,17 @@ struct HomeView: View {
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showPrayerView) {
                 PrayerView(prefetchedPrayer: prefetchedPrayer) {
+                    let levelBefore = levelData.level
                     let result = streakManager.markPrayedToday()
                     currentStreak  = result.streak
                     showWelcomeBackBanner = result.isReturningAfterBreak
                     hasPrayedToday = true
                     totalPrayers   = UserDefaults.standard.integer(forKey: StreakManager.totalPrayersKey)
+                    if levelData.level > levelBefore {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(0.4)) {
+                            levelUpTo = levelData.level
+                        }
+                    }
                     if UserDefaults.standard.bool(forKey: StreakManager.cycleCompletedTodayKey) {
                         showCycleBanner = true
                     }
@@ -118,9 +134,12 @@ struct HomeView: View {
             moment = SkyMoment.current
             loadState()
             #if DEBUG
-            // Raccourci de test : lancer avec l'argument -debugOpenPrayer ouvre la prière
+            // Raccourcis de test : -debugOpenPrayer ouvre la prière, -debugOpenSettings les réglages
             if ProcessInfo.processInfo.arguments.contains("-debugOpenPrayer") {
                 showPrayerView = true
+            }
+            if ProcessInfo.processInfo.arguments.contains("-debugOpenSettings") {
+                showSettings = true
             }
             #endif
         }
@@ -335,15 +354,10 @@ struct VerseHero: View {
                 .shadow(color: .black.opacity(0.15), radius: 12, y: 2)
 
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(verse.reference)
-                        .font(.system(size: 16, weight: .semibold, design: .serif))
-                        .italic()
-                        .foregroundColor(.white)
-                    Text(DailyVerse.translationName)
-                        .font(.system(size: 12))
-                        .foregroundColor(.white.opacity(0.7))
-                }
+                Text(verse.reference)
+                    .font(.system(size: 16, weight: .semibold, design: .serif))
+                    .italic()
+                    .foregroundColor(.white)
                 Spacer()
                 Button(action: shareVerse) {
                     Image(systemName: "square.and.arrow.up")
@@ -365,7 +379,7 @@ struct VerseHero: View {
     }
 
     private func shareVerse() {
-        let text = "\(verse.text)\n— \(verse.reference) (\(DailyVerse.translationName))"
+        let text = "\(verse.text)\n— \(verse.reference)"
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootVC = windowScene.windows.first?.rootViewController {
@@ -374,70 +388,175 @@ struct VerseHero: View {
     }
 }
 
-// Bouton de prière du jour + série de jours
+// Bouton de prière du jour, ou le rappel qu'on a prié
 struct PrayerActionSection: View {
     let hasPrayed: Bool
     let userName: String
-    let streak: Int
-    let totalPrayers: Int
     let onPrayNow: () -> Void
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            if hasPrayed {
-                HStack(spacing: 12) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 28))
-                        .foregroundColor(Color.amenaPrimary)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(t("You've prayed today", "Vous avez prié aujourd'hui"))
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(Color.amenaText)
-                        Text(t("See you tomorrow, \(userName).", "À demain, \(userName)."))
-                            .font(.system(size: 14))
-                            .foregroundColor(Color.amenaTextSecondary)
-                    }
-                }
-            } else {
-                Button(action: onPrayNow) {
-                    HStack(spacing: 10) {
-                        Image(systemName: "hands.sparkles.fill")
-                        Text(t("Pray now", "Prier maintenant"))
-                    }
-                    .font(.system(size: 18, weight: .semibold))
+        if hasPrayed {
+            HStack(spacing: 14) {
+                Image(systemName: "sun.max.fill")
+                    .font(.system(size: 22))
                     .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 58)
-                    .background(Color.amenaPrimary)
-                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                    .frame(width: 48, height: 48)
+                    .background(Color.amenaGold)
+                    .clipShape(Circle())
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(t("You've prayed today", "Vous avez prié aujourd'hui"))
+                        .font(.system(size: 20, design: .serif))
+                        .foregroundColor(Color.amenaText)
+                    Text(t("See you tomorrow, \(userName).", "À demain, \(userName)."))
+                        .font(.system(size: 14))
+                        .foregroundColor(Color.amenaTextSecondary)
+                }
+                Spacer(minLength: 0)
+            }
+        } else {
+            VStack(spacing: 10) {
+                Button(action: onPrayNow) {
+                    Text(t("Pray now", "Prier maintenant"))
+                        .font(.system(size: 20, weight: .regular, design: .serif))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 58)
+                        .background(Color.amenaNightBlue)
+                        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
                 Text(t("A prayer written for you today, about 2 minutes.", "Une prière écrite pour vous aujourd'hui, environ 2 minutes."))
                     .font(.system(size: 14))
                     .foregroundColor(Color.amenaTextSecondary)
-                    .frame(maxWidth: .infinity)
-            }
-
-            // Pas de "0 jour" au premier lancement : on n'affiche la série qu'une fois commencée
-            if totalPrayers > 0 {
-                HStack(spacing: 18) {
-                    Label(t("\(streak)-day streak", "\(streak) jours d'affilée"), systemImage: "flame.fill")
-                    Label(t("\(totalPrayers) prayers", "\(totalPrayers) prières"), systemImage: "hands.and.sparkles.fill")
-                }
-                .font(.system(size: 14, weight: .medium))
-                .foregroundColor(Color.amenaText)
-                .labelStyle(StatLabelStyle())
-                .padding(.top, 4)
             }
         }
     }
 }
 
-private struct StatLabelStyle: LabelStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(spacing: 6) {
-            configuration.icon.foregroundColor(.orange)
-            configuration.title
+// La semaine en cours : un soleil par jour de prière
+struct WeekStrip: View {
+    let prayers: [PrayerEntry]
+    let streak: Int
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    private var calendar: Calendar {
+        var c = Calendar.current
+        c.firstWeekday = 2  // la semaine commence le lundi (Belgique, France)
+        return c
+    }
+
+    private var days: [Date] {
+        let today = calendar.startOfDay(for: Date())
+        guard let start = calendar.dateInterval(of: .weekOfYear, for: today)?.start else { return [] }
+        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: start) }
+    }
+
+    private var prayedDays: Set<Date> { Set(prayers.map { calendar.startOfDay(for: $0.date) }) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                Text(t("This week", "Cette semaine"))
+                    .font(.system(size: 20, design: .serif))
+                    .foregroundColor(Color.amenaText)
+                Spacer()
+                if streak > 1 {
+                    Label(t("\(streak) days in a row", "\(streak) jours d'affilée"), systemImage: "flame.fill")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(Color.amenaTextSecondary)
+                }
+            }
+            HStack(spacing: 0) {
+                ForEach(days, id: \.self) { day in
+                    dayCell(day).frame(maxWidth: .infinity)
+                }
+            }
+        }
+        .padding(16)
+        .background(Color.amenaSecondaryBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private func dayCell(_ day: Date) -> some View {
+        let today = calendar.startOfDay(for: Date())
+        let prayed = prayedDays.contains(day)
+        let isToday = day == today
+        let isFuture = day > today
+        return VStack(spacing: 6) {
+            Text(day.formatted(.dateTime.weekday(.narrow).locale(appLocale)).uppercased())
+                .font(.system(size: 12, weight: isToday ? .bold : .regular))
+                .foregroundColor(isToday ? Color.amenaText : Color.amenaTextSecondary)
+            ZStack {
+                Circle()
+                    .fill(prayed ? Color.amenaGold : Color.clear)
+                Circle()
+                    .stroke(isToday && !prayed ? Color.amenaNightBlue : Color.amenaTextSecondary.opacity(isFuture ? 0.15 : 0.3),
+                            lineWidth: isToday && !prayed ? 2 : 1)
+                    .opacity(prayed ? 0 : 1)
+                if prayed {
+                    Image(systemName: "sun.max.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.white)
+                }
+            }
+            .frame(width: 34, height: 34)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(day.formatted(.dateTime.weekday(.wide).locale(appLocale)))
+        .accessibilityValue(prayed ? t("prayed", "prié") : "")
+    }
+}
+
+// Rappel des intentions du Carnet sur l'accueil, avec un accès direct
+struct IntentionsCard: View {
+    let onOpenNotebook: () -> Void
+    @State private var active: [PrayerRequest] = []
+    @State private var answeredCount = 0
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    var body: some View {
+        Button(action: onOpenNotebook) {
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    if active.isEmpty {
+                        Text(t("Who do you want to pray for?", "Pour qui voulez-vous prier ?"))
+                            .font(.system(size: 20, design: .serif))
+                            .foregroundColor(Color.amenaText)
+                        Text(t("Write an intention: your prayer will name it every day.",
+                               "Écrivez une intention : votre prière la nommera chaque jour."))
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.amenaTextSecondary)
+                    } else {
+                        Text(t("You're praying for", "Vous priez pour"))
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.amenaTextSecondary)
+                        Text(active.prefix(2).map(\.text).joined(separator: " · ")
+                             + (active.count > 2 ? " +\(active.count - 2)" : ""))
+                            .font(.system(size: 18, design: .serif))
+                            .foregroundColor(Color.amenaText)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                        if answeredCount > 0 {
+                            Label(t("\(answeredCount) answered", "\(answeredCount) exaucée\(answeredCount > 1 ? "s" : "")"), systemImage: "sun.max.fill")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(Color.amenaGold)
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color.amenaTextSecondary)
+            }
+            .padding(16)
+            .background(Color.amenaSecondaryBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .onAppear {
+            let all = PrayerRequestStore.load()
+            active = all.filter { !$0.isAnswered }
+            answeredCount = all.count - active.count
         }
     }
 }
@@ -447,7 +566,14 @@ struct SheepRow: View {
     let sheepName: String
     let level: Int
     let faithPercent: Double
+    let totalPrayers: Int
     @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    // Prières restantes avant le niveau suivant (nil au niveau max)
+    private var prayersToNextLevel: Int? {
+        guard level < StreakManager.levelThresholds.count else { return nil }
+        return max(StreakManager.levelThresholds[level] - totalPrayers, 1)
+    }
 
     private var sheepVideoName: String {
         switch level {
@@ -457,6 +583,14 @@ struct SheepRow: View {
         case 7, 8:  return "sheep_lv7"
         default:    return "sheep_lv9"
         }
+    }
+
+    private var progressCaption: String {
+        guard let left = prayersToNextLevel else {
+            return t("\(sheepName) has reached the top", "\(sheepName) est au sommet")
+        }
+        return t("\(left) more \(left > 1 ? "prayers" : "prayer") to level \(level + 1)",
+                 "Encore \(left) \(left > 1 ? "prières" : "prière") avant le niveau \(level + 1)")
     }
 
     var body: some View {
@@ -489,7 +623,7 @@ struct SheepRow: View {
                     }
                 }
                 .frame(height: 6)
-                Text(t("Grows with each prayer", "Grandit à chaque prière"))
+                Text(progressCaption)
                     .font(.system(size: 12))
                     .foregroundColor(Color.amenaTextSecondary)
             }
@@ -497,6 +631,52 @@ struct SheepRow: View {
         .padding(14)
         .background(Color.amenaSecondaryBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+}
+
+// Le mouton monte de niveau : on le montre en grand, un instant
+struct LevelUpBanner: View {
+    let sheepName: String
+    let level: Int
+    let onDismiss: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    private var videoName: String {
+        ["sheep_lv1", "sheep_lv1", "sheep_lv3", "sheep_lv3", "sheep_lv5", "sheep_lv5", "sheep_lv7", "sheep_lv7", "sheep_lv9", "sheep_lv9"][min(max(level, 1), 10) - 1]
+    }
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            if let url = Bundle.main.url(forResource: videoName, withExtension: "mp4") {
+                LoopingVideoView(url: url)
+            } else {
+                Image(videoName).resizable().scaledToFill()
+            }
+            LinearGradient(colors: [.clear, .black.opacity(0.6)], startPoint: .center, endPoint: .bottom)
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(t("\(sheepName) is growing!", "\(sheepName) grandit !"))
+                        .font(.system(size: 24, design: .serif))
+                    Text(t("Level \(level) reached", "Niveau \(level) atteint"))
+                        .font(.system(size: 15))
+                        .opacity(0.85)
+                }
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 13, weight: .semibold))
+                        .frame(width: 32, height: 32)
+                        .background(Color.white.opacity(0.2))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel(t("Close", "Fermer"))
+            }
+            .foregroundColor(.white)
+            .padding(16)
+        }
+        .frame(height: 220)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .onAppear { UINotificationFeedbackGenerator().notificationOccurred(.success) }
     }
 }
 

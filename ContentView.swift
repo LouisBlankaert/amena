@@ -31,18 +31,22 @@ struct ContentView: View {
 }
 
 struct MainTabView: View {
+    @AppStorage("selectedTab") private var selectedTab = 0
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
-                    Label(t("Home", "Accueil"), systemImage: "house.fill")
+                    Label(t("Home", "Accueil"), systemImage: "sun.horizon.fill")
                 }
+                .tag(0)
             JournalView()
                 .tabItem {
-                    Label("Journal", systemImage: "book.fill")
+                    Label(t("Notebook", "Carnet"), systemImage: "book.closed.fill")
                 }
+                .tag(1)
         }
-        .tint(Color.amenaPrimary)
+        .tint(Color.amenaNightBlue)
     }
 }
 

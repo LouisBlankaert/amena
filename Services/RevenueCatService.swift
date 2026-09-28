@@ -36,6 +36,14 @@ final class RevenueCatService: @unchecked Sendable {
         UserDefaults.standard.set(true, forKey: "isPremium")
     }
 
+    // Retire l'accès créateur (pour retester le paywall comme un vrai utilisateur),
+    // puis redemande le vrai statut à l'App Store
+    func disableFounderAccess() async {
+        KeychainHelper.setBool(false, forKey: founderAccessKey)
+        UserDefaults.standard.set(false, forKey: "isPremium")
+        await checkCurrentSubscription()
+    }
+
     // À appeler une seule fois, au lancement de l'app (avant tout achat/restore).
     func configure() {
         #if DEBUG

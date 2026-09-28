@@ -115,11 +115,6 @@ enum DailyVerse {
     }
 
     // Verset du jour : un par jour de l'année, boucle tous les 100 jours
-    // Nom de la traduction, affiché sous chaque verset
-    static var translationName: String {
-        t("King James Version", "Louis Segond 1910")
-    }
-
     static var today: (text: String, reference: String) {
         verse(for: Date())
     }

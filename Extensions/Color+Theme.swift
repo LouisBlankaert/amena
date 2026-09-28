@@ -28,6 +28,9 @@ extension Color {
     // Bleu nuit pour le dégradé verset du jour
     static let amenaNightBlue = Color(hex: "#1a1a6e")
 
+    // Or du soleil : jours priés, prières exaucées
+    static let amenaGold = Color(hex: "#E9A23B")
+
     // Bordure sélectionnée (cards abonnement, boutons)
     static let amenaSelectedBorder = Color(hex: "#4B8BF5")
 

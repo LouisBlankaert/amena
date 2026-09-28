@@ -14,7 +14,7 @@ set_global_options(max_instances=10)
 GROQ_API_KEY = SecretParam("GROQ_API_KEY")
 
 ALLOWED_LANGUAGES = {"English", "French"}
-MAX_THEME_LENGTH = 600  # le thème le plus long de l'app fait ~350 caractères
+MAX_THEME_LENGTH = 900  # thème le plus long de l'app : ~650 caractères avec 2 demandes du Carnet
 
 HEADERS = {
     "Access-Control-Allow-Origin": "*",

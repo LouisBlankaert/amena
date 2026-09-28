@@ -10,7 +10,6 @@ struct SettingsView: View {
     @AppStorage("prayerLanguage")      private var prayerLanguage = "English"
 
     @State private var prayerTimes:   [PrayerTimeItem] = []
-    @State private var editingIndex:  Int? = nil
     @State private var notifStatus:   String = "checking..."
     @State private var isRestoring    = false
     @State private var restoreMessage: String? = nil
@@ -18,8 +17,10 @@ struct SettingsView: View {
     @State private var versionTapCount = 0
     @State private var showFounderUnlockAlert = false
     @State private var showFounderCodePrompt = false
+    @State private var showFounderDisablePrompt = false
     @State private var founderCodeInput = ""
     @State private var founderCodeError = false
+    @State private var intentions: Set<PrayerIntention> = []
 
     // Code secret connu de toi seul, rangé dans Secrets.swift (jamais commité) —
     // change-le là-bas si tu penses qu'il a fuité.
@@ -31,204 +32,222 @@ struct SettingsView: View {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "—"
     }
 
-    private let timeFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.timeStyle = .short
-        return f
-    }()
-
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.amenaBackground.ignoresSafeArea()
+                VStack(spacing: 0) {
+                    SkyMoment.current.colors.first!.frame(height: 260)
+                    Color.amenaBackground
+                }
+                .ignoresSafeArea()
 
-                List {
-
-                    // ── PROFIL ───────────────────────────────────────
-                    Section(t("prayers language", "langue des prières")) {
-                        HStack {
-                            Label(t("Prayer language", "Langue de prière"), systemImage: "globe")
-                                .foregroundColor(Color.amenaText)
+                ScrollView {
+                    VStack(spacing: 0) {
+                        // En-tête sous le ciel
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(t("Settings", "Réglages"))
+                                .font(.system(size: 34, weight: .regular, design: .serif))
+                                .foregroundColor(.white)
                             Spacer()
-                            Picker("", selection: $prayerLanguage) {
-                                Text("English").tag("English")
-                                Text("Français").tag("French")
+                            Button { dismiss() } label: {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 40, height: 40)
+                                    .background(Color.white.opacity(0.15))
+                                    .clipShape(Circle())
                             }
-                            .pickerStyle(.segmented)
-                            .frame(width: 160)
+                            .accessibilityLabel(t("Close", "Fermer"))
                         }
-                    }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+                        .padding(.bottom, 64)
+                        .background(SkyBackground(moment: SkyMoment.current).ignoresSafeArea(edges: .top))
 
-                    Section(t("profile", "profil")) {
-                        HStack {
-                            Label(t("Your name", "Votre prénom"), systemImage: "person.fill")
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            TextField(t("Name", "Prénom"), text: $userName)
-                                .multilineTextAlignment(.trailing)
-                                .foregroundColor(Color.amenaTextSecondary)
-                        }
-                        HStack {
-                            Label(t("Companion's name", "Nom du compagnon"), systemImage: "hare.fill")
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            TextField(t("Sheep name", "Nom du mouton"), text: $sheepName)
-                                .multilineTextAlignment(.trailing)
-                                .foregroundColor(Color.amenaTextSecondary)
-                        }
-                    }
-
-                    // ── HEURES DE PRIÈRE ──────────────────────────────
-                    Section {
-                        ForEach(Array(prayerTimes.enumerated()), id: \.element.id) { index, _ in
-                            VStack(spacing: 0) {
-                                HStack {
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(prayerTimes[index].name)
-                                            .font(.system(size: 15, weight: .medium))
-                                            .foregroundColor(Color.amenaText)
-                                        Text(t("every day", "chaque jour"))
-                                            .font(.system(size: 12))
-                                            .foregroundColor(Color.amenaTextSecondary)
+                        VStack(alignment: .leading, spacing: 32) {
+                            // ── VOUS ─────────────────────────────────
+                            SettingsSection(t("You", "Vous")) {
+                                SettingsRow(t("First name", "Prénom")) {
+                                    TextField(t("Name", "Prénom"), text: $userName)
+                                        .multilineTextAlignment(.trailing)
+                                        .foregroundColor(Color.amenaTextSecondary)
+                                }
+                                Divider()
+                                SettingsRow(t("Your sheep", "Votre mouton")) {
+                                    TextField(t("Sheep name", "Nom du mouton"), text: $sheepName)
+                                        .multilineTextAlignment(.trailing)
+                                        .foregroundColor(Color.amenaTextSecondary)
+                                }
+                                Divider()
+                                SettingsRow(t("Language", "Langue")) {
+                                    HStack(spacing: 0) {
+                                        languageChip("FR", value: "French")
+                                        languageChip("EN", value: "English")
                                     }
-                                    Spacer()
-                                    Text(timeFormatter.string(from: prayerTimes[index].time))
-                                        .font(.system(size: 17, weight: .semibold))
-                                        .foregroundColor(prayerTimes[index].isEnabled ? Color.amenaPrimary : Color.amenaTextSecondary)
-                                    Toggle("", isOn: $prayerTimes[index].isEnabled)
-                                        .tint(Color.amenaPrimary)
-                                        .labelsHidden()
-                                        .onChange(of: prayerTimes[index].isEnabled) { _ in savePrayerTimes() }
+                                    .padding(3)
+                                    .background(Color.amenaUnselectedBackground)
+                                    .clipShape(Capsule())
+                                }
+                            }
+
+                            // ── CE QUI PÈSE SUR LE CŒUR ──────────────
+                            VStack(alignment: .leading, spacing: 12) {
+                                SettingsTitle(t("On your heart", "Sur votre cœur"))
+                                Text(t("Your daily prayer speaks about what you choose here.",
+                                       "Votre prière du jour parle de ce que vous choisissez ici."))
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color.amenaTextSecondary)
+                                LazyVGrid(columns: [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)], spacing: 8) {
+                                    ForEach(PrayerIntention.allCases) { intention in
+                                        let isOn = intentions.contains(intention)
+                                        Button {
+                                            if isOn { intentions.remove(intention) } else { intentions.insert(intention) }
+                                            PrayerIntention.save(PrayerIntention.allCases.filter(intentions.contains))
+                                        } label: {
+                                            HStack(spacing: 8) {
+                                                Image(systemName: intention.icon).font(.system(size: 13)).frame(width: 16)
+                                                Text(intention.label).font(.system(size: 14, weight: .medium))
+                                                    .multilineTextAlignment(.leading)
+                                                    .fixedSize(horizontal: false, vertical: true)
+                                                Spacer(minLength: 0)
+                                            }
+                                            .foregroundColor(isOn ? .white : Color.amenaText)
+                                            .padding(.horizontal, 12)
+                                            .frame(minHeight: 46)
+                                            .background(isOn ? Color.amenaNightBlue : Color.amenaSecondaryBackground)
+                                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                        }
+                                        .accessibilityAddTraits(isOn ? .isSelected : [])
+                                    }
+                                }
+                            }
+
+                            // ── RAPPELS ──────────────────────────────
+                            SettingsSection(t("Reminders", "Rappels")) {
+                                SettingsRow(t("Verse of the day", "Verset du jour")) {
+                                    Text("10:00").foregroundColor(Color.amenaTextSecondary)
+                                }
+                                ForEach($prayerTimes) { $item in
+                                    Divider()
+                                    SettingsRow(item.name) {
+                                        DatePicker("", selection: $item.time, displayedComponents: .hourAndMinute)
+                                            .labelsHidden()
+                                            .onChange(of: item.time) { _ in
+                                                item.name = PrayerTimeItem.name(for: item.time)
+                                                savePrayerTimes()
+                                            }
+                                        Toggle("", isOn: $item.isEnabled)
+                                            .labelsHidden()
+                                            .tint(Color.amenaNightBlue)
+                                            .onChange(of: item.isEnabled) { _ in savePrayerTimes() }
+                                    }
+                                }
+                                Divider()
+                                Button {
+                                    let time = makeSettingsTime(hour: 8, minute: 0)
+                                    prayerTimes.append(PrayerTimeItem(name: PrayerTimeItem.name(for: time), time: time, isEnabled: true))
+                                    savePrayerTimes()
+                                } label: {
+                                    Label(t("Add a reminder", "Ajouter un rappel"), systemImage: "plus")
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(Color.amenaNightBlue)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 14)
+                                }
+                                if notifStatus != "enabled" {
+                                    Divider()
+                                    Button {
+                                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                                            UIApplication.shared.open(url)
+                                        }
+                                    } label: {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(t("Notifications are off", "Les notifications sont coupées"))
+                                                .font(.system(size: 15, weight: .medium))
+                                                .foregroundColor(Color.amenaText)
+                                            Text(t("Turn them on in the iPhone settings", "Activez-les dans les réglages de l'iPhone"))
+                                                .font(.system(size: 13))
+                                                .foregroundColor(Color.amenaNightBlue)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 12)
+                                    }
+                                }
+                            }
+
+                            // ── ABONNEMENT ───────────────────────────
+                            SettingsSection(t("Subscription", "Abonnement")) {
+                                SettingsRow(t("Status", "Statut")) {
+                                    Text(isPremium ? "Premium" : t("Free", "Gratuit"))
+                                        .foregroundColor(isPremium ? Color.amenaGold : Color.amenaTextSecondary)
+                                        .fontWeight(.semibold)
+                                }
+                                Divider()
+                                Button {
+                                    Task { await restorePurchases() }
+                                } label: {
+                                    HStack {
+                                        Text(isRestoring ? t("Restoring…", "Restauration…") : t("Restore purchases", "Restaurer les achats"))
+                                            .font(.system(size: 15, weight: .medium))
+                                            .foregroundColor(Color.amenaNightBlue)
+                                        Spacer()
+                                        if isRestoring { ProgressView() }
+                                    }
+                                    .padding(.vertical, 14)
+                                }
+                                .disabled(isRestoring)
+                                if let msg = restoreMessage {
+                                    Text(msg)
+                                        .font(.system(size: 13))
+                                        .foregroundColor(Color.amenaTextSecondary)
+                                        .padding(.bottom, 12)
+                                }
+                            }
+
+                            // ── À PROPOS ─────────────────────────────
+                            SettingsSection(t("About", "À propos")) {
+                                SettingsRow(t("Version", "Version")) {
+                                    Text(appVersion).foregroundColor(Color.amenaTextSecondary)
                                 }
                                 .contentShape(Rectangle())
                                 .onTapGesture {
-                                    withAnimation { editingIndex = editingIndex == index ? nil : index }
+                                    versionTapCount += 1
+                                    if versionTapCount >= 7 {
+                                        versionTapCount = 0
+                                        if RevenueCatService.shared.hasFounderAccess {
+                                            showFounderDisablePrompt = true
+                                        } else {
+                                            founderCodeInput = ""
+                                            founderCodeError = false
+                                            showFounderCodePrompt = true
+                                        }
+                                    }
                                 }
-
-                                if editingIndex == index {
-                                    DatePicker("", selection: $prayerTimes[index].time, displayedComponents: .hourAndMinute)
-                                        .datePickerStyle(.wheel)
-                                        .labelsHidden()
-                                        .onChange(of: prayerTimes[index].time) { _ in savePrayerTimes() }
-                                        .transition(.move(edge: .top).combined(with: .opacity))
-                                }
+                                Divider()
+                                SettingsLink(t("Privacy policy", "Confidentialité"), url: "https://louisblankaert.github.io/amena/privacy.html")
+                                Divider()
+                                SettingsLink(t("Terms of use", "Conditions d'utilisation"), url: "https://louisblankaert.github.io/amena/terms.html")
                             }
-                        }
-                        .onDelete { indexSet in
-                            prayerTimes.remove(atOffsets: indexSet)
-                            savePrayerTimes()
-                        }
 
-                        Button {
-                            let time = makeSettingsTime(hour: 8, minute: 0)
-                            prayerTimes.append(PrayerTimeItem(
-                                name: PrayerTimeItem.name(for: time),
-                                time: time,
-                                isEnabled: true
-                            ))
-                            savePrayerTimes()
-                        } label: {
-                            Label(t("Add prayer time", "Ajouter une heure de prière"), systemImage: "plus.circle.fill")
-                                .foregroundColor(Color.amenaPrimary)
-                        }
-                    } header: {
-                        Text(t("prayer times", "heures de prière"))
-                    }
-
-                    Section(t("notifications", "notifications")) {
-                        HStack {
-                            Label(t("Status", "Statut"), systemImage: "bell.fill")
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            Text(notifStatus == "enabled" ? t("enabled", "activé") : notifStatus == "disabled" ? t("disabled", "désactivé") : t("not set", "non défini"))
-                                .font(.system(size: 13))
-                                .foregroundColor(notifStatus == "enabled" ? .green : Color.amenaTextSecondary)
-                        }
-                        Button {
-                            if let url = URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(url)
+                            Button(t("Restart the welcome screens", "Revoir les écrans d'accueil")) {
+                                showResetAlert = true
                             }
-                        } label: {
-                            Label(t("Open notification settings", "Ouvrir les paramètres"), systemImage: "arrow.up.right.square")
-                                .foregroundColor(Color.amenaPrimary)
-                        }
-                    }
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.amenaTextSecondary)
+                            .frame(maxWidth: .infinity)
 
-                    Section(t("subscription", "abonnement")) {
-                        HStack {
-                            Label(t("Status", "Statut"), systemImage: "crown.fill")
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            Text(isPremium ? t("Premium", "Premium") : t("Free", "Gratuit"))
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(isPremium ? Color.amenaPrimary : Color.amenaTextSecondary)
+                            Spacer(minLength: 40)
                         }
-
-                        Button {
-                            Task { await restorePurchases() }
-                        } label: {
-                            HStack {
-                                Label(isRestoring ? t("Restoring...", "Restauration...") : t("Restore purchases", "Restaurer les achats"), systemImage: "arrow.clockwise")
-                                    .foregroundColor(Color.amenaPrimary)
-                                if isRestoring { Spacer(); ProgressView().tint(Color.amenaPrimary) }
-                            }
-                        }
-                        .disabled(isRestoring)
-
-                        if let msg = restoreMessage {
-                            Text(msg)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color.amenaTextSecondary)
-                        }
-                    }
-
-                    Section(t("about", "à propos")) {
-                        HStack {
-                            Label(t("Version", "Version"), systemImage: "info.circle")
-                                .foregroundColor(Color.amenaText)
-                            Spacer()
-                            Text(appVersion)
-                                .foregroundColor(Color.amenaTextSecondary)
-                        }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            versionTapCount += 1
-                            if versionTapCount >= 7 {
-                                versionTapCount = 0
-                                founderCodeInput = ""
-                                founderCodeError = false
-                                showFounderCodePrompt = true
-                            }
-                        }
-                        Link(destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!) {
-                            Label(t("Privacy Policy", "Politique de confidentialité"), systemImage: "hand.raised.fill")
-                                .foregroundColor(Color.amenaPrimary)
-                        }
-                        Link(destination: URL(string: "https://louisblankaert.github.io/amena/terms.html")!) {
-                            Label(t("Terms of Use", "Conditions d'utilisation"), systemImage: "doc.text.fill")
-                                .foregroundColor(Color.amenaPrimary)
-                        }
-                    }
-
-                    Section {
-                        Button(role: .destructive) {
-                            showResetAlert = true
-                        } label: {
-                            Label(t("Reset onboarding", "Réinitialiser l'accueil"), systemImage: "arrow.counterclockwise")
-                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 28)
+                        .background(Color.amenaBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                        .padding(.top, -32)
                     }
                 }
-                .scrollContentBackground(.hidden)
+                .scrollDismissesKeyboard(.interactively)
             }
-            .navigationTitle(t("settings", "paramètres"))
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(t("Done", "Fermer")) { dismiss() }
-                        .foregroundColor(Color.amenaPrimary)
-                        .fontWeight(.semibold)
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
             .alert(t("Reset onboarding?", "Réinitialiser l'accueil ?"), isPresented: $showResetAlert) {
                 Button(t("Cancel", "Annuler"), role: .cancel) {}
                 Button(t("Reset", "Réinitialiser"), role: .destructive) {
@@ -237,6 +256,18 @@ struct SettingsView: View {
                 }
             } message: {
                 Text(t("This will restart the app from the beginning. Your prayers won't be deleted.", "Ceci relancera l'app depuis le début. Vos prières ne seront pas supprimées."))
+            }
+            .alert(t("Disable founder access?", "Désactiver l'accès créateur ?"), isPresented: $showFounderDisablePrompt) {
+                Button(t("Cancel", "Annuler"), role: .cancel) {}
+                Button(t("Disable", "Désactiver"), role: .destructive) {
+                    Task {
+                        await RevenueCatService.shared.disableFounderAccess()
+                        await MainActor.run { isPremium = RevenueCatService.shared.isPremium }
+                    }
+                }
+            } message: {
+                Text(t("You'll see the app like a regular user, paywall included. Re-enter the code to get it back.",
+                       "Vous verrez l'app comme un utilisateur normal, paywall compris. Retapez le code pour le récupérer."))
             }
             .alert(t("Enter code", "Entrer le code"), isPresented: $showFounderCodePrompt) {
                 TextField(t("Secret code", "Code secret"), text: $founderCodeInput)
@@ -263,12 +294,28 @@ struct SettingsView: View {
             }
         }
         .onAppear {
+            intentions = Set(PrayerIntention.saved)
             loadPrayerTimes()
             checkNotificationStatus()
         }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────
+
+    private func languageChip(_ label: String, value: String) -> some View {
+        Button {
+            prayerLanguage = value
+        } label: {
+            Text(label)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(prayerLanguage == value ? .white : Color.amenaText)
+                .frame(width: 40, height: 28)
+                .background(prayerLanguage == value ? Color.amenaNightBlue : Color.clear)
+                .clipShape(Capsule())
+        }
+        .accessibilityLabel(value == "French" ? "Français" : "English")
+        .accessibilityAddTraits(prayerLanguage == value ? .isSelected : [])
+    }
 
     private func loadPrayerTimes() {
         guard let data = UserDefaults.standard.data(forKey: "prayerTimes"),
@@ -340,6 +387,77 @@ struct PrayerTimeItem: Identifiable {
         case 4..<12:  return t("Morning prayer", "Prière du matin")
         case 12..<18: return t("Afternoon prayer", "Prière de l'après-midi")
         default:      return t("Evening prayer", "Prière du soir")
+        }
+    }
+}
+
+// ── Éléments de mise en page des Réglages ─────────────────────────────
+
+private struct SettingsTitle: View {
+    let text: String
+    init(_ text: String) { self.text = text }
+    var body: some View {
+        Text(text)
+            .font(.system(size: 22, weight: .regular, design: .serif))
+            .foregroundColor(Color.amenaText)
+    }
+}
+
+// Un groupe de lignes sur fond gris clair, avec son titre serif
+private struct SettingsSection<Content: View>: View {
+    let title: String
+    @ViewBuilder let content: Content
+    init(_ title: String, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.content = content()
+    }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SettingsTitle(title)
+            VStack(spacing: 0) { content }
+                .padding(.horizontal, 16)
+                .background(Color.amenaSecondaryBackground)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        }
+    }
+}
+
+private struct SettingsRow<Trailing: View>: View {
+    let label: String
+    @ViewBuilder let trailing: Trailing
+    init(_ label: String, @ViewBuilder trailing: () -> Trailing) {
+        self.label = label
+        self.trailing = trailing()
+    }
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(label)
+                .font(.system(size: 16))
+                .foregroundColor(Color.amenaText)
+            Spacer(minLength: 8)
+            trailing
+        }
+        .frame(minHeight: 50)
+    }
+}
+
+private struct SettingsLink: View {
+    let label: String
+    let url: String
+    init(_ label: String, url: String) {
+        self.label = label
+        self.url = url
+    }
+    var body: some View {
+        Link(destination: URL(string: url)!) {
+            HStack {
+                Text(label).font(.system(size: 16)).foregroundColor(Color.amenaText)
+                Spacer()
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color.amenaTextSecondary)
+            }
+            .frame(minHeight: 50)
         }
     }
 }

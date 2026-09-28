@@ -30,6 +30,7 @@ struct PaywallView: View {
         let date = Calendar.current.date(byAdding: .day, value: 3, to: Date()) ?? Date()
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
+        formatter.locale = appLocale
         return formatter.string(from: date)
     }
 
