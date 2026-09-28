@@ -66,6 +66,37 @@ final class RevenueCatService: @unchecked Sendable {
         AffiliateService.shared.attachReferralCodeToCurrentUser()
     }
 
+    // Prix réels lus depuis l'App Store, dans la monnaie du pays de l'utilisateur
+    // (l'app est vendue en EUR, USD, CAD et CHF : jamais de prix écrit en dur),
+    // et droit à l'essai gratuit (une personne qui l'a déjà utilisé n'y a plus droit —
+    // lui afficher "3 jours gratuits" serait trompeur, Apple refuse ça).
+    func loadPrices() async -> PlanPrices {
+        guard let offering = try? await Purchases.shared.offerings().current else {
+            return .fallback
+        }
+        func product(_ plan: SubscriptionPlan) -> StoreProduct? {
+            offering.availablePackages.first { $0.storeProduct.productIdentifier == plan.productId }?.storeProduct
+        }
+
+        var prices = PlanPrices.fallback
+        if let weekly = product(.weekly) {
+            prices.weekly = weekly.localizedPriceString
+        }
+        if let yearly = product(.yearly) {
+            prices.yearly = yearly.localizedPriceString
+            prices.yearlyPerWeek = yearly.localizedPricePerWeek ?? prices.yearlyPerWeek
+            if yearly.introductoryDiscount == nil {
+                prices.isTrialEligible = false
+            } else {
+                // .unknown (statut indéterminable) : on laisse l'essai, c'est StoreKit
+                // qui aura le dernier mot au moment de l'achat
+                let status = await Purchases.shared.checkTrialOrIntroDiscountEligibility(product: yearly)
+                prices.isTrialEligible = status != .ineligible && status != .noIntroOfferExists
+            }
+        }
+        return prices
+    }
+
     // Obligatoire App Store : bouton "Restore Purchases"
     func restorePurchases() async throws {
         let info = try await Purchases.shared.restorePurchases()
@@ -92,6 +123,17 @@ final class RevenueCatService: @unchecked Sendable {
     var isPremium: Bool {
         UserDefaults.standard.bool(forKey: "isPremium")
     }
+}
+
+// Prix affichés sur le paywall, déjà formatés dans la monnaie de l'utilisateur
+struct PlanPrices: Sendable {
+    var weekly: String
+    var yearly: String
+    var yearlyPerWeek: String
+    var isTrialEligible: Bool
+
+    // Utilisé seulement si l'App Store ne répond pas : prix du pays de base (Belgique)
+    static let fallback = PlanPrices(weekly: "4,99 €", yearly: "29,99 €", yearlyPerWeek: "0,58 €", isTrialEligible: true)
 }
 
 enum PurchaseError: Error {

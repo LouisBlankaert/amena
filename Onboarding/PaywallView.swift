@@ -17,6 +17,13 @@ struct PaywallView: View {
     @State private var purchaseErrorMessage = ""
     @State private var showReferralField = false
     @State private var referralCode = ""
+    // Prix réels de l'App Store (monnaie du pays) + droit à l'essai, chargés à l'affichage
+    @State private var prices = PlanPrices.fallback
+    @State private var pricesLoaded = false
+    @State private var purchasedWithTrial = false
+
+    // L'essai gratuit ne concerne que l'annuel, et seulement si la personne y a encore droit
+    private var showsTrial: Bool { selectedPlan == .yearly && prices.isTrialEligible }
 
     // Date de fin d'essai = aujourd'hui + 3 jours
     private var trialEndDate: String {
@@ -28,7 +35,7 @@ struct PaywallView: View {
 
     var body: some View {
         if showPostPaywall {
-            PostPaywallView(plan: purchasedPlan, onNext: onNext)
+            PostPaywallView(plan: purchasedPlan, hadTrial: purchasedWithTrial, prices: prices, onNext: onNext)
         } else {
             mainPaywall
         }
@@ -63,7 +70,7 @@ struct PaywallView: View {
                     .padding(.top, 60)
 
                     // Titre : adapté selon le plan
-                    Text(selectedPlan == .yearly ? t("try amena free for 3 days", "essayez amena gratuitement 3 jours") : t("start praying today", "commencez à prier aujourd'hui"))
+                    Text(showsTrial ? t("try amena free for 3 days", "essayez amena gratuitement 3 jours") : t("start praying today", "commencez à prier aujourd'hui"))
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(Color.amenaText)
                         .multilineTextAlignment(.center)
@@ -71,7 +78,7 @@ struct PaywallView: View {
                         .animation(.easeInOut(duration: 0.2), value: selectedPlan)
 
                     // Timeline : uniquement pour yearly (free trial)
-                    if selectedPlan == .yearly {
+                    if showsTrial {
                         TrialTimeline(trialEndDate: trialEndDate)
                             .padding(.horizontal, 24)
                             .transition(.opacity.combined(with: .move(edge: .top)))
@@ -82,20 +89,24 @@ struct PaywallView: View {
                         // Weekly (ancrage psychologique)
                         PlanOptionCard(
                             plan: .weekly,
+                            prices: prices,
                             isSelected: selectedPlan == .weekly,
                             onSelect: { selectedPlan = .weekly }
                         )
                         // Yearly (mis en avant)
                         PlanOptionCard(
                             plan: .yearly,
+                            prices: prices,
                             isSelected: selectedPlan == .yearly,
                             onSelect: { selectedPlan = .yearly }
                         )
                     }
                     .padding(.horizontal, 24)
+                    // Masque les prix de secours tant que l'App Store n'a pas répondu
+                    .redacted(reason: pricesLoaded ? [] : .placeholder)
 
                     // "No Payment Due Now" uniquement pour yearly
-                    if selectedPlan == .yearly {
+                    if showsTrial {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 13, weight: .bold))
@@ -103,8 +114,6 @@ struct PaywallView: View {
                             Text(t("No Payment Due Now", "Aucun paiement maintenant"))
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundColor(Color.amenaText)
-                            Text("👇")
-                                .font(.system(size: 14))
                         }
                         .transition(.opacity)
                     }
@@ -122,18 +131,17 @@ struct PaywallView: View {
                                 .cornerRadius(16)
                                 .padding(.horizontal, 24)
                         } else {
-                            Text(selectedPlan == .yearly ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
+                            Text(showsTrial ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
                                 .amenaPrimaryButton()
                         }
                     }
 
                     // Texte légal adapté au plan
-                    Text(selectedPlan == .yearly
-                         ? t("3 days free, then 29,99 €/year (0,58 €/week)", "3 jours gratuits, puis 29,99 €/an (0,58 €/semaine)")
-                         : t("4,99 €/week — billed weekly, cancel anytime", "4,99 €/semaine — facturation hebdomadaire, annulation possible"))
+                    Text(legalText)
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                         .multilineTextAlignment(.center)
+                        .redacted(reason: pricesLoaded ? [] : .placeholder)
 
                     // Code de parrainage (optionnel) — discret, replié par défaut
                     VStack(spacing: 8) {
@@ -191,6 +199,25 @@ struct PaywallView: View {
                 }
             }
         }
+        .task {
+            prices = await RevenueCatService.shared.loadPrices()
+            pricesLoaded = true
+        }
+    }
+
+    // Texte légal sous le bouton : le montant réellement facturé, toujours visible
+    private var legalText: String {
+        switch selectedPlan {
+        case .yearly where prices.isTrialEligible:
+            return t("3 days free, then \(prices.yearly)/year (\(prices.yearlyPerWeek)/week), cancel anytime",
+                     "3 jours gratuits, puis \(prices.yearly)/an (\(prices.yearlyPerWeek)/semaine), annulation possible")
+        case .yearly:
+            return t("\(prices.yearly)/year (\(prices.yearlyPerWeek)/week), billed yearly, cancel anytime",
+                     "\(prices.yearly)/an (\(prices.yearlyPerWeek)/semaine), facturation annuelle, annulation possible")
+        case .weekly:
+            return t("\(prices.weekly)/week, billed weekly, cancel anytime",
+                     "\(prices.weekly)/semaine, facturation hebdomadaire, annulation possible")
+        }
     }
 
     private func restorePurchases() {
@@ -201,19 +228,19 @@ struct PaywallView: View {
                 await MainActor.run {
                     isRestoring = false
                     if RevenueCatService.shared.isPremium {
-                        restoreMessage = "Purchase restored successfully!"
+                        restoreMessage = t("Purchase restored!", "Achat restauré !")
                         // Redirige vers l'app après un court délai
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                             showPostPaywall = true
                         }
                     } else {
-                        restoreMessage = "No active subscription found."
+                        restoreMessage = t("No active subscription found.", "Aucun abonnement actif trouvé.")
                     }
                 }
             } catch {
                 await MainActor.run {
                     isRestoring = false
-                    restoreMessage = "Restore failed. Please try again."
+                    restoreMessage = t("Restore failed. Please try again.", "La restauration a échoué. Veuillez réessayer.")
                 }
             }
         }
@@ -232,10 +259,11 @@ struct PaywallView: View {
                 await MainActor.run {
                     isPurchasing = false
                     purchasedPlan = selectedPlan
+                    purchasedWithTrial = showsTrial
                     AnalyticsService.shared.log(.trialStarted)
                     AnalyticsService.shared.log(.subscriptionPurchased(plan: selectedPlan.productId))
-                    // Rappel fin d'essai uniquement pour le plan yearly (weekly = paiement immédiat)
-                    if selectedPlan == .yearly {
+                    // Rappel fin d'essai uniquement s'il y a vraiment un essai (weekly = paiement immédiat)
+                    if purchasedWithTrial {
                         NotificationService.shared.scheduleTrialEndingReminder()
                     }
                     showPostPaywall = true
@@ -339,6 +367,7 @@ struct TrialTimeline: View {
 // Carte d'option d'abonnement
 struct PlanOptionCard: View {
     let plan: SubscriptionPlan
+    let prices: PlanPrices
     let isSelected: Bool
     let onSelect: () -> Void
     @AppStorage("prayerLanguage") private var lang: String = "English"
@@ -350,11 +379,11 @@ struct PlanOptionCard: View {
     // Prix par semaine : affiché en subordonné (Apple 3.1.2(c) — le montant facturé
     // doit être l'élément le plus visible, le calcul par semaine passe en second plan)
     private var pricePerWeekSubordinate: String {
-        plan == .weekly ? "" : t("(0,58€/week)", "(0,58€/semaine)")
+        plan == .weekly ? "" : t("(\(prices.yearlyPerWeek)/week)", "(\(prices.yearlyPerWeek)/semaine)")
     }
 
     private var totalPrice: String {
-        plan == .weekly ? t("4,99€/week", "4,99€/semaine") : t("29,99€/year", "29,99€/an")
+        plan == .weekly ? t("\(prices.weekly)/week", "\(prices.weekly)/semaine") : t("\(prices.yearly)/year", "\(prices.yearly)/an")
     }
 
     var body: some View {
@@ -378,7 +407,7 @@ struct PlanOptionCard: View {
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(Color.amenaText)
                         // Badge "3-day free trial" uniquement sur l'option yearly
-                        if plan == .yearly {
+                        if plan == .yearly && prices.isTrialEligible {
                             Text(t("3-day free trial", "3 jours gratuits"))
                                 .font(.system(size: 10, weight: .semibold))
                                 .foregroundColor(.white)
@@ -422,6 +451,8 @@ struct PlanOptionCard: View {
 // Écran post-paywall : confirmation de démarrage de l'essai
 struct PostPaywallView: View {
     let plan: SubscriptionPlan
+    let hadTrial: Bool
+    let prices: PlanPrices
     let onNext: () -> Void
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
@@ -437,11 +468,11 @@ struct PostPaywallView: View {
                         Circle()
                             .fill(Color.amenaOrangePale)
                             .frame(width: 120, height: 120)
-                        Image(systemName: plan == .yearly ? "bell.fill" : "checkmark.circle.fill")
+                        Image(systemName: hadTrial ? "bell.fill" : "checkmark.circle.fill")
                             .font(.system(size: 50))
                             .foregroundColor(Color.amenaPrimary)
                     }
-                    if plan == .yearly {
+                    if hadTrial {
                         ZStack {
                             Circle()
                                 .fill(.red)
@@ -454,7 +485,7 @@ struct PostPaywallView: View {
                 }
 
                 VStack(spacing: 12) {
-                    Text(plan == .yearly
+                    Text(hadTrial
                          ? t("we'll send you a reminder before your free trial ends", "nous vous enverrons un rappel avant la fin de votre essai gratuit")
                          : t("you're all set! welcome to amena.", "tout est prêt ! bienvenue sur amena."))
                         .font(.system(size: 24, weight: .bold))
@@ -462,7 +493,7 @@ struct PostPaywallView: View {
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 32)
 
-                    if plan == .yearly {
+                    if hadTrial {
                         HStack(spacing: 6) {
                             Image(systemName: "checkmark")
                                 .foregroundColor(Color.amenaPrimary)
@@ -480,13 +511,13 @@ struct PostPaywallView: View {
                     Button {
                         onNext()
                     } label: {
-                        Text(plan == .yearly ? t("continue for FREE", "continuer GRATUITEMENT") : t("start praying", "commencer à prier"))
+                        Text(hadTrial ? t("continue for FREE", "continuer GRATUITEMENT") : t("start praying", "commencer à prier"))
                             .amenaPrimaryButton()
                     }
 
                     Text(plan == .yearly
-                         ? t("just 29,99 € per year (0,58 €/week)", "seulement 29,99 € par an (0,58 €/semaine)")
-                         : t("4,99 €/week — cancel anytime", "4,99 €/semaine — annulation possible"))
+                         ? t("\(prices.yearly) per year (\(prices.yearlyPerWeek)/week), cancel anytime", "\(prices.yearly) par an (\(prices.yearlyPerWeek)/semaine), annulation possible")
+                         : t("\(prices.weekly)/week, cancel anytime", "\(prices.weekly)/semaine, annulation possible"))
                         .font(.system(size: 12))
                         .foregroundColor(Color.amenaTextSecondary)
                 }

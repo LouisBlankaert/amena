@@ -8,6 +8,20 @@ struct ContentView: View {
     @AppStorage("onboardingCompleted") private var onboardingCompleted = false
 
     var body: some View {
+        #if DEBUG
+        // Raccourci de test : lancer avec l'argument -debugPaywall affiche le paywall seul
+        if ProcessInfo.processInfo.arguments.contains("-debugPaywall") {
+            PaywallView(onNext: {})
+        } else {
+            mainContent
+        }
+        #else
+        mainContent
+        #endif
+    }
+
+    @ViewBuilder
+    private var mainContent: some View {
         if onboardingCompleted {
             MainTabView()
         } else {

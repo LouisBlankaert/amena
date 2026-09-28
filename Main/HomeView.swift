@@ -94,7 +94,7 @@ struct HomeView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
-            .sheet(isPresented: $showPrayerView) {
+            .fullScreenCover(isPresented: $showPrayerView) {
                 PrayerView(prefetchedPrayer: prefetchedPrayer) {
                     let result = streakManager.markPrayedToday()
                     currentStreak  = result.streak
@@ -117,6 +117,12 @@ struct HomeView: View {
         .onAppear {
             moment = SkyMoment.current
             loadState()
+            #if DEBUG
+            // Raccourci de test : lancer avec l'argument -debugOpenPrayer ouvre la prière
+            if ProcessInfo.processInfo.arguments.contains("-debugOpenPrayer") {
+                showPrayerView = true
+            }
+            #endif
         }
     }
 
@@ -236,7 +242,7 @@ enum SkyMoment {
         case .dawn:  return UnitPoint(x: 0.85, y: 0.95)
         case .day:   return UnitPoint(x: 0.88, y: 0.12)
         case .dusk:  return UnitPoint(x: 0.12, y: 0.95)
-        case .night: return UnitPoint(x: 0.84, y: 0.14)
+        case .night: return UnitPoint(x: 0.72, y: 0.2)   // décalée pour ne pas passer sous les boutons ronds
         }
     }
 
