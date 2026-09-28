@@ -24,6 +24,7 @@ struct HomeView: View {
     @State private var showWelcomeBackBanner = false
     @State private var prefetchedPrayer = ""  // pré-généré en arrière-plan
     @State private var prayers: [PrayerEntry] = []
+    @State private var moment = SkyMoment.current
 
     // Niveau et % FAITH calculés dynamiquement depuis totalPrayers
     private var levelData: (level: Int, faithPercent: Double) {
@@ -33,73 +34,61 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.amenaBackground.ignoresSafeArea()
+                // Fond derrière le scroll : couleur du haut du ciel en haut (pour le
+                // rebond du scroll), blanc en bas (continuité avec le panneau)
+                VStack(spacing: 0) {
+                    moment.colors.first!.frame(height: 400)
+                    Color.amenaBackground
+                }
+                .ignoresSafeArea()
 
                 ScrollView {
-                    VStack(spacing: 24) {
-                        // En-tête : bonjour + nom
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(t("good \(timeOfDay), \(userName)", "\(greetingFr), \(userName)"))
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(Color.amenaText)
-                                Text(hasPrayedToday ? t("You've prayed today ✓", "Vous avez prié aujourd'hui ✓") : t("Don't forget to pray today", "N'oubliez pas de prier aujourd'hui"))
-                                    .font(.system(size: 14))
-                                    .foregroundColor(hasPrayedToday ? Color.amenaPrimary : Color.amenaTextSecondary)
-                            }
-                            Spacer()
-                            Button {
-                                showSettings = true
-                            } label: {
-                                Image(systemName: "gearshape.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(Color.amenaTextSecondary)
-                            }
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.top, 20)
-
-                        // Carte principale : statut prière
-                        PrayerStatusCard(
-                            hasPrayed: hasPrayedToday,
-                            streak: currentStreak,
-                            totalPrayers: totalPrayers,
-                            onPrayNow: { showPrayerView = true }
+                    VStack(spacing: 0) {
+                        VerseHero(
+                            moment: moment,
+                            greeting: t("good \(timeOfDay), \(userName)", "\(greetingFr), \(userName)"),
+                            onSettings: { showSettings = true }
                         )
-                        .padding(.horizontal, 24)
 
-                        // Bannière de retour bienveillante après une pause (jamais punitive)
-                        if showWelcomeBackBanner {
-                            WelcomeBackBanner(onDismiss: { showWelcomeBackBanner = false })
-                                .padding(.horizontal, 24)
-                        }
-
-                        // Bannière cycle complet (30 jours)
-                        if showCycleBanner {
-                            CycleCompletedBanner(
-                                cycleNumber: completedCycles,
-                                onDismiss: { showCycleBanner = false }
+                        // Panneau blanc qui remonte par-dessus le ciel
+                        VStack(spacing: 20) {
+                            PrayerActionSection(
+                                hasPrayed: hasPrayedToday,
+                                userName: userName,
+                                streak: currentStreak,
+                                totalPrayers: totalPrayers,
+                                onPrayNow: { showPrayerView = true }
                             )
-                            .padding(.horizontal, 24)
+
+                            // Bannière de retour bienveillante après une pause (jamais punitive)
+                            if showWelcomeBackBanner {
+                                WelcomeBackBanner(onDismiss: { showWelcomeBackBanner = false })
+                            }
+
+                            // Bannière cycle complet (30 jours)
+                            if showCycleBanner {
+                                CycleCompletedBanner(
+                                    cycleNumber: completedCycles,
+                                    onDismiss: { showCycleBanner = false }
+                                )
+                            }
+
+                            SheepRow(
+                                sheepName: sheepName,
+                                level: levelData.level,
+                                faithPercent: levelData.faithPercent
+                            )
+
+                            // Historique de prière façon GitHub
+                            PrayerContributionGrid(prayers: prayers)
+
+                            Spacer(minLength: 80)
                         }
-
-                        // Carte mascotte mouton
-                        SheepStatusCard(
-                            sheepName: sheepName,
-                            level: levelData.level,
-                            faithPercent: levelData.faithPercent
-                        )
-                        .padding(.horizontal, 24)
-
-                        // Verset du jour
-                        VerseOfDayCard()
-                            .padding(.horizontal, 24)
-
-                        // Historique de prière façon GitHub
-                        PrayerContributionGrid(prayers: prayers)
-                            .padding(.horizontal, 24)
-
-                        Spacer(minLength: 40)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 28)
+                        .background(Color.amenaBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                        .padding(.top, -32)
                     }
                 }
             }
@@ -126,6 +115,7 @@ struct HomeView: View {
             }
         }
         .onAppear {
+            moment = SkyMoment.current
             loadState()
         }
     }
@@ -195,78 +185,276 @@ struct HomeView: View {
     }
 }
 
-// Carte de statut de prière du jour
-struct PrayerStatusCard: View {
+// Moment de la journée : pilote le ciel en fond de l'accueil.
+// Les chrétiens prient depuis toujours à des heures précises (laudes à l'aube,
+// vêpres au couchant...) : le ciel rappelle à quel moment de la journée on prie.
+enum SkyMoment {
+    case dawn, day, dusk, night
+
+    static var current: SkyMoment {
+        #if DEBUG
+        // Pour tester les 4 ciels sans attendre l'heure : réglage "debugSkyMoment"
+        // (dawn / day / dusk / night) dans UserDefaults, ignoré en version App Store
+        switch UserDefaults.standard.string(forKey: "debugSkyMoment") {
+        case "dawn":  return .dawn
+        case "day":   return .day
+        case "dusk":  return .dusk
+        case "night": return .night
+        default:      break
+        }
+        #endif
+        switch Calendar.current.component(.hour, from: Date()) {
+        case 5..<11:  return .dawn
+        case 11..<17: return .day
+        case 17..<21: return .dusk
+        default:      return .night
+        }
+    }
+
+    // Dégradé du haut du ciel vers l'horizon
+    var colors: [Color] {
+        switch self {
+        case .dawn:  return [Color(hex: "#4A6FB8"), Color(hex: "#B69BC9"), Color(hex: "#F4BE9C")]
+        case .day:   return [Color(hex: "#2C68CF"), Color(hex: "#5C98E6"), Color(hex: "#A9CDF6")]
+        case .dusk:  return [Color(hex: "#262659"), Color(hex: "#7E4887"), Color(hex: "#E8905A")]
+        case .night: return [Color(hex: "#060A22"), Color(hex: "#141C49"), Color(hex: "#27336F")]
+        }
+    }
+
+    // Soleil ou lune : couleur, position et taille du halo
+    var glowColor: Color {
+        switch self {
+        case .dawn:  return Color(hex: "#FFE2B5")
+        case .day:   return .white
+        case .dusk:  return Color(hex: "#FFB36B")
+        case .night: return Color(hex: "#F3EFDC")
+        }
+    }
+
+    var glowPosition: UnitPoint {
+        switch self {
+        case .dawn:  return UnitPoint(x: 0.85, y: 0.95)
+        case .day:   return UnitPoint(x: 0.88, y: 0.12)
+        case .dusk:  return UnitPoint(x: 0.12, y: 0.95)
+        case .night: return UnitPoint(x: 0.84, y: 0.14)
+        }
+    }
+
+    var showsStars: Bool { self == .night }
+}
+
+// Le ciel : dégradé + halo du soleil/de la lune + étoiles la nuit
+struct SkyBackground: View {
+    let moment: SkyMoment
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack {
+                LinearGradient(colors: moment.colors, startPoint: .top, endPoint: .bottom)
+
+                // Halo large et doux, puis le disque lui-même
+                Circle()
+                    .fill(moment.glowColor.opacity(0.55))
+                    .frame(width: 260, height: 260)
+                    .blur(radius: 70)
+                    .position(x: geo.size.width * moment.glowPosition.x,
+                              y: geo.size.height * moment.glowPosition.y)
+                Circle()
+                    .fill(moment.glowColor.opacity(moment == .day ? 0.5 : 0.9))
+                    .frame(width: moment == .night ? 34 : 56, height: moment == .night ? 34 : 56)
+                    .blur(radius: moment == .night ? 0.5 : 8)
+                    .position(x: geo.size.width * moment.glowPosition.x,
+                              y: geo.size.height * moment.glowPosition.y)
+
+                if moment.showsStars {
+                    StarField()
+                }
+            }
+        }
+    }
+}
+
+// Étoiles placées de façon fixe (même ciel à chaque ouverture, pas de scintillement aléatoire)
+struct StarField: View {
+    var body: some View {
+        Canvas { context, size in
+            var seed: UInt64 = 7
+            func next() -> Double {
+                seed = seed &* 6364136223846793005 &+ 1442695040888963407
+                return Double(seed >> 33) / Double(UInt32.max >> 1)
+            }
+            for _ in 0..<70 {
+                let x = next() * size.width
+                let y = next() * size.height * 0.8
+                let r = 0.5 + next() * 1.2
+                let rect = CGRect(x: x, y: y, width: r * 2, height: r * 2)
+                context.fill(Path(ellipseIn: rect), with: .color(.white.opacity(0.35 + next() * 0.5)))
+            }
+        }
+    }
+}
+
+// Le haut de l'accueil : le ciel du moment et, au centre, le verset du jour en grand
+struct VerseHero: View {
+    let moment: SkyMoment
+    let greeting: String
+    let onSettings: () -> Void
+    @AppStorage("prayerLanguage") private var lang: String = "English"
+
+    private var verse: (text: String, reference: String) { DailyVerse.today }
+
+    // Le verset doit tenir dans le ciel : plus il est long, plus la police est petite
+    private var verseSize: CGFloat {
+        switch verse.text.count {
+        case ..<70:   return 32
+        case ..<130:  return 27
+        default:      return 23
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text(greeting)
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundColor(.white.opacity(0.9))
+                Spacer()
+                Button(action: onSettings) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 18))
+                        .foregroundColor(.white.opacity(0.85))
+                        .frame(width: 40, height: 40)
+                        .background(Color.white.opacity(0.15))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel(t("Settings", "Réglages"))
+            }
+            .padding(.top, 8)
+
+            Spacer(minLength: 64)
+
+            // Le verset, en serif comme dans une Bible imprimée
+            Text(t("“\(verse.text)”", "« \(verse.text) »"))
+                .font(.system(size: verseSize, weight: .regular, design: .serif))
+                .foregroundColor(.white)
+                .lineSpacing(verseSize * 0.18)
+                .fixedSize(horizontal: false, vertical: true)
+                .shadow(color: .black.opacity(0.15), radius: 12, y: 2)
+
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verse.reference)
+                        .font(.system(size: 16, weight: .semibold, design: .serif))
+                        .italic()
+                        .foregroundColor(.white)
+                    Text(DailyVerse.translationName)
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                Spacer()
+                Button(action: shareVerse) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .background(Color.white.opacity(0.15))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel(t("Share this verse", "Partager ce verset"))
+            }
+            .padding(.top, 20)
+
+            Spacer(minLength: 88) // place pour le panneau blanc qui remonte par-dessus
+        }
+        .padding(.horizontal, 24)
+        .frame(minHeight: 560)
+        .background(SkyBackground(moment: moment).ignoresSafeArea(edges: .top))
+    }
+
+    private func shareVerse() {
+        let text = "\(verse.text)\n— \(verse.reference) (\(DailyVerse.translationName))"
+        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let rootVC = windowScene.windows.first?.rootViewController {
+            rootVC.present(activityVC, animated: true)
+        }
+    }
+}
+
+// Bouton de prière du jour + série de jours
+struct PrayerActionSection: View {
     let hasPrayed: Bool
+    let userName: String
     let streak: Int
     let totalPrayers: Int
     let onPrayNow: () -> Void
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
     var body: some View {
-        VStack(spacing: 16) {
-            // Statut visuel
-            HStack {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(t("Today's Prayer", "Prière du jour"))
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(Color.amenaText)
-                    HStack(spacing: 6) {
-                        Image(systemName: hasPrayed ? "checkmark.circle.fill" : "clock.fill")
-                            .foregroundColor(hasPrayed ? .green : Color.amenaPrimary)
-                        Text(hasPrayed ? t("Completed", "Terminée") : t("Pending", "En attente"))
-                            .font(.system(size: 14))
-                            .foregroundColor(hasPrayed ? .green : Color.amenaTextSecondary)
-                    }
-                }
-                Spacer()
-                // Streak
-                VStack(spacing: 2) {
-                    Text("\(streak)")
-                        .font(.system(size: 28, weight: .bold))
+        VStack(alignment: .leading, spacing: 14) {
+            if hasPrayed {
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 28))
                         .foregroundColor(Color.amenaPrimary)
-                    HStack(spacing: 2) {
-                        Text(t("day streak", "jours d'affilée"))
-                        Image(systemName: "flame.fill")
-                            .foregroundColor(.orange)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(t("You've prayed today", "Vous avez prié aujourd'hui"))
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(Color.amenaText)
+                        Text(t("See you tomorrow, \(userName).", "À demain, \(userName)."))
+                            .font(.system(size: 14))
+                            .foregroundColor(Color.amenaTextSecondary)
                     }
-                    .font(.system(size: 11))
-                    .foregroundColor(Color.amenaTextSecondary)
-                    // Compteur cumulatif : ne redescend jamais à 0, même si le streak est cassé.
-                    Text(t("\(totalPrayers) prayers total", "\(totalPrayers) prières au total"))
-                        .font(.system(size: 10))
-                        .foregroundColor(Color.amenaTextSecondary.opacity(0.7))
-                        .padding(.top, 2)
                 }
-            }
-
-            // Bouton "pray now" (visible seulement si pas encore prié)
-            if !hasPrayed {
+            } else {
                 Button(action: onPrayNow) {
-                    HStack(spacing: 8) {
+                    HStack(spacing: 10) {
                         Image(systemName: "hands.sparkles.fill")
-                        Text(t("pray now", "prier maintenant"))
+                        Text(t("Pray now", "Prier maintenant"))
                     }
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 50)
+                    .frame(height: 58)
                     .background(Color.amenaPrimary)
-                    .cornerRadius(14)
+                    .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 }
+                Text(t("A prayer written for you today, about 2 minutes.", "Une prière écrite pour vous aujourd'hui, environ 2 minutes."))
+                    .font(.system(size: 14))
+                    .foregroundColor(Color.amenaTextSecondary)
+                    .frame(maxWidth: .infinity)
+            }
+
+            // Pas de "0 jour" au premier lancement : on n'affiche la série qu'une fois commencée
+            if totalPrayers > 0 {
+                HStack(spacing: 18) {
+                    Label(t("\(streak)-day streak", "\(streak) jours d'affilée"), systemImage: "flame.fill")
+                    Label(t("\(totalPrayers) prayers", "\(totalPrayers) prières"), systemImage: "hands.and.sparkles.fill")
+                }
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(Color.amenaText)
+                .labelStyle(StatLabelStyle())
+                .padding(.top, 4)
             }
         }
-        .padding(20)
-        .background(Color.amenaSecondaryBackground)
-        .cornerRadius(20)
     }
 }
 
-// Carte statut de la mascotte — vidéo en boucle plein fond + gradient bas
-struct SheepStatusCard: View {
+private struct StatLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 6) {
+            configuration.icon.foregroundColor(.orange)
+            configuration.title
+        }
+    }
+}
+
+// Mascotte en format compact : la vidéo en vignette, le nom, le niveau et la barre FAITH
+struct SheepRow: View {
     let sheepName: String
     let level: Int
     let faithPercent: Double
+    @AppStorage("prayerLanguage") private var lang: String = "English"
 
     private var sheepVideoName: String {
         switch level {
@@ -279,63 +467,43 @@ struct SheepStatusCard: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Vidéo mouton en boucle silencieuse
-            if let url = Bundle.main.url(forResource: sheepVideoName, withExtension: "mp4") {
-                LoopingVideoView(url: url)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 220)
-                    .clipped()
-            } else {
-                // Fallback image si vidéo non trouvée
-                Image(sheepVideoName)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 220)
-                    .clipped()
+        HStack(spacing: 14) {
+            Group {
+                if let url = Bundle.main.url(forResource: sheepVideoName, withExtension: "mp4") {
+                    LoopingVideoView(url: url)
+                } else {
+                    Image(sheepVideoName).resizable().scaledToFill()
+                }
             }
+            .frame(width: 72, height: 72)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
 
-            // Gradient sombre en bas
-            LinearGradient(
-                colors: [.clear, .black.opacity(0.65)],
-                startPoint: .center,
-                endPoint: .bottom
-            )
-            .frame(height: 220)
-
-            // Infos en bas
-            VStack(spacing: 8) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(sheepName)
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.white)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(Color.amenaText)
                     Spacer()
-                    Text("lv \(level)")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(Color.amenaPrimary)
-                        .cornerRadius(6)
+                    Text(t("level \(level)", "niveau \(level)"))
+                        .font(.system(size: 13))
+                        .foregroundColor(Color.amenaTextSecondary)
                 }
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white.opacity(0.25))
-                            .frame(height: 6)
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color.white)
-                            .frame(width: geo.size.width * faithPercent, height: 6)
+                        Capsule().fill(Color.amenaUnselectedBackground)
+                        Capsule().fill(Color.amenaPrimary)
+                            .frame(width: max(6, geo.size.width * faithPercent))
                     }
                 }
                 .frame(height: 6)
+                Text(t("Grows with each prayer", "Grandit à chaque prière"))
+                    .font(.system(size: 12))
+                    .foregroundColor(Color.amenaTextSecondary)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 16)
         }
-        .frame(height: 220)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .padding(14)
+        .background(Color.amenaSecondaryBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 
@@ -406,50 +574,6 @@ struct CycleCompletedBanner: View {
             )
         )
         .cornerRadius(16)
-    }
-}
-
-// Carte "verset du jour" — même verset que celui montré pendant l'onboarding,
-// mais recalculé chaque jour (voir Services/DailyVerse.swift)
-struct VerseOfDayCard: View {
-    @AppStorage("prayerLanguage") private var lang: String = "English"
-
-    private var verse: (text: String, reference: String) { DailyVerse.today }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(t("VERSE OF THE DAY", "VERSET DU JOUR"))
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(Color.amenaPrimary)
-                    .kerning(1.5)
-                Spacer()
-                Button(action: shareVerse) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color.amenaTextSecondary)
-                }
-            }
-            Text(verse.text)
-                .font(.system(size: 15))
-                .foregroundColor(Color.amenaText)
-                .lineSpacing(4)
-            Text(verse.reference)
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.amenaPrimary)
-        }
-        .padding(16)
-        .background(Color.amenaSecondaryBackground)
-        .cornerRadius(16)
-    }
-
-    private func shareVerse() {
-        let text = "\(verse.text)\n— \(verse.reference)"
-        let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootVC = windowScene.windows.first?.rootViewController {
-            rootVC.present(activityVC, animated: true)
-        }
     }
 }
 

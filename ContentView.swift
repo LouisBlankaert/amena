@@ -21,7 +21,7 @@ struct MainTabView: View {
         TabView {
             HomeView()
                 .tabItem {
-                    Label("Home", systemImage: "house.fill")
+                    Label(t("Home", "Accueil"), systemImage: "house.fill")
                 }
             JournalView()
                 .tabItem {

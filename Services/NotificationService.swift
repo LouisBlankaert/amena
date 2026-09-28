@@ -16,21 +16,34 @@ final class NotificationService: @unchecked Sendable {
         center.getNotificationSettings { settings in
             guard settings.authorizationStatus == .authorized else { return }
 
-            // Supprime toutes les notifications existantes avant d'en planifier de nouvelles
-            center.removeAllPendingNotificationRequests()
-
-            // Charge les heures de prière depuis UserDefaults
-            guard let data = UserDefaults.standard.data(forKey: "prayerTimes"),
-                  let times = try? JSONDecoder().decode([Date].self, from: data) else {
-                // Si pas d'horaires configurés, planifie une notification par défaut (matin)
-                self.scheduleDefaultNotification()
-                return
+            // Supprime les notifications déjà planifiées avant d'en planifier de nouvelles,
+            // SAUF le rappel de fin d'essai : il n'est planifié qu'une fois (au paywall),
+            // l'effacer ici l'empêcherait de partir.
+            center.getPendingNotificationRequests { requests in
+                let idsToRemove = requests
+                    .map(\.identifier)
+                    .filter { $0 != "trial_ending" }
+                center.removePendingNotificationRequests(withIdentifiers: idsToRemove)
+                self.scheduleAll()
             }
+        }
+    }
 
-            // Planifie une notification pour chaque heure configurée
-            for (index, prayerTime) in times.enumerated() {
-                self.scheduleDailyNotification(at: prayerTime, identifier: "prayer_\(index)")
-            }
+    private func scheduleAll() {
+        // Verset du jour à 10h
+        scheduleDailyVerseNotifications()
+
+        // Charge les heures de prière depuis UserDefaults
+        guard let data = UserDefaults.standard.data(forKey: "prayerTimes"),
+              let times = try? JSONDecoder().decode([Date].self, from: data) else {
+            // Si pas d'horaires configurés, planifie une notification par défaut (matin)
+            scheduleDefaultNotification()
+            return
+        }
+
+        // Planifie une notification pour chaque heure configurée
+        for (index, prayerTime) in times.enumerated() {
+            scheduleDailyNotification(at: prayerTime, identifier: "prayer_\(index)")
         }
     }
 
@@ -55,6 +68,38 @@ final class NotificationService: @unchecked Sendable {
         )
 
         UNUserNotificationCenter.current().add(request)
+    }
+
+    // Verset du jour à 10h, un verset différent chaque jour.
+    // Une notif "repeats: true" montrerait toujours le même texte, donc on planifie
+    // chaque jour à l'avance. iOS limite à 64 notifs en attente : 30 jours laisse de
+    // la place pour les rappels de prière, et la fenêtre est relancée à chaque ouverture
+    // de l'app (HomeView → schedulePrayerNotifications).
+    private func scheduleDailyVerseNotifications() {
+        let calendar = Calendar.current
+        let now = Date()
+
+        for dayOffset in 0..<30 {
+            guard let day = calendar.date(byAdding: .day, value: dayOffset, to: now),
+                  let fireDate = calendar.date(bySettingHour: 10, minute: 0, second: 0, of: day),
+                  fireDate > now else { continue }
+
+            let verse = DailyVerse.verse(for: day)
+            let content = UNMutableNotificationContent()
+            content.title = t("Verse of the day", "Verset du jour")
+            content.subtitle = verse.reference
+            content.body = verse.text
+            content.sound = .default
+
+            let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
+            let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+            let request = UNNotificationRequest(
+                identifier: "verse_\(dayOffset)",
+                content: content,
+                trigger: trigger
+            )
+            UNUserNotificationCenter.current().add(request)
+        }
     }
 
     // Notification par défaut : 7h du matin

@@ -41,6 +41,9 @@ struct VerseOfDayView: View {
                     Text(todayVerse.reference)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(Color.amenaPrimary)
+                    + Text(" · \(DailyVerse.translationName)")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color.amenaTextSecondary)
 
                     // Bouton partage centré sous la référence
                     Button {
@@ -86,7 +89,7 @@ struct VerseOfDayView: View {
     }
 
     private func shareVerse() {
-        let text = "\(todayVerse.text)\n— \(todayVerse.reference)"
+        let text = "\(todayVerse.text)\n— \(todayVerse.reference) (\(DailyVerse.translationName))"
         let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootVC = windowScene.windows.first?.rootViewController {
