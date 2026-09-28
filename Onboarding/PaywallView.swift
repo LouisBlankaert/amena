@@ -479,7 +479,7 @@ struct PlanOptionCard: View {
     }
 }
 
-// Écran post-paywall : confirmation de démarrage de l'essai
+// Écran après l'achat : confirmation, sous le ciel comme le reste du parcours
 struct PostPaywallView: View {
     let plan: SubscriptionPlan
     let hadTrial: Bool
@@ -489,71 +489,51 @@ struct PostPaywallView: View {
 
     var body: some View {
         ZStack {
-            Color.amenaBackground.ignoresSafeArea()
+            SkyBackground(moment: SkyMoment.current).ignoresSafeArea()
+            Color.black.opacity(0.12).ignoresSafeArea()
 
-            VStack(spacing: 32) {
+            VStack(alignment: .leading, spacing: 0) {
                 Spacer()
 
-                ZStack(alignment: .topTrailing) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.amenaOrangePale)
-                            .frame(width: 120, height: 120)
-                        Image(systemName: hadTrial ? "bell.fill" : "checkmark.circle.fill")
-                            .font(.system(size: 50))
-                            .foregroundColor(Color.amenaPrimary)
-                    }
-                    if hadTrial {
-                        ZStack {
-                            Circle()
-                                .fill(.red)
-                                .frame(width: 24, height: 24)
-                            Text("1")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                    }
-                }
+                Image(systemName: hadTrial ? "bell.fill" : "sun.max.fill")
+                    .font(.system(size: 26))
+                    .foregroundColor(.white)
+                    .frame(width: 64, height: 64)
+                    .background(Color.white.opacity(0.18))
+                    .clipShape(Circle())
 
-                VStack(spacing: 12) {
-                    Text(hadTrial
-                         ? t("we'll send you a reminder before your free trial ends", "nous vous enverrons un rappel avant la fin de votre essai gratuit")
-                         : t("you're all set! welcome to amena.", "tout est prêt ! bienvenue sur amena."))
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(Color.amenaText)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 32)
+                Text(hadTrial
+                     ? t("Your 3 free days start now.", "Vos 3 jours gratuits commencent.")
+                     : t("Welcome to amena.", "Bienvenue sur amena."))
+                    .font(.system(size: 34, weight: .regular, design: .serif))
+                    .foregroundColor(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 24)
 
-                    if hadTrial {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark")
-                                .foregroundColor(Color.amenaPrimary)
-                                .fontWeight(.bold)
-                            Text(t("No Payment Due Now", "Aucun paiement maintenant"))
-                                .font(.system(size: 15, weight: .medium))
-                                .foregroundColor(Color.amenaText)
-                        }
-                    }
-                }
+                Text(hadTrial
+                     ? t("Nothing to pay today. We'll remind you the day before your trial ends.",
+                         "Rien à payer aujourd'hui. Nous vous préviendrons la veille de la fin de l'essai.")
+                     : t("Your first prayer is waiting for you, every day.",
+                         "Votre prière vous attend, chaque jour."))
+                    .font(.system(size: 17))
+                    .foregroundColor(.white.opacity(0.85))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 12)
 
                 Spacer()
 
-                VStack(spacing: 8) {
-                    Button {
-                        onNext()
-                    } label: {
-                        Text(hadTrial ? t("continue for FREE", "continuer GRATUITEMENT") : t("start praying", "commencer à prier"))
-                            .amenaPrimaryButton()
-                    }
+                OnboardingButton(title: t("Start praying", "Commencer à prier"), action: onNext)
 
-                    Text(plan == .yearly
-                         ? t("\(prices.yearly) per year (\(prices.yearlyPerWeek)/week), cancel anytime", "\(prices.yearly) par an (\(prices.yearlyPerWeek)/semaine), annulation possible")
-                         : t("\(prices.weekly)/week, cancel anytime", "\(prices.weekly)/semaine, annulation possible"))
-                        .font(.system(size: 12))
-                        .foregroundColor(Color.amenaTextSecondary)
-                }
-                .padding(.bottom, 48)
+                Text(plan == .yearly
+                     ? t("\(prices.yearly) per year, cancel anytime", "\(prices.yearly) par an, annulation possible à tout moment")
+                     : t("\(prices.weekly) per week, cancel anytime", "\(prices.weekly) par semaine, annulation possible à tout moment"))
+                    .font(.system(size: 13))
+                    .foregroundColor(.white.opacity(0.7))
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 12)
+                    .padding(.bottom, 12)
             }
+            .padding(.horizontal, 24)
         }
     }
 }
