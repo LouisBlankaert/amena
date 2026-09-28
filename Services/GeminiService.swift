@@ -24,8 +24,6 @@ final class GeminiService: @unchecked Sendable {
         Guide every step I take, every word I speak, every decision I make. May my actions today reflect Your love and not the anxious pace of this world. I trust that You hold this day, and I surrender it fully to You.
 
         In Jesus' name, Amen.
-
-        — Philippians 4:6-7
         """,
         """
         Lord,
@@ -37,8 +35,6 @@ final class GeminiService: @unchecked Sendable {
         Let Your light shine through me in every interaction. Where there is conflict, make me a peacemaker. Where there is darkness, make me a light. Where there is need, make me generous. I want to look back at this day and see Your fingerprints all over it.
 
         In Jesus' name, Amen.
-
-        — Psalm 16:11
         """,
         """
         Heavenly Father,
@@ -50,8 +46,6 @@ final class GeminiService: @unchecked Sendable {
         I give You this day — all of it. The meetings, the meals, the moments in between. Use even the mundane things for Your glory. Let gratitude be the lens through which I see everything today. I choose You above the scroll, above the screen, above every temporary thing.
 
         In Jesus' name, Amen.
-
-        — Matthew 6:33
         """,
         """
         Lord,
@@ -63,8 +57,6 @@ final class GeminiService: @unchecked Sendable {
         Be still, You say. And know that I am God. Let those words settle into the deepest part of me today, Lord. You are God. That changes everything. I can rest because You are in control. I can trust because You are good. I can love because You first loved me.
 
         In Jesus' name, Amen.
-
-        — Psalm 46:10
         """,
         """
         Heavenly Father,
@@ -76,8 +68,6 @@ final class GeminiService: @unchecked Sendable {
         Stir in me a deeper hunger for Your Word, a deeper desire for prayer, a deeper courage to live differently than the world around me. I don't want to sleepwalk through my days anymore. I want to live wide awake, fully alive in You.
 
         In Jesus' name, Amen.
-
-        — Lamentations 3:22-23
         """
     ]
 
@@ -94,8 +84,6 @@ final class GeminiService: @unchecked Sendable {
         Je choisis Votre visage avant l'écran, Votre voix avant le bruit. Restez proche de moi, Père.
 
         Au nom de Jésus, Amen.
-
-        — Philippiens 4:6-7
         """,
         """
         Seigneur,
@@ -109,8 +97,6 @@ final class GeminiService: @unchecked Sendable {
         Vous êtes Dieu. Cela change tout.
 
         Au nom de Jésus, Amen.
-
-        — Psaume 16:11
         """
     ]
 

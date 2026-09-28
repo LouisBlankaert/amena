@@ -40,7 +40,16 @@ Theme: {theme}.
 - If French: use correct French grammar. Never write 'je me prostre' — use 'je m'incline' or 'je me prosterne' instead.
 - If French: when addressing God, use the formal 'vous' (vouvoiement) consistently throughout the entire prayer — never switch to 'tu' (tutoiement) mid-prayer.
 - End with 'Au nom de Jésus, Amen.' if French, or 'In Jesus' name, Amen.' if English.
-- Add the Biblical reference on the last line starting with '— '."""
+- Do NOT add any Bible reference or citation line: end the prayer with the Amen."""
+
+
+def _strip_reference(prayer: str) -> str:
+    # Une référence seule ("— Philippiens 4:6-7"), sans le texte du verset, n'explique rien
+    # et l'IA peut se tromper de verset : les vrais versets exacts sont sur l'accueil.
+    lines = prayer.rstrip().splitlines()
+    while lines and lines[-1].strip()[:1] in ("—", "–", "-") and any(c.isdigit() for c in lines[-1]):
+        lines.pop()
+    return "\n".join(lines).rstrip()
 
 
 @https_fn.on_request(secrets=[GROQ_API_KEY], invoker="public")
@@ -85,6 +94,7 @@ def generate_prayer(req: https_fn.Request) -> https_fn.Response:
         with urllib.request.urlopen(groq_req, timeout=30) as resp:
             result = json.loads(resp.read().decode("utf-8"))
         prayer = (result["choices"][0]["message"].get("content") or "").strip()
+        prayer = _strip_reference(prayer)
         if not prayer:
             return _error("Empty prayer", 502)
         return https_fn.Response(json.dumps({"prayer": prayer}, ensure_ascii=False), status=200, headers=HEADERS)

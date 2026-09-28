@@ -93,12 +93,6 @@ struct PrayerEntry: Identifiable, Codable {
         return words.joined(separator: " ") + (text.split(separator: " ").count > 15 ? "..." : "")
     }
 
-    // Extrait la référence biblique — dernière ligne commençant par "— "
-    var biblicalReference: String? {
-        let lines = text.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
-        return lines.last(where: { $0.hasPrefix("—") || $0.hasPrefix("–") })
-    }
-
     // Thème = heure de la prière convertie en label lisible
     var timeLabel: String {
         let hour = Calendar.current.component(.hour, from: date)
@@ -213,14 +207,6 @@ struct JournalPrayerCard: View {
                 .font(.system(size: 15))
                 .foregroundColor(Color.amenaText)
                 .lineSpacing(4)
-
-            // Référence biblique si disponible
-            if let ref = prayer.biblicalReference {
-                Text(ref)
-                    .font(.system(size: 12, weight: .medium, design: .serif))
-                    .foregroundColor(Color.amenaPrimary)
-                    .padding(.top, 2)
-            }
         }
         .padding(16)
         .background(Color.amenaSecondaryBackground)
