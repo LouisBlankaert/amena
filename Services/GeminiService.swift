@@ -1,6 +1,6 @@
-// GeminiService : génère des prières via l'API Gemini de Google
-// Utilise async/await (Swift moderne) pour les appels réseau
-// La clé API est dans Secrets.swift (JAMAIS commitée)
+// GeminiService (nom historique) : génère les prières en appelant notre fonction
+// Firebase `generate_prayer` (functions/main.py), qui elle-même appelle Groq.
+// Aucune clé d'IA dans l'app. Utilise async/await pour les appels réseau.
 
 import Foundation
 
@@ -11,13 +11,6 @@ import Foundation
 final class GeminiService: @unchecked Sendable {
     static let shared = GeminiService()
     private init() {}
-
-    private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
-
-    // Groq a retiré llama-3.3-70b-versatile de son catalogue (404 model_not_found) ;
-    // openai/gpt-oss-20b avec reasoning_effort "low" est le remplaçant validé — sans
-    // ça le modèle consomme tout le budget de tokens en raisonnement interne et
-    // renvoie un "content" vide.
 
     // Plusieurs prières de secours qui varient aléatoirement si l'API échoue
     private static let fallbackPrayers = [
@@ -133,97 +126,34 @@ final class GeminiService: @unchecked Sendable {
         fallbackPrayers.randomElement() ?? fallbackPrayers[0]
     }
 
+    // La prière est écrite par notre fonction Firebase (functions/main.py), qui garde la
+    // clé Groq et les consignes d'écriture côté serveur : aucune clé dans l'app.
+    private let prayerEndpoint = URL(string: "https://generate-prayer-7l4wcwuhba-uc.a.run.app")!
+
     func generatePrayer(theme: String = "daily Christian prayer", language: String = "English") async throws -> String {
-        guard let url = URL(string: "https://api.groq.com/openai/v1/chat/completions") else {
-            throw GeminiError.invalidURL
-        }
-
-        let prompt = """
-        IMPORTANT: You must write ONLY in \(language). Every single word must be in \(language).
-        Write a heartfelt Christian prayer of exactly 200 to 250 words in \(language).
-        Theme: \(theme).
-        - If French: start with one of these (vary each time): 'Seigneur,' or 'Dieu,' or 'Seigneur Jésus,' or 'Père,' — never use 'Père céleste'.
-        - If English: start with one of these (vary each time): 'Lord,' or 'Heavenly Father,' or 'Father,' or 'Dear God,'.
-        - Write at least 4 full paragraphs with rich, poetic language.
-        - Be personal, warm, and deeply emotional.
-        - If French: use correct French grammar. Never write 'je me prostre' — use 'je m'incline' or 'je me prosterne' instead.
-        - If French: when addressing God, use the formal 'vous' (vouvoiement) consistently throughout the entire prayer — never switch to 'tu' (tutoiement) mid-prayer.
-        - End with 'Au nom de Jésus, Amen.' if French, or 'In Jesus' name, Amen.' if English.
-        - Add the Biblical reference on the last line starting with '— '.
-        """
-
-        let requestBody: [String: Any] = [
-            "model": "openai/gpt-oss-20b",
-            "messages": [["role": "user", "content": prompt]],
-            "max_tokens": 600,
-            "temperature": 0.7,
-            "reasoning_effort": "low"
-        ]
-
-        let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: prayerEndpoint)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(Secrets.groqAPIKey)", forHTTPHeaderField: "Authorization")
-        request.httpBody = jsonData
-        request.timeoutInterval = 30
+        request.httpBody = try JSONSerialization.data(withJSONObject: ["theme": theme, "language": language])
+        request.timeoutInterval = 45
 
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw GeminiError.invalidResponse
         }
-        print("📡 Groq status: \(httpResponse.statusCode)")
         guard httpResponse.statusCode == 200 else {
             let body = String(data: data, encoding: .utf8) ?? ""
-            print("⚠️ Groq error: \(body.prefix(300))")
-            throw NSError(domain: "Groq", code: httpResponse.statusCode)
+            print("⚠️ Prayer function error \(httpResponse.statusCode): \(body.prefix(300))")
+            throw NSError(domain: "PrayerFunction", code: httpResponse.statusCode)
         }
 
-        let text = try parseGroqResponse(data: data)
-        print("✅ Prayer generated via Groq (\(text.count) chars)")
+        struct PrayerResponse: Decodable { let prayer: String }
+        let text = try JSONDecoder().decode(PrayerResponse.self, from: data).prayer
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { throw GeminiError.noContent }
+        print("✅ Prayer generated (\(text.count) chars)")
         return text
-    }
-
-    // Extrait le texte de la réponse Gemini
-    // Gemini 3 peut retourner des "thought parts" (internes) — on les filtre
-    private func parseResponse(data: Data) throws -> String {
-        struct GeminiResponse: Codable {
-            struct Candidate: Codable {
-                struct Content: Codable {
-                    struct Part: Codable {
-                        let text: String?
-                        let thought: Bool?   // true = partie "thinking" interne, à ignorer
-                    }
-                    let parts: [Part]
-                }
-                let content: Content
-            }
-            let candidates: [Candidate]
-        }
-
-        let decoded = try JSONDecoder().decode(GeminiResponse.self, from: data)
-        let parts = decoded.candidates.first?.content.parts ?? []
-        // On prend la première partie qui N'EST PAS du "thinking" interne
-        guard let text = parts.first(where: { $0.thought != true })?.text else {
-            throw GeminiError.noContent
-        }
-        return text.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private func parseGroqResponse(data: Data) throws -> String {
-        struct GroqResponse: Codable {
-            struct Choice: Codable {
-                struct Message: Codable { let content: String }
-                let message: Message
-            }
-            let choices: [Choice]
-        }
-        let decoded = try JSONDecoder().decode(GroqResponse.self, from: data)
-        guard let text = decoded.choices.first?.message.content else {
-            throw GeminiError.noContent
-        }
-        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

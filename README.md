@@ -27,8 +27,6 @@ cd amena
 ```swift
 // Secrets.swift
 enum Secrets {
-    static let groqAPIKey = "VOTRE_CLE_GROQ"
-
     // dashboard.revenuecat.com → Project Settings → API Keys → Apple App Store
     // (clé test_ acceptée pour développer sans App Store Connect connecté)
     static let revenueCatAPIKey = "VOTRE_CLE_REVENUECAT"
