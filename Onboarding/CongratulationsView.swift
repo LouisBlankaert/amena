@@ -62,6 +62,12 @@ struct PrayerRecapCard: View {
         return words.joined(separator: " ") + (prayer.split(separator: " ").count > 20 ? "..." : "")
     }
 
+    // Référence biblique réelle de la prière générée — dernière ligne commençant par "— "
+    private var biblicalReference: String? {
+        let lines = prayer.components(separatedBy: "\n").map { $0.trimmingCharacters(in: .whitespaces) }
+        return lines.last(where: { $0.hasPrefix("—") || $0.hasPrefix("–") })
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // En-tête avec thème et date
@@ -89,10 +95,12 @@ struct PrayerRecapCard: View {
                 .foregroundColor(Color.amenaText)
                 .lineSpacing(4)
 
-            // Référence biblique (fixe pour la première prière)
-            Text("— Matthew 6:9-13")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundColor(Color.amenaPrimary)
+            // Référence biblique réelle de la prière générée
+            if let biblicalReference {
+                Text(biblicalReference)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(Color.amenaPrimary)
+            }
         }
         .padding(20)
         .background(Color.amenaSecondaryBackground)

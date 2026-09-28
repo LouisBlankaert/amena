@@ -15,6 +15,15 @@ struct SettingsView: View {
     @State private var isRestoring    = false
     @State private var restoreMessage: String? = nil
     @State private var showResetAlert = false
+    @State private var versionTapCount = 0
+    @State private var showFounderUnlockAlert = false
+    @State private var showFounderCodePrompt = false
+    @State private var founderCodeInput = ""
+    @State private var founderCodeError = false
+
+    // Code secret connu de toi seul, rangé dans Secrets.swift (jamais commité) —
+    // change-le là-bas si tu penses qu'il a fuité.
+    private let founderSecretCode = Secrets.founderCode
 
     // Lit la vraie version depuis Info.plist plutôt que de la coder en dur
     // (source de vérité unique : MARKETING_VERSION dans project.yml)
@@ -180,6 +189,16 @@ struct SettingsView: View {
                             Text(appVersion)
                                 .foregroundColor(Color.amenaTextSecondary)
                         }
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            versionTapCount += 1
+                            if versionTapCount >= 7 {
+                                versionTapCount = 0
+                                founderCodeInput = ""
+                                founderCodeError = false
+                                showFounderCodePrompt = true
+                            }
+                        }
                         Link(destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!) {
                             Label(t("Privacy Policy", "Politique de confidentialité"), systemImage: "hand.raised.fill")
                                 .foregroundColor(Color.amenaPrimary)
@@ -217,6 +236,29 @@ struct SettingsView: View {
                 }
             } message: {
                 Text(t("This will restart the app from the beginning. Your prayers won't be deleted.", "Ceci relancera l'app depuis le début. Vos prières ne seront pas supprimées."))
+            }
+            .alert(t("Enter code", "Entrer le code"), isPresented: $showFounderCodePrompt) {
+                TextField(t("Secret code", "Code secret"), text: $founderCodeInput)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                Button(t("Cancel", "Annuler"), role: .cancel) {}
+                Button(t("Unlock", "Débloquer")) {
+                    if founderCodeInput == founderSecretCode {
+                        RevenueCatService.shared.enableFounderAccess()
+                        isPremium = true
+                        showFounderUnlockAlert = true
+                    } else {
+                        founderCodeError = true
+                    }
+                }
+            }
+            .alert(t("Founder access enabled", "Accès créateur activé"), isPresented: $showFounderUnlockAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(t("Premium unlocked permanently on this device.", "Premium débloqué définitivement sur cet appareil."))
+            }
+            .alert(t("Wrong code", "Code incorrect"), isPresented: $founderCodeError) {
+                Button("OK", role: .cancel) {}
             }
         }
         .onAppear {

@@ -21,6 +21,21 @@ final class RevenueCatService: @unchecked Sendable {
     // Nom de l'entitlement configuré dans le dashboard RevenueCat.
     private let premiumEntitlementId = "premium"
 
+    // Accès créateur : débloqué via un geste caché + code secret dans Settings.
+    // Stocké dans le Keychain (et non UserDefaults) pour survivre à une suppression
+    // de l'app, et conservé indépendamment du vrai statut RevenueCat pour ne pas
+    // être écrasé par checkCurrentSubscription().
+    private let founderAccessKey = "founderAccess"
+
+    var hasFounderAccess: Bool {
+        KeychainHelper.bool(forKey: founderAccessKey)
+    }
+
+    func enableFounderAccess() {
+        KeychainHelper.setBool(true, forKey: founderAccessKey)
+        UserDefaults.standard.set(true, forKey: "isPremium")
+    }
+
     // À appeler une seule fois, au lancement de l'app (avant tout achat/restore).
     func configure() {
         Purchases.configure(withAPIKey: Secrets.revenueCatAPIKey)
@@ -59,9 +74,18 @@ final class RevenueCatService: @unchecked Sendable {
 
     private func applyEntitlement(from info: CustomerInfo) {
         let isActive = info.entitlements[premiumEntitlementId]?.isActive == true
-        UserDefaults.standard.set(isActive, forKey: "isPremium")
+        UserDefaults.standard.set(isActive || hasFounderAccess, forKey: "isPremium")
         if let productId = info.entitlements[premiumEntitlementId]?.productIdentifier {
             UserDefaults.standard.set(productId, forKey: "activePlanId")
+        }
+    }
+
+    // Vérifié à chaque lancement (voir AmenaApp) pour que l'accès créateur soit
+    // restauré automatiquement même si l'app a été supprimée puis réinstallée,
+    // sans attendre que checkCurrentSubscription() ait pu tourner.
+    func restoreFounderAccessIfNeeded() {
+        if hasFounderAccess {
+            UserDefaults.standard.set(true, forKey: "isPremium")
         }
     }
 

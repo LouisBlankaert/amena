@@ -14,6 +14,11 @@ final class GeminiService: @unchecked Sendable {
 
     private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
+    // Groq a retiré llama-3.3-70b-versatile de son catalogue (404 model_not_found) ;
+    // openai/gpt-oss-20b avec reasoning_effort "low" est le remplaçant validé — sans
+    // ça le modèle consomme tout le budget de tokens en raisonnement interne et
+    // renvoie un "content" vide.
+
     // Plusieurs prières de secours qui varient aléatoirement si l'API échoue
     private static let fallbackPrayers = [
         """
@@ -148,10 +153,11 @@ final class GeminiService: @unchecked Sendable {
         """
 
         let requestBody: [String: Any] = [
-            "model": "llama-3.3-70b-versatile",
+            "model": "openai/gpt-oss-20b",
             "messages": [["role": "user", "content": prompt]],
             "max_tokens": 600,
-            "temperature": 0.7
+            "temperature": 0.7,
+            "reasoning_effort": "low"
         ]
 
         let jsonData = try JSONSerialization.data(withJSONObject: requestBody)

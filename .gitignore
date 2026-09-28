@@ -1,6 +1,7 @@
 # Secrets — JAMAIS commiter
 Secrets.swift
 GoogleService-Info.plist
+*.p8
 
 # Fichiers internes
 CLAUDE.md

@@ -35,6 +35,9 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         // Ce fichier doit être ajouté manuellement dans Xcode (voir instructions ci-dessous)
         FirebaseApp.configure()
         RevenueCatService.shared.configure()
+        // Restaure l'accès créateur immédiatement (avant même le premier écran),
+        // sans attendre le round-trip réseau de checkCurrentSubscription().
+        RevenueCatService.shared.restoreFounderAccessIfNeeded()
         return true
     }
 }
