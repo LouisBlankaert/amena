@@ -358,9 +358,11 @@ private struct RevealStep: View {
     let onNext: () -> Void
     @State private var showsHope = false
 
-    // Heures par jour sur les 50 prochaines années, converties en années pleines
-    private var years: Int {
-        Int((dailyScreenTime * 365 * 50 / (24 * 365)).rounded())
+    // Heures par jour sur une année, converties en jours entiers (24 h).
+    // Une année plutôt que "les 50 prochaines" : ça vaut quel que soit l'âge,
+    // et deux mois se ressentent mieux qu'un chiffre abstrait sur toute une vie.
+    private var days: Int {
+        Int((dailyScreenTime * 365 / 24).rounded())
     }
 
     private var name: String { userName.trimmingCharacters(in: .whitespaces) }
@@ -368,15 +370,15 @@ private struct RevealStep: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer()
-            Text(t("\(name), over the next 50 years, that's", "\(name), sur les 50 prochaines années, cela fait"))
+            Text(t("\(name), every year, that's", "\(name), chaque année, cela fait"))
                 .font(.system(size: 22, design: .serif))
                 .foregroundColor(.white.opacity(0.85))
-            Text(t("\(years) years", "\(years) ans"))
+            Text(t("\(days) days", "\(days) jours"))
                 .font(.system(size: 104, weight: .regular, design: .serif))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.6)
                 .lineLimit(1)
-            Text(t("in front of a screen.", "devant un écran."))
+            Text(t("in front of a screen, day and night.", "entiers devant un écran, jour et nuit."))
                 .font(.system(size: 22, design: .serif))
                 .foregroundColor(.white.opacity(0.85))
 
