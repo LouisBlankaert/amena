@@ -7,7 +7,7 @@
 // 1. Créer un compte sur dashboard.revenuecat.com, y connecter l'app com.louis.Amena
 //    (clé API App Store Connect / shared secret côté RevenueCat).
 // 2. Créer un Entitlement nommé "premium" et l'attacher aux deux produits
-//    com.louis.Amena.yearly / com.louis.Amena.weekly.
+//    com.louis.Amena.yearly / com.louis.Amena.monthly.
 // 3. Créer une Offering (ex: "default") avec un Package par produit.
 // 4. Remplacer Secrets.revenueCatAPIKey par la vraie clé publique du SDK.
 
@@ -95,12 +95,18 @@ final class RevenueCatService: @unchecked Sendable {
         }
 
         var prices = PlanPrices.fallback
-        if let weekly = product(.weekly) {
-            prices.weekly = weekly.localizedPriceString
+        let monthly = product(.monthly)
+        if let monthly {
+            prices.monthly = monthly.localizedPriceString
         }
         if let yearly = product(.yearly) {
             prices.yearly = yearly.localizedPriceString
-            prices.yearlyPerWeek = yearly.localizedPricePerWeek ?? prices.yearlyPerWeek
+            prices.yearlyPerMonth = yearly.localizedPricePerMonth ?? prices.yearlyPerMonth
+            // Économie de l'annuel par rapport à 12 mois de mensuel (ex. 39,99 vs 6,99 × 12 → 52 %)
+            if let monthly, monthly.price > 0 {
+                let ratio = NSDecimalNumber(decimal: yearly.price / (monthly.price * 12)).doubleValue
+                prices.yearlySavingsPercent = Int(((1 - ratio) * 100).rounded())
+            }
             if yearly.introductoryDiscount == nil {
                 prices.isTrialEligible = false
             } else {
@@ -144,13 +150,15 @@ final class RevenueCatService: @unchecked Sendable {
 
 // Prix affichés sur le paywall, déjà formatés dans la monnaie de l'utilisateur
 struct PlanPrices: Sendable {
-    var weekly: String
+    var monthly: String
     var yearly: String
-    var yearlyPerWeek: String
+    var yearlyPerMonth: String
+    var yearlySavingsPercent: Int
     var isTrialEligible: Bool
 
     // Utilisé seulement si l'App Store ne répond pas : prix du pays de base (Belgique)
-    static let fallback = PlanPrices(weekly: "4,99 €", yearly: "29,99 €", yearlyPerWeek: "0,58 €", isTrialEligible: true)
+    static let fallback = PlanPrices(monthly: "6,99 €", yearly: "39,99 €", yearlyPerMonth: "3,33 €",
+                                     yearlySavingsPercent: 52, isTrialEligible: true)
 }
 
 enum PurchaseError: Error {

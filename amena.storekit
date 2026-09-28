@@ -1,108 +1,88 @@
 {
-  "appPolicies" : {
-    "eula" : "",
-    "policies" : [
+  "appPolicies": {
+    "eula": "",
+    "policies": [
       {
-        "locale" : "en_US",
-        "policyText" : "",
-        "policyURL" : ""
+        "locale": "en_US",
+        "policyText": "",
+        "policyURL": ""
       }
     ]
   },
-  "identifier" : "7570B24D",
-  "nonRenewingSubscriptions" : [
-
-  ],
-  "products" : [
-
-  ],
-  "settings" : {
-    "_askToBuyEnabled" : false,
-    "_billingGracePeriodEnabled" : false,
-    "_billingIssuesEnabled" : false,
-    "_disableDialogs" : false,
-    "_failTransactionsEnabled" : false,
-    "_locale" : "en_US",
-    "_renewalBillingIssuesEnabled" : false,
-    "_storefront" : "USA",
-    "_storeKitErrors" : [
-
-    ],
-    "_timeRate" : 0
+  "identifier": "7570B24D",
+  "nonRenewingSubscriptions": [],
+  "products": [],
+  "settings": {
+    "_askToBuyEnabled": false,
+    "_billingGracePeriodEnabled": false,
+    "_billingIssuesEnabled": false,
+    "_disableDialogs": false,
+    "_failTransactionsEnabled": false,
+    "_locale": "en_US",
+    "_renewalBillingIssuesEnabled": false,
+    "_storefront": "USA",
+    "_storeKitErrors": [],
+    "_timeRate": 0
   },
-  "subscriptionGroups" : [
+  "subscriptionGroups": [
     {
-      "id" : "5CBF2494",
-      "localizations" : [
-
-      ],
-      "name" : "Amena Premium",
-      "subscriptions" : [
+      "id": "5CBF2494",
+      "localizations": [],
+      "name": "Amena Premium",
+      "subscriptions": [
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "29.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "6AAC6640",
-          "introductoryOffer" : {
-            "internalID" : "42C4BA47",
-            "paymentMode" : "free",
-            "subscriptionPeriod" : "P3D"
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "39.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "6AAC6640",
+          "introductoryOffer": {
+            "internalID": "42C4BA47",
+            "paymentMode": "free",
+            "subscriptionPeriod": "P3D"
           },
-          "localizations" : [
+          "localizations": [
             {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
+              "description": "",
+              "displayName": "",
+              "locale": "en_US"
             }
           ],
-          "productID" : "com.louis.Amena.yearly",
-          "recurringSubscriptionPeriod" : "P1Y",
-          "referenceName" : "Amena Yearly",
-          "subscriptionGroupID" : "5CBF2494",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "productID": "com.louis.Amena.yearly",
+          "recurringSubscriptionPeriod": "P1Y",
+          "referenceName": "Amena Yearly",
+          "subscriptionGroupID": "5CBF2494",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
         },
         {
-          "adHocOffers" : [
-
-          ],
-          "codeOffers" : [
-
-          ],
-          "displayPrice" : "4.99",
-          "familyShareable" : false,
-          "groupNumber" : 1,
-          "internalID" : "CE8BED42",
-          "introductoryOffer" : null,
-          "localizations" : [
+          "adHocOffers": [],
+          "codeOffers": [],
+          "displayPrice": "6.99",
+          "familyShareable": false,
+          "groupNumber": 1,
+          "internalID": "CE8BED42",
+          "introductoryOffer": null,
+          "localizations": [
             {
-              "description" : "",
-              "displayName" : "",
-              "locale" : "en_US"
+              "description": "Monthly access to Amena",
+              "displayName": "Amena Monthly",
+              "locale": "en_US"
             }
           ],
-          "productID" : "com.louis.Amena.weekly",
-          "recurringSubscriptionPeriod" : "P1W",
-          "referenceName" : "Amena Weekly",
-          "subscriptionGroupID" : "5CBF2494",
-          "type" : "RecurringSubscription",
-          "winbackOffers" : [
-
-          ]
+          "productID": "com.louis.Amena.monthly",
+          "recurringSubscriptionPeriod": "P1M",
+          "referenceName": "Monthly",
+          "subscriptionGroupID": "5CBF2494",
+          "type": "RecurringSubscription",
+          "winbackOffers": []
         }
       ]
     }
   ],
-  "version" : {
-    "major" : 4,
-    "minor" : 0
+  "version": {
+    "major": 4,
+    "minor": 0
   }
 }

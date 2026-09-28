@@ -1,5 +1,5 @@
 // Écran paywall : abonnement avec essai gratuit 3 jours
-// 2 options : weekly (ancrage) et yearly (mis en avant)
+// 2 options : mensuel et annuel (mis en avant, avec l'économie affichée)
 
 import SwiftUI
 import FirebaseAnalytics
@@ -93,12 +93,12 @@ struct PaywallView: View {
 
                         // Options d'abonnement
                         VStack(spacing: 12) {
-                            // Weekly (ancrage psychologique)
+                            // Mensuel
                             PlanOptionCard(
-                                plan: .weekly,
+                                plan: .monthly,
                                 prices: prices,
-                                isSelected: selectedPlan == .weekly,
-                                onSelect: { selectedPlan = .weekly }
+                                isSelected: selectedPlan == .monthly,
+                                onSelect: { selectedPlan = .monthly }
                             )
                             // Yearly (mis en avant)
                             PlanOptionCard(
@@ -117,7 +117,7 @@ struct PaywallView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 13, weight: .bold))
-                                    .foregroundColor(Color.amenaPrimary)
+                                    .foregroundColor(Color.amenaNightBlue)
                                 Text(t("No Payment Due Now", "Aucun paiement maintenant"))
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(Color.amenaText)
@@ -134,7 +134,7 @@ struct PaywallView: View {
                                     .tint(.white)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 56)
-                                    .background(Color.amenaPrimary)
+                                    .background(Color.amenaNightBlue)
                                     .cornerRadius(16)
                                     .padding(.horizontal, 24)
                             } else {
@@ -222,14 +222,14 @@ struct PaywallView: View {
     private var legalText: String {
         switch selectedPlan {
         case .yearly where prices.isTrialEligible:
-            return t("3 days free, then \(prices.yearly)/year (\(prices.yearlyPerWeek)/week), cancel anytime",
-                     "3 jours gratuits, puis \(prices.yearly)/an (\(prices.yearlyPerWeek)/semaine), annulation possible")
+            return t("3 days free, then \(prices.yearly)/year (\(prices.yearlyPerMonth)/month), cancel anytime",
+                     "3 jours gratuits, puis \(prices.yearly)/an (\(prices.yearlyPerMonth)/mois), annulation possible")
         case .yearly:
-            return t("\(prices.yearly)/year (\(prices.yearlyPerWeek)/week), billed yearly, cancel anytime",
-                     "\(prices.yearly)/an (\(prices.yearlyPerWeek)/semaine), facturation annuelle, annulation possible")
-        case .weekly:
-            return t("\(prices.weekly)/week, billed weekly, cancel anytime",
-                     "\(prices.weekly)/semaine, facturation hebdomadaire, annulation possible")
+            return t("\(prices.yearly)/year (\(prices.yearlyPerMonth)/month), billed yearly, cancel anytime",
+                     "\(prices.yearly)/an (\(prices.yearlyPerMonth)/mois), facturation annuelle, annulation possible")
+        case .monthly:
+            return t("\(prices.monthly)/month, billed monthly, cancel anytime",
+                     "\(prices.monthly)/mois, facturation mensuelle, annulation possible")
         }
     }
 
@@ -275,7 +275,7 @@ struct PaywallView: View {
                     purchasedWithTrial = showsTrial
                     AnalyticsService.shared.log(.trialStarted)
                     AnalyticsService.shared.log(.subscriptionPurchased(plan: selectedPlan.productId))
-                    // Rappel fin d'essai uniquement s'il y a vraiment un essai (weekly = paiement immédiat)
+                    // Rappel fin d'essai uniquement s'il y a vraiment un essai (mensuel = paiement immédiat)
                     if purchasedWithTrial {
                         NotificationService.shared.scheduleTrialEndingReminder()
                     }
@@ -327,11 +327,11 @@ private struct PaywallBenefit: View {
 
 // Types d'abonnement disponibles
 enum SubscriptionPlan {
-    case weekly, yearly
+    case monthly, yearly
 
     var productId: String {
         switch self {
-        case .weekly: return "com.louis.Amena.weekly"
+        case .monthly: return "com.louis.Amena.monthly"
         case .yearly: return "com.louis.Amena.yearly"
         }
     }
@@ -358,7 +358,7 @@ struct TrialTimeline: View {
                     VStack(spacing: 0) {
                         ZStack {
                             Circle()
-                                .fill(Color.amenaPrimary)
+                                .fill(Color.amenaNightBlue)
                                 .frame(width: 36, height: 36)
                             Image(systemName: step.icon)
                                 .font(.system(size: 14))
@@ -367,7 +367,7 @@ struct TrialTimeline: View {
                         // Ligne verticale entre les icônes (sauf pour le dernier)
                         if index < steps.count - 1 {
                             Rectangle()
-                                .fill(Color.amenaPrimary.opacity(0.3))
+                                .fill(Color.amenaNightBlue.opacity(0.3))
                                 .frame(width: 2, height: 32)
                         }
                     }
@@ -404,17 +404,17 @@ struct PlanOptionCard: View {
     @AppStorage("prayerLanguage") private var lang: String = "English"
 
     private var title: String {
-        plan == .weekly ? t("weekly", "hebdomadaire") : t("yearly", "annuel")
+        plan == .monthly ? t("monthly", "mensuel") : t("yearly", "annuel")
     }
 
     // Prix par semaine : affiché en subordonné (Apple 3.1.2(c) — le montant facturé
     // doit être l'élément le plus visible, le calcul par semaine passe en second plan)
-    private var pricePerWeekSubordinate: String {
-        plan == .weekly ? "" : t("(\(prices.yearlyPerWeek)/week)", "(\(prices.yearlyPerWeek)/semaine)")
+    private var pricePerMonthSubordinate: String {
+        plan == .monthly ? "" : t("(\(prices.yearlyPerMonth)/month)", "(\(prices.yearlyPerMonth)/mois)")
     }
 
     private var totalPrice: String {
-        plan == .weekly ? t("\(prices.weekly)/week", "\(prices.weekly)/semaine") : t("\(prices.yearly)/year", "\(prices.yearly)/an")
+        plan == .monthly ? t("\(prices.monthly)/month", "\(prices.monthly)/mois") : t("\(prices.yearly)/year", "\(prices.yearly)/an")
     }
 
     var body: some View {
@@ -423,11 +423,11 @@ struct PlanOptionCard: View {
                 // Checkmark ou cercle vide
                 ZStack {
                     Circle()
-                        .stroke(isSelected ? Color.amenaPrimary : Color.amenaTextSecondary.opacity(0.4), lineWidth: 2)
+                        .stroke(isSelected ? Color.amenaNightBlue : Color.amenaTextSecondary.opacity(0.4), lineWidth: 2)
                         .frame(width: 22, height: 22)
                     if isSelected {
                         Circle()
-                            .fill(Color.amenaPrimary)
+                            .fill(Color.amenaNightBlue)
                             .frame(width: 12, height: 12)
                     }
                 }
@@ -437,16 +437,22 @@ struct PlanOptionCard: View {
                         Text(title)
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(Color.amenaText)
-                        // Badge "3-day free trial" uniquement sur l'option yearly
-                        if plan == .yearly && prices.isTrialEligible {
-                            Text(t("3-day free trial", "3 jours gratuits"))
-                                .font(.system(size: 10, weight: .semibold))
+                        // Annuel : l'économie par rapport au mensuel, toujours visible
+                        if plan == .yearly && prices.yearlySavingsPercent > 0 {
+                            Text("−\(prices.yearlySavingsPercent) %")
+                                .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
-                                .background(Color.amenaPrimary)
-                                .cornerRadius(6)
+                                .background(Color.amenaGold)
+                                .clipShape(Capsule())
                         }
+                    }
+                    // Essai gratuit : seulement si la personne y a droit
+                    if plan == .yearly && prices.isTrialEligible {
+                        Text(t("3 days free", "3 jours gratuits"))
+                            .font(.system(size: 13))
+                            .foregroundColor(Color.amenaTextSecondary)
                     }
                 }
 
@@ -456,10 +462,10 @@ struct PlanOptionCard: View {
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(totalPrice)
                         .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(isSelected ? Color.amenaPrimary : Color.amenaText)
-                    // Équivalent hebdo : subordonné (petit, gris)
-                    if !pricePerWeekSubordinate.isEmpty {
-                        Text(pricePerWeekSubordinate)
+                        .foregroundColor(isSelected ? Color.amenaNightBlue : Color.amenaText)
+                    // Équivalent par mois : subordonné (petit, gris)
+                    if !pricePerMonthSubordinate.isEmpty {
+                        Text(pricePerMonthSubordinate)
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
                     }
@@ -470,9 +476,9 @@ struct PlanOptionCard: View {
             .cornerRadius(14)
             .overlay(
                 RoundedRectangle(cornerRadius: 14)
-                    .stroke(isSelected ? Color.amenaPrimary : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? Color.amenaNightBlue : Color.clear, lineWidth: 2)
             )
-            .shadow(color: isSelected ? Color.amenaPrimary.opacity(0.2) : .clear, radius: 8, x: 0, y: 4)
+            .shadow(color: isSelected ? Color.amenaNightBlue.opacity(0.2) : .clear, radius: 8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
         .animation(.easeInOut(duration: 0.15), value: isSelected)
@@ -526,7 +532,7 @@ struct PostPaywallView: View {
 
                 Text(plan == .yearly
                      ? t("\(prices.yearly) per year, cancel anytime", "\(prices.yearly) par an, annulation possible à tout moment")
-                     : t("\(prices.weekly) per week, cancel anytime", "\(prices.weekly) par semaine, annulation possible à tout moment"))
+                     : t("\(prices.monthly) per month, cancel anytime", "\(prices.monthly) par mois, annulation possible à tout moment"))
                     .font(.system(size: 13))
                     .foregroundColor(.white.opacity(0.7))
                     .frame(maxWidth: .infinity)

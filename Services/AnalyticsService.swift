@@ -32,7 +32,7 @@ enum AnalyticsEvent {
     var parameters: [String: Any]? {
         switch self {
         case .subscriptionPurchased(let plan):
-            return ["plan": plan]   // ex: "yearly" ou "weekly"
+            return ["plan": plan]   // ex: "com.louis.Amena.yearly" ou "com.louis.Amena.monthly"
         default:
             return nil
         }
