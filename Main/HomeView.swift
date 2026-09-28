@@ -168,26 +168,13 @@ struct HomeView: View {
     private func prefetchNextPrayer() {
         guard prefetchedPrayer.isEmpty else { return }
         Task {
-            let theme = dailyPrayerTheme()
+            let theme = DailyPrayerTheme.current
             if let generated = try? await GeminiService.shared.generatePrayer(theme: theme, language: prayerLanguage) {
                 await MainActor.run { prefetchedPrayer = generated }
             } else {
                 await MainActor.run { prefetchedPrayer = GeminiService.fallbackPrayerForLanguage(prayerLanguage) }
             }
         }
-    }
-
-    private func dailyPrayerTheme() -> String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        let themes: [String]
-        if hour < 12 {
-            themes = ["gratitude for a new day", "morning surrender and trust in God", "seeking God's guidance at the start of the day"]
-        } else if hour < 18 {
-            themes = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"]
-        } else {
-            themes = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness"]
-        }
-        return themes.randomElement()!
     }
 }
 

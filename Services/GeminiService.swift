@@ -233,3 +233,83 @@ enum GeminiError: Error {
     case invalidResponse
     case noContent
 }
+
+// Ce que la personne porte en ce moment (choisi à l'onboarding, modifiable dans Réglages).
+// Sert à écrire des prières qui parlent vraiment de sa vie, pas des prières génériques.
+enum PrayerIntention: String, CaseIterable, Identifiable {
+    case anxiety, family, work, health, loneliness, forgiveness, gratitude, faith, future
+
+    var id: String { rawValue }
+
+    static let storageKey = "prayerIntentions"
+
+    var label: String {
+        switch self {
+        case .anxiety:     return t("Anxiety", "L'anxiété")
+        case .family:      return t("My family", "Ma famille")
+        case .work:        return t("Work or studies", "Travail ou études")
+        case .health:      return t("Health", "La santé")
+        case .loneliness:  return t("Loneliness", "La solitude")
+        case .forgiveness: return t("Forgiveness", "Le pardon")
+        case .gratitude:   return t("Gratitude", "La gratitude")
+        case .faith:       return t("A distant faith", "Une foi qui s'éloigne")
+        case .future:      return t("My future", "Mon avenir")
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .anxiety:     return "wind"
+        case .family:      return "house.fill"
+        case .work:        return "briefcase.fill"
+        case .health:      return "heart.fill"
+        case .loneliness:  return "person.fill"
+        case .forgiveness: return "hand.raised.fill"
+        case .gratitude:   return "sun.max.fill"
+        case .faith:       return "flame.fill"
+        case .future:      return "signpost.right.fill"
+        }
+    }
+
+    // Description envoyée à l'IA (toujours en anglais, la langue de sortie est imposée ailleurs)
+    var promptText: String {
+        switch self {
+        case .anxiety:     return "anxiety and a need for peace"
+        case .family:      return "their family and loved ones"
+        case .work:        return "the pressure of work or studies"
+        case .health:      return "health and healing"
+        case .loneliness:  return "loneliness"
+        case .forgiveness: return "forgiveness and letting go of hurt"
+        case .gratitude:   return "gratitude for what they have"
+        case .faith:       return "a faith that feels distant, and the wish to come back to God"
+        case .future:      return "uncertainty about their future and life choices"
+        }
+    }
+
+    static var saved: [PrayerIntention] {
+        (UserDefaults.standard.stringArray(forKey: storageKey) ?? []).compactMap(PrayerIntention.init(rawValue:))
+    }
+
+    static func save(_ intentions: [PrayerIntention]) {
+        UserDefaults.standard.set(intentions.map(\.rawValue), forKey: storageKey)
+    }
+}
+
+// Thème de la prière du jour : le moment de la journée + ce que la personne porte
+enum DailyPrayerTheme {
+    static var current: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        let base: String
+        if hour < 12 {
+            base = ["gratitude for a new day", "seeking God's guidance at the start of the day", "morning surrender and trust in God"].randomElement()!
+        } else if hour < 18 {
+            base = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"].randomElement()!
+        } else {
+            base = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness and releasing the day to God"].randomElement()!
+        }
+        // 2 intentions au plus par prière, tirées au hasard, pour varier d'un jour à l'autre
+        let picked = PrayerIntention.saved.shuffled().prefix(2).map(\.promptText)
+        guard !picked.isEmpty else { return base }
+        return "\(base). The person praying is currently carrying: \(picked.joined(separator: " and ")). Speak to this gently and concretely, as if you knew them"
+    }
+}

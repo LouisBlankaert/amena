@@ -38,16 +38,23 @@ final class RevenueCatService: @unchecked Sendable {
 
     // À appeler une seule fois, au lancement de l'app (avant tout achat/restore).
     func configure() {
+        #if DEBUG
+        // Raccourci de test : -debugNoStore lance l'app sans l'App Store (captures d'écran
+        // sur un simulateur sans compte Apple, qui sinon affiche "Connectez-vous")
+        if ProcessInfo.processInfo.arguments.contains("-debugNoStore") { return }
+        #endif
         Purchases.configure(withAPIKey: Secrets.revenueCatAPIKey)
     }
 
     // Vérifie l'abonnement actif au lancement (équivalent de checkCurrentSubscription)
     func checkCurrentSubscription() async {
+        guard Purchases.isConfigured else { return }
         guard let info = try? await Purchases.shared.customerInfo() else { return }
         applyEntitlement(from: info)
     }
 
     func purchase(plan: SubscriptionPlan) async throws {
+        guard Purchases.isConfigured else { throw PurchaseError.productNotFound }
         let offerings = try await Purchases.shared.offerings()
         guard let package = offerings.current?.availablePackages.first(where: {
             $0.storeProduct.productIdentifier == plan.productId
@@ -71,6 +78,7 @@ final class RevenueCatService: @unchecked Sendable {
     // et droit à l'essai gratuit (une personne qui l'a déjà utilisé n'y a plus droit —
     // lui afficher "3 jours gratuits" serait trompeur, Apple refuse ça).
     func loadPrices() async -> PlanPrices {
+        guard Purchases.isConfigured else { return .fallback }
         guard let offering = try? await Purchases.shared.offerings().current else {
             return .fallback
         }
@@ -99,6 +107,7 @@ final class RevenueCatService: @unchecked Sendable {
 
     // Obligatoire App Store : bouton "Restore Purchases"
     func restorePurchases() async throws {
+        guard Purchases.isConfigured else { throw PurchaseError.productNotFound }
         let info = try await Purchases.shared.restorePurchases()
         applyEntitlement(from: info)
     }

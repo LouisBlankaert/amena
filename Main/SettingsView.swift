@@ -120,9 +120,10 @@ struct SettingsView: View {
                         }
 
                         Button {
+                            let time = makeSettingsTime(hour: 8, minute: 0)
                             prayerTimes.append(PrayerTimeItem(
-                                name: "Prayer \(prayerTimes.count + 1)",
-                                time: makeSettingsTime(hour: 8, minute: 0),
+                                name: PrayerTimeItem.name(for: time),
+                                time: time,
                                 isEnabled: true
                             ))
                             savePrayerTimes()
@@ -272,16 +273,12 @@ struct SettingsView: View {
     private func loadPrayerTimes() {
         guard let data = UserDefaults.standard.data(forKey: "prayerTimes"),
               let times = try? JSONDecoder().decode([Date].self, from: data) else {
-            prayerTimes = [
-                PrayerTimeItem(name: "Morning Prayer",   time: makeSettingsTime(hour: 7,  minute: 0), isEnabled: true),
-                PrayerTimeItem(name: "Afternoon Prayer", time: makeSettingsTime(hour: 12, minute: 0), isEnabled: true),
-                PrayerTimeItem(name: "Evening Prayer",   time: makeSettingsTime(hour: 21, minute: 0), isEnabled: true)
-            ]
+            let time = makeSettingsTime(hour: 20, minute: 0)
+            prayerTimes = [PrayerTimeItem(name: PrayerTimeItem.name(for: time), time: time, isEnabled: true)]
             return
         }
-        let names = ["Morning Prayer", "Afternoon Prayer", "Evening Prayer"]
-        prayerTimes = times.enumerated().map { i, date in
-            PrayerTimeItem(name: names[safe: i] ?? "Prayer \(i + 1)", time: date, isEnabled: true)
+        prayerTimes = times.map { date in
+            PrayerTimeItem(name: PrayerTimeItem.name(for: date), time: date, isEnabled: true)
         }
     }
 
@@ -328,5 +325,21 @@ private func makeSettingsTime(hour: Int, minute: Int) -> Date {
 private extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+// Modèle d'une heure de rappel de prière (nom déduit de l'heure, traduit)
+struct PrayerTimeItem: Identifiable {
+    let id = UUID()
+    var name: String
+    var time: Date
+    var isEnabled: Bool
+
+    static func name(for time: Date) -> String {
+        switch Calendar.current.component(.hour, from: time) {
+        case 4..<12:  return t("Morning prayer", "Prière du matin")
+        case 12..<18: return t("Afternoon prayer", "Prière de l'après-midi")
+        default:      return t("Evening prayer", "Prière du soir")
+        }
     }
 }

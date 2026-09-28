@@ -43,159 +43,171 @@ struct PaywallView: View {
 
     private var mainPaywall: some View {
         ZStack {
-            Color.amenaBackground.ignoresSafeArea()
-                .onAppear {
-                    // Si l'utilisateur est déjà abonné (ex: reset onboarding après un achat réel),
-                    // on ne lui redemande pas de payer — StoreKit sait déjà qu'il est premium.
-                    guard !RevenueCatService.shared.isPremium else {
-                        onNext()
-                        return
-                    }
-                    // Paywall affiché → event "paywall_shown"
-                    AnalyticsService.shared.log(.paywallShown)
+            // Ciel en haut (rebond du scroll), blanc en bas : continuité avec le panneau
+            VStack(spacing: 0) {
+                SkyMoment.current.colors.first!.frame(height: 300)
+                Color.amenaBackground
+            }
+            .ignoresSafeArea()
+            .onAppear {
+                // Si l'utilisateur est déjà abonné (ex: reset onboarding après un achat réel),
+                // on ne lui redemande pas de payer — StoreKit sait déjà qu'il est premium.
+                guard !RevenueCatService.shared.isPremium else {
+                    onNext()
+                    return
                 }
+                // Paywall affiché → event "paywall_shown"
+                AnalyticsService.shared.log(.paywallShown)
+            }
 
             ScrollView {
-                VStack(spacing: 24) {
-                    // En-tête : laurier (étoiles retirées — pas encore assez d'avis réels pour les afficher)
-                    HStack(spacing: 6) {
-                        Image(systemName: "laurel.leading")
-                            .foregroundColor(Color.amenaPrimary)
-                        Text(t("your daily prayer companion", "votre compagnon de prière quotidien"))
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color.amenaText)
-                        Image(systemName: "laurel.trailing")
-                            .foregroundColor(Color.amenaPrimary)
-                    }
-                    .padding(.top, 60)
+                VStack(spacing: 0) {
+                    // En-tête sous le ciel : ce qu'on obtient, avant de parler prix
+                    VStack(alignment: .leading, spacing: 18) {
+                        Text(showsTrial ? t("Try amena free for 3 days", "Essayez amena gratuitement 3 jours") : t("Start praying today", "Commencez à prier aujourd'hui"))
+                            .font(.system(size: 32, weight: .regular, design: .serif))
+                            .foregroundColor(.white)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .animation(.easeInOut(duration: 0.2), value: selectedPlan)
 
-                    // Titre : adapté selon le plan
-                    Text(showsTrial ? t("try amena free for 3 days", "essayez amena gratuitement 3 jours") : t("start praying today", "commencez à prier aujourd'hui"))
-                        .font(.system(size: 26, weight: .bold))
-                        .foregroundColor(Color.amenaText)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, 24)
-                        .animation(.easeInOut(duration: 0.2), value: selectedPlan)
-
-                    // Timeline : uniquement pour yearly (free trial)
-                    if showsTrial {
-                        TrialTimeline(trialEndDate: trialEndDate)
-                            .padding(.horizontal, 24)
-                            .transition(.opacity.combined(with: .move(edge: .top)))
+                        VStack(alignment: .leading, spacing: 12) {
+                            PaywallBenefit(icon: "hands.sparkles.fill", text: t("A new prayer every day, written about what you're living", "Chaque jour, une nouvelle prière écrite sur ce que vous vivez"))
+                            PaywallBenefit(icon: "book.closed.fill", text: t("The verse of the day at 10 a.m., straight from the Bible", "Le verset du jour à 10 h, tiré de la Bible"))
+                            PaywallBenefit(icon: "flame.fill", text: t("Your prayer journal and your streak, day after day", "Votre journal de prière et votre série, jour après jour"))
+                        }
                     }
-
-                    // Options d'abonnement
-                    VStack(spacing: 12) {
-                        // Weekly (ancrage psychologique)
-                        PlanOptionCard(
-                            plan: .weekly,
-                            prices: prices,
-                            isSelected: selectedPlan == .weekly,
-                            onSelect: { selectedPlan = .weekly }
-                        )
-                        // Yearly (mis en avant)
-                        PlanOptionCard(
-                            plan: .yearly,
-                            prices: prices,
-                            isSelected: selectedPlan == .yearly,
-                            onSelect: { selectedPlan = .yearly }
-                        )
-                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 24)
-                    // Masque les prix de secours tant que l'App Store n'a pas répondu
-                    .redacted(reason: pricesLoaded ? [] : .placeholder)
+                    .padding(.top, 48)
+                    .padding(.bottom, 64)
+                    .background(SkyBackground(moment: SkyMoment.current).ignoresSafeArea(edges: .top))
 
-                    // "No Payment Due Now" uniquement pour yearly
-                    if showsTrial {
-                        HStack(spacing: 6) {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(Color.amenaPrimary)
-                            Text(t("No Payment Due Now", "Aucun paiement maintenant"))
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(Color.amenaText)
-                        }
-                        .transition(.opacity)
-                    }
-
-                    // Bouton principal orange
-                    Button {
-                        startTrial()
-                    } label: {
-                        if isPurchasing {
-                            ProgressView()
-                                .tint(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.amenaPrimary)
-                                .cornerRadius(16)
+                    VStack(spacing: 24) {
+                        // Timeline : uniquement pour yearly (free trial)
+                        if showsTrial {
+                            TrialTimeline(trialEndDate: trialEndDate)
                                 .padding(.horizontal, 24)
-                        } else {
-                            Text(showsTrial ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
-                                .amenaPrimaryButton()
+                                .transition(.opacity.combined(with: .move(edge: .top)))
                         }
-                    }
 
-                    // Texte légal adapté au plan
-                    Text(legalText)
-                        .font(.system(size: 12))
-                        .foregroundColor(Color.amenaTextSecondary)
-                        .multilineTextAlignment(.center)
+                        // Options d'abonnement
+                        VStack(spacing: 12) {
+                            // Weekly (ancrage psychologique)
+                            PlanOptionCard(
+                                plan: .weekly,
+                                prices: prices,
+                                isSelected: selectedPlan == .weekly,
+                                onSelect: { selectedPlan = .weekly }
+                            )
+                            // Yearly (mis en avant)
+                            PlanOptionCard(
+                                plan: .yearly,
+                                prices: prices,
+                                isSelected: selectedPlan == .yearly,
+                                onSelect: { selectedPlan = .yearly }
+                            )
+                        }
+                        .padding(.horizontal, 24)
+                        // Masque les prix de secours tant que l'App Store n'a pas répondu
                         .redacted(reason: pricesLoaded ? [] : .placeholder)
 
-                    // Code de parrainage (optionnel) — discret, replié par défaut
-                    VStack(spacing: 8) {
-                        if showReferralField {
-                            TextField(t("referral code", "code de parrainage"), text: $referralCode)
-                                .textInputAutocapitalization(.characters)
-                                .autocorrectionDisabled()
-                                .multilineTextAlignment(.center)
-                                .padding(12)
-                                .background(Color.amenaSecondaryBackground)
-                                .cornerRadius(10)
-                                .padding(.horizontal, 24)
-                        } else {
-                            Button(t("have a referral code?", "un code de parrainage ?")) {
-                                withAnimation { showReferralField = true }
+                        // "No Payment Due Now" uniquement pour yearly
+                        if showsTrial {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 13, weight: .bold))
+                                    .foregroundColor(Color.amenaPrimary)
+                                Text(t("No Payment Due Now", "Aucun paiement maintenant"))
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(Color.amenaText)
+                            }
+                            .transition(.opacity)
+                        }
+
+                        // Bouton principal orange
+                        Button {
+                            startTrial()
+                        } label: {
+                            if isPurchasing {
+                                ProgressView()
+                                    .tint(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 56)
+                                    .background(Color.amenaPrimary)
+                                    .cornerRadius(16)
+                                    .padding(.horizontal, 24)
+                            } else {
+                                Text(showsTrial ? t("start my free trial", "commencer mon essai gratuit") : t("subscribe now", "s'abonner maintenant"))
+                                    .amenaPrimaryButton()
+                            }
+                        }
+
+                        // Texte légal adapté au plan
+                        Text(legalText)
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.amenaTextSecondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                            .redacted(reason: pricesLoaded ? [] : .placeholder)
+
+                        // Code de parrainage (optionnel) — discret, replié par défaut
+                        VStack(spacing: 8) {
+                            if showReferralField {
+                                TextField(t("referral code", "code de parrainage"), text: $referralCode)
+                                    .textInputAutocapitalization(.characters)
+                                    .autocorrectionDisabled()
+                                    .multilineTextAlignment(.center)
+                                    .padding(12)
+                                    .background(Color.amenaSecondaryBackground)
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 24)
+                            } else {
+                                Button(t("have a referral code?", "un code de parrainage ?")) {
+                                    withAnimation { showReferralField = true }
+                                }
+                                .font(.system(size: 12))
+                                .foregroundColor(Color.amenaTextSecondary)
+                            }
+                        }
+
+                        // Liens Privacy + Terms
+                        HStack(spacing: 16) {
+                            Link(t("Privacy", "Confidentialité"), destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color.amenaTextSecondary)
+                            Text("•")
+                                .foregroundColor(Color.amenaTextSecondary)
+                            Link(t("Terms", "Conditions"), destination: URL(string: "https://louisblankaert.github.io/amena/terms.html")!)
+                                .font(.system(size: 12))
+                                .foregroundColor(Color.amenaTextSecondary)
+                            Text("•")
+                                .foregroundColor(Color.amenaTextSecondary)
+                            Button(isRestoring ? t("Restoring...", "Restauration...") : t("Restore", "Restaurer")) {
+                                restorePurchases()
                             }
                             .font(.system(size: 12))
                             .foregroundColor(Color.amenaTextSecondary)
+                            .disabled(isRestoring)
                         }
-                    }
-
-                    // Liens Privacy + Terms
-                    HStack(spacing: 16) {
-                        Link(t("Privacy", "Confidentialité"), destination: URL(string: "https://louisblankaert.github.io/amena/privacy.html")!)
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.amenaTextSecondary)
-                        Text("•")
-                            .foregroundColor(Color.amenaTextSecondary)
-                        Link(t("Terms", "Conditions"), destination: URL(string: "https://louisblankaert.github.io/amena/terms.html")!)
-                            .font(.system(size: 12))
-                            .foregroundColor(Color.amenaTextSecondary)
-                        Text("•")
-                            .foregroundColor(Color.amenaTextSecondary)
-                        Button(isRestoring ? t("Restoring...", "Restauration...") : t("Restore", "Restaurer")) {
-                            restorePurchases()
+                        if !restoreMessage.isEmpty {
+                            Text(restoreMessage)
+                                .font(.system(size: 12))
+                                .foregroundColor(RevenueCatService.shared.isPremium ? .green : Color.amenaTextSecondary)
+                                .multilineTextAlignment(.center)
                         }
-                        .font(.system(size: 12))
-                        .foregroundColor(Color.amenaTextSecondary)
-                        .disabled(isRestoring)
+                        if !purchaseErrorMessage.isEmpty {
+                            Text(purchaseErrorMessage)
+                                .font(.system(size: 12))
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 24)
+                        }
+                        Spacer().frame(height: 40)
                     }
-                    if !restoreMessage.isEmpty {
-                        Text(restoreMessage)
-                            .font(.system(size: 12))
-                            .foregroundColor(RevenueCatService.shared.isPremium ? .green : Color.amenaTextSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-                    if !purchaseErrorMessage.isEmpty {
-                        Text(purchaseErrorMessage)
-                            .font(.system(size: 12))
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 24)
-                    }
-                    Spacer().frame(height: 40)
+                    .padding(.top, 28)
+                    .background(Color.amenaBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
+                    .padding(.top, -32)
                 }
             }
         }
@@ -291,6 +303,24 @@ struct PaywallView: View {
                 }
             }
         }
+    }
+}
+
+// Une ligne d'avantage sous le ciel du paywall
+private struct PaywallBenefit: View {
+    let icon: String
+    let text: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 15))
+                .frame(width: 20)
+            Text(text)
+                .font(.system(size: 16))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundColor(.white)
     }
 }
 

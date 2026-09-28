@@ -7,6 +7,8 @@ import FirebaseAnalytics
 
 struct PrayerView: View {
     var prefetchedPrayer: String = ""
+    // Faux pendant l'onboarding : la première prière ne se ferme pas, on la termine par « Amen »
+    var showsCloseButton: Bool = true
     let onPrayerCompleted: () -> Void
     @AppStorage("prayerLanguage") private var prayerLanguage = "English"
 
@@ -39,17 +41,19 @@ struct PrayerView: View {
                         .font(.system(size: 30, weight: .regular, design: .serif))
                         .foregroundColor(.white)
                     Spacer()
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(width: 40, height: 40)
-                            .background(Color.white.opacity(0.15))
-                            .clipShape(Circle())
+                    if showsCloseButton {
+                        Button {
+                            dismiss()
+                        } label: {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(.white)
+                                .frame(width: 40, height: 40)
+                                .background(Color.white.opacity(0.15))
+                                .clipShape(Circle())
+                        }
+                        .accessibilityLabel(t("Close", "Fermer"))
                     }
-                    .accessibilityLabel(t("Close", "Fermer"))
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 12)
@@ -137,19 +141,6 @@ struct PrayerView: View {
         }
     }
 
-    private var prayerTheme: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        let themes: [String]
-        if hour < 12 {
-            themes = ["gratitude for a new day", "seeking God's guidance at the start of the day", "morning surrender and trust in God"]
-        } else if hour < 18 {
-            themes = ["strength and focus in the middle of the day", "peace amid daily pressures", "renewing faith in the afternoon"]
-        } else {
-            themes = ["reflection and gratitude at the end of the day", "rest and trust in God's hands tonight", "evening thankfulness and releasing the day to God"]
-        }
-        return themes.randomElement()!
-    }
-
     private func loadPrayer() {
         // Si une prière pré-générée est disponible, on l'utilise immédiatement
         if !prefetchedPrayer.isEmpty {
@@ -160,7 +151,7 @@ struct PrayerView: View {
         }
         Task {
             do {
-                let generated = try await GeminiService.shared.generatePrayer(theme: prayerTheme, language: prayerLanguage)
+                let generated = try await GeminiService.shared.generatePrayer(theme: DailyPrayerTheme.current, language: prayerLanguage)
                 await MainActor.run {
                     prayer = generated
                     isLoading = false
